@@ -13,9 +13,9 @@ container code, or covered where the port names it); **replaced** (SDL or the pl
 | Class | Functions |
 |---|---|
 | folded | 3043 |
-| replaced (SDL or the platform layer) | 225 |
+| replaced (SDL or the platform layer) | 228 |
 | software renderer | 113 |
-| unused: PORT (preserve) | 62 |
+| unused: PORT (preserve) | 59 |
 | dev dialog (MFC), its window plumbing: replaced | 50 |
 | unlabelled | 2 |
 | dev dialog (MFC), its logic: PORT (preserve) | 2 |
@@ -60,7 +60,6 @@ Fixed 2026-11-13 (mac5/broken-five), the five rows this table had: the radar's v
 - 1 functions, 52 decomp lines (0x00548840): the puffers' wind step with a dt argument: dead code, never called (puffers.md)
 - 2 functions, 33 decomp lines (0x00557450, 0x00557490): the defines list's constructor and destructor, no caller reaches them (zreader.md:103)
 - 1 functions, 211 decomp lines (0x005706f0): sounds.zrd's SYNTAX 1 reader: no shipped or community data uses syntax 1 (symbols.csv, sound.md:41)
-- 3 functions, 285 decomp lines (0x00571380, 0x00571f70, 0x005746b0): the Aureal A3D path: its init (CoCreateInstance), 3D placement and error names; only 0x570625 writes the selector [0x72c2cc], and only to 0 (DirectSound) when A3D fails, so A3D never runs (sound.md:38)
 - 2 functions, 86 decomp lines (0x00596a70, 0x00596c80): list teardown helpers whose callers (0x00596930, 0x00596c60) nothing reaches
 - 1 functions, 9 decomp lines (0x005a92d0): _rmtmp at zSave's stop, unreached
 
@@ -2917,7 +2916,7 @@ Fixed 2026-11-13 (mac5/broken-five), the five rows this table had: the radar's v
 | 0x00570068 | 43 | folded | follows 0x0056ffc0: covered where named: the sound set's build (zsnd_init.cpp:260, 265), the archive load (zsnd_parm.cpp:63), 3D placement (zsnd_3d.cpp:138), the group chain step (zsnd_grp.cpp:170) |
 | 0x005700a0 | 26 | folded | covered by the port where it names it (src/gamez/zsound/zsnd_parm.cpp:150) |
 | 0x005706f0 | 211 | unused: PORT (preserve) | sounds.zrd's SYNTAX 1 reader: no shipped or community data uses syntax 1 (symbols.csv, sound.md:41) |
-| 0x00571380 | 39 | unused: PORT (preserve) | the Aureal A3D path: its init (CoCreateInstance), 3D placement and error names; only 0x570625 writes the selector [0x72c2cc], and only to 0 (DirectSound) when A3D fails, so A3D never runs (sound.md:38) |
+| 0x00571380 | 39 | replaced (SDL or the platform layer) | the Aureal A3D path (a 1998 sound card's COM API: its init through CoCreateInstance, 3D placement and error names), replaced like DirectSound by the port's SDL audio; never run in the release either: only 0x570625 writes the selector [0x72c2cc], and only to 0 (DirectSound) when A3D fails (sound.md:38) |
 | 0x005715c0 | 9 | folded | a thunk: one call to another function |
 | 0x005716d0 | 22 | folded | zSound's static containers and their cleanup (vector and list heads made at start-up, the sets' pointer list freed); the port's members construct and free themselves |
 | 0x00571730 | 9 | folded | a thunk: one call to another function |
@@ -2925,7 +2924,7 @@ Fixed 2026-11-13 (mac5/broken-five), the five rows this table had: the radar's v
 | 0x00571830 | 35 | folded | covered by the port where it names it (src/gamez/zsound/zsnd_3d.cpp:27) |
 | 0x005718f0 | 32 | folded | covered by the port where it names it (src/gamez/zsound/zsnd_3d.cpp:95) |
 | 0x00571940 | 77 | folded | ported, by docs/symbols.csv: ported: 2500/s, ends only on an exact landing |
-| 0x00571f70 | 48 | unused: PORT (preserve) | the Aureal A3D path: its init (CoCreateInstance), 3D placement and error names; only 0x570625 writes the selector [0x72c2cc], and only to 0 (DirectSound) when A3D fails, so A3D never runs (sound.md:38) |
+| 0x00571f70 | 48 | replaced (SDL or the platform layer) | the Aureal A3D path (a 1998 sound card's COM API: its init through CoCreateInstance, 3D placement and error names), replaced like DirectSound by the port's SDL audio; never run in the release either: only 0x570625 writes the selector [0x72c2cc], and only to 0 (DirectSound) when A3D fails (sound.md:38) |
 | 0x00572050 | 113 | folded | covered where named: the sound set's build (zsnd_init.cpp:260, 265), the archive load (zsnd_parm.cpp:63), 3D placement (zsnd_3d.cpp:138), the group chain step (zsnd_grp.cpp:170) |
 | 0x005723a0 | 17 | folded | zSound's static containers and their cleanup (vector and list heads made at start-up, the sets' pointer list freed); the port's members construct and free themselves |
 | 0x005723d0 | 9 | folded | a thunk: one call to another function |
@@ -2955,7 +2954,7 @@ Fixed 2026-11-13 (mac5/broken-five), the five rows this table had: the radar's v
 | 0x00574590 | 27 | folded | covered by the port where it names it (src/gamez/zsound/zsnd_grp.cpp:247) |
 | 0x005745f0 | 11 | folded | a thunk: one call to another function |
 | 0x00574660 | 13 | folded | covered by the port where it names it (src/gamez/zsound/zsnd_cd.cpp:32) |
-| 0x005746b0 | 198 | unused: PORT (preserve) | the Aureal A3D path: its init (CoCreateInstance), 3D placement and error names; only 0x570625 writes the selector [0x72c2cc], and only to 0 (DirectSound) when A3D fails, so A3D never runs (sound.md:38) |
+| 0x005746b0 | 198 | replaced (SDL or the platform layer) | the Aureal A3D path (a 1998 sound card's COM API: its init through CoCreateInstance, 3D placement and error names), replaced like DirectSound by the port's SDL audio; never run in the release either: only 0x570625 writes the selector [0x72c2cc], and only to 0 (DirectSound) when A3D fails (sound.md:38) |
 | 0x00574c90 | 17 | folded | zSound's static containers and their cleanup (vector and list heads made at start-up, the sets' pointer list freed); the port's members construct and free themselves |
 | 0x00574cc0 | 9 | folded | a thunk: one call to another function |
 | 0x00574d40 | 24 | folded | covered by the port where it names it (src/gamez/zsound/zsnd.h:336) |
@@ -3258,63 +3257,6 @@ Fixed 2026-11-13 (mac5/broken-five), the five rows this table had: the radar's v
 | 0x00598b30 | 66 | replaced (SDL or the platform layer) | the machine probe (fixes.md:289, (A)): CPUID and its vendor, family and MMX tests, the MHz timing loops (QueryPerformanceCounter, RDTSC, the CMOS port, Intel's cpuspeed with its divide by zero: protection.md:140), GlobalMemoryStatus and the DirectDraw caps; the port fills zutl_reg's Machine itself (zutl_reg.cpp:48) |
 | 0x00598c80 | 13 | replaced (SDL or the platform layer) | the machine probe (fixes.md:289, (A)): CPUID and its vendor, family and MMX tests, the MHz timing loops (QueryPerformanceCounter, RDTSC, the CMOS port, Intel's cpuspeed with its divide by zero: protection.md:140), GlobalMemoryStatus and the DirectDraw caps; the port fills zutl_reg's Machine itself (zutl_reg.cpp:48) |
 
-### zimage (52 not ported)
-
-| Address | Lines | Class | Why |
-|---|---|---|---|
-| 0x00517280 | 17 | folded | covered by the port where it names it (src/frontend/sdl/sdl_twod_host.h:36) |
-| 0x005172c0 | 14 | replaced (SDL or the platform layer) | zimg_winfonts: the GDI fonts by name from fonts.zrd's WINDOWS_FONTS (list, find, addref, release, teardown); the SDL text host draws its own fonts (sdl_twod_host.h:36) |
-| 0x005172e0 | 14 | replaced (SDL or the platform layer) | zimg_winfonts: the GDI fonts by name from fonts.zrd's WINDOWS_FONTS (list, find, addref, release, teardown); the SDL text host draws its own fonts (sdl_twod_host.h:36) |
-| 0x00517300 | 13 | replaced (SDL or the platform layer) | zimg_winfonts: the GDI fonts by name from fonts.zrd's WINDOWS_FONTS (list, find, addref, release, teardown); the SDL text host draws its own fonts (sdl_twod_host.h:36) |
-| 0x00517310 | 27 | replaced (SDL or the platform layer) | zimg_winfonts: the GDI fonts by name from fonts.zrd's WINDOWS_FONTS (list, find, addref, release, teardown); the SDL text host draws its own fonts (sdl_twod_host.h:36) |
-| 0x00517370 | 48 | replaced (SDL or the platform layer) | zimg_winfonts: the GDI fonts by name from fonts.zrd's WINDOWS_FONTS (list, find, addref, release, teardown); the SDL text host draws its own fonts (sdl_twod_host.h:36) |
-| 0x00517410 | 47 | replaced (SDL or the platform layer) | zimg_winfonts: the GDI fonts by name from fonts.zrd's WINDOWS_FONTS (list, find, addref, release, teardown); the SDL text host draws its own fonts (sdl_twod_host.h:36) |
-| 0x005174b0 | 61 | replaced (SDL or the platform layer) | zimg_winfonts: the GDI fonts by name from fonts.zrd's WINDOWS_FONTS (list, find, addref, release, teardown); the SDL text host draws its own fonts (sdl_twod_host.h:36) |
-| 0x005175e0 | 29 | replaced (SDL or the platform layer) | zimg_winfonts: the GDI fonts by name from fonts.zrd's WINDOWS_FONTS (list, find, addref, release, teardown); the SDL text host draws its own fonts (sdl_twod_host.h:36) |
-| 0x00517650 | 16 | replaced (SDL or the platform layer) | zimg_winfonts: the GDI fonts by name from fonts.zrd's WINDOWS_FONTS (list, find, addref, release, teardown); the SDL text host draws its own fonts (sdl_twod_host.h:36) |
-| 0x00517680 | 22 | replaced (SDL or the platform layer) | zimg_winfonts: the GDI fonts by name from fonts.zrd's WINDOWS_FONTS (list, find, addref, release, teardown); the SDL text host draws its own fonts (sdl_twod_host.h:36) |
-| 0x005176b0 | 31 | folded | covered by the port where it names it (src/gamez/zimage/zimg_texture.cpp:306) |
-| 0x00517730 | 16 | folded | covered by the port where it names it (src/gamez/zimage/zimg_texture.cpp:291) |
-| 0x00517760 | 16 | folded | covered by the port where it names it (src/frontend/sdl/sdl_twod_host.cpp:173) |
-| 0x00517790 | 13 | folded | covered by the port where it names it (src/gamez/zimage/zimg_texture.cpp:320) |
-| 0x005177a0 | 47 | folded | the texture cache by name and its teardown: g_cache (zimg_texture.cpp:296-321), a std::list freed with the program |
-| 0x00517840 | 20 | folded | covered by the port where it names it (src/gamez/zimage/zimg_texture.cpp:318) |
-| 0x005178a0 | 61 | folded | the texture cache by name and its teardown: g_cache (zimg_texture.cpp:296-321), a std::list freed with the program |
-| 0x00517be0 | 16 | folded | the texture cache by name and its teardown: g_cache (zimg_texture.cpp:296-321), a std::list freed with the program |
-| 0x00517c10 | 9 | folded | covered by the port where it names it (src/frontend/sdl/sdl_twod_host.cpp:67) |
-| 0x00517c30 | 12 | folded | covered by the port where it names it (src/gamez/zimage/zimg_library.cpp:295) |
-| 0x00517c40 | 15 | folded | covered by the port where it names it (src/gamez/zimage/zimg_library.cpp:348) |
-| 0x00517c60 | 12 | folded | covered by the port where it names it (src/gamez/zimage/zimg_library.cpp:294) |
-| 0x00517c70 | 16 | folded | covered by the port where it names it (src/gamez/zmodel/gmod_cull.cpp:350) |
-| 0x00517c90 | 15 | folded | covered by the port where it names it (src/frontend/sdl/sdl_twod_host.cpp:67) |
-| 0x00517f70 | 14 | folded | covered by the port where it names it (src/gamez/zimage/zimg_library.cpp:34) |
-| 0x00517fe0 | 9 | folded | a thunk: one call to another function |
-| 0x00517ff0 | 9 | folded | a thunk: one call to another function |
-| 0x00518020 | 9 | folded | a thunk: one call to another function |
-| 0x00518030 | 9 | folded | a thunk: one call to another function |
-| 0x005184e0 | 47 | replaced (SDL or the platform layer) | the texture table's start-up: zeroes the table and makes the Direct3D default texture record; the port's GPU textures make their own (zimg_texture.cpp:109, fixes.md puffer row) |
-| 0x005185f0 | 13 | folded | covered by the port where it names it (src/frontend/sdl/sdl_twod_host.cpp:174) |
-| 0x00518760 | 14 | folded | covered by the port where it names it (src/gamez/zimage/zimg_library.cpp:386) |
-| 0x00518790 | 11 | folded | one-line setters/lookups the port does inline: zImage's library flag (no effect, app_engine.cpp:307), the texture group (mech_lib.cpp:34, app_mission.cpp:1910), the archive file test (zimg_library.cpp:20), the extension cut (zimg_texture.cpp:94) |
-| 0x005187a0 | 11 | folded | one-line setters/lookups the port does inline: zImage's library flag (no effect, app_engine.cpp:307), the texture group (mech_lib.cpp:34, app_mission.cpp:1910), the archive file test (zimg_library.cpp:20), the extension cut (zimg_texture.cpp:94) |
-| 0x00518c50 | 9 | folded | a thunk: one call to another function |
-| 0x00518f50 | 11 | folded | one-line setters/lookups the port does inline: zImage's library flag (no effect, app_engine.cpp:307), the texture group (mech_lib.cpp:34, app_mission.cpp:1910), the archive file test (zimg_library.cpp:20), the extension cut (zimg_texture.cpp:94) |
-| 0x00518f60 | 8 | folded | returns a constant or a global |
-| 0x005190e0 | 15 | unused: PORT (preserve) | frees a chain of loaded textures; its only caller 0x005374d0 is unreached |
-| 0x00519120 | 25 | software renderer | the software renderer's texture tables: the nth mip of a chain for 0x00563940 (module-starts.md:158) and the 32 light and fog levels of every paletted texture (software-path.md:30) |
-| 0x00519150 | 121 | folded | one-line setters/lookups the port does inline: zImage's library flag (no effect, app_engine.cpp:307), the texture group (mech_lib.cpp:34, app_mission.cpp:1910), the archive file test (zimg_library.cpp:20), the extension cut (zimg_texture.cpp:94) |
-| 0x00519370 | 51 | software renderer | the software renderer's texture tables: the nth mip of a chain for 0x00563940 (module-starts.md:158) and the 32 light and fog levels of every paletted texture (software-path.md:30) |
-| 0x00519510 | 38 | software renderer | the software renderer's texture tables: the nth mip of a chain for 0x00563940 (module-starts.md:158) and the 32 light and fog levels of every paletted texture (software-path.md:30) |
-| 0x005195b0 | 75 | software renderer | the software renderer's texture tables: the nth mip of a chain for 0x00563940 (module-starts.md:158) and the 32 light and fog levels of every paletted texture (software-path.md:30) |
-| 0x005197d0 | 11 | software renderer | follows 0x00519510: the software renderer's texture tables: the nth mip of a chain for 0x00563940 (module-starts.md:158) and the 32 light and fog levels of every paletted texture (software-path.md:30) |
-| 0x00519820 | 65 | replaced (SDL or the platform layer) | the square-only device resize (D3D caps 0x20; render-drawtable.md:124): no modern device needs it |
-| 0x00519df0 | 20 | unused: PORT (preserve) | zFont, the bitmap fonts from fonts.zrd: loaded at start-up (0x00519e50), split into glyphs, measured by id (0x0051a0d0), freed (0x00519f70), but nothing in 1.2 draws them (app_engine.cpp:318, twod.md section 4) |
-| 0x00519e50 | 51 | unused: PORT (preserve) | zFont, the bitmap fonts from fonts.zrd: loaded at start-up (0x00519e50), split into glyphs, measured by id (0x0051a0d0), freed (0x00519f70), but nothing in 1.2 draws them (app_engine.cpp:318, twod.md section 4) |
-| 0x00519f70 | 20 | unused: PORT (preserve) | zFont, the bitmap fonts from fonts.zrd: loaded at start-up (0x00519e50), split into glyphs, measured by id (0x0051a0d0), freed (0x00519f70), but nothing in 1.2 draws them (app_engine.cpp:318, twod.md section 4) |
-| 0x00519fa0 | 52 | unused: PORT (preserve) | zFont, the bitmap fonts from fonts.zrd: loaded at start-up (0x00519e50), split into glyphs, measured by id (0x0051a0d0), freed (0x00519f70), but nothing in 1.2 draws them (app_engine.cpp:318, twod.md section 4) |
-| 0x0051a080 | 30 | unused: PORT (preserve) | zFont, the bitmap fonts from fonts.zrd: loaded at start-up (0x00519e50), split into glyphs, measured by id (0x0051a0d0), freed (0x00519f70), but nothing in 1.2 draws them (app_engine.cpp:318, twod.md section 4) |
-| 0x0051a0d0 | 51 | unused: PORT (preserve) | zFont, the bitmap fonts from fonts.zrd: loaded at start-up (0x00519e50), split into glyphs, measured by id (0x0051a0d0), freed (0x00519f70), but nothing in 1.2 draws them (app_engine.cpp:318, twod.md section 4) |
-
 ### zclass (52 not ported)
 
 | Address | Lines | Class | Why |
@@ -3371,6 +3313,63 @@ Fixed 2026-11-13 (mac5/broken-five), the five rows this table had: the radar's v
 | 0x004fd900 | 30 | folded | covered by the port where it names it (src/gamez/zclass/cls_node.cpp:549) |
 | 0x004fe0b0 | 9 | folded | covered by the port where it names it (src/gamez/zclass/cls_node.cpp:584) |
 | 0x004fe0f0 | 9 | folded | covered by the port where it names it (src/gamez/zclass/list.cpp:354) |
+
+### zimage (52 not ported)
+
+| Address | Lines | Class | Why |
+|---|---|---|---|
+| 0x00517280 | 17 | folded | covered by the port where it names it (src/frontend/sdl/sdl_twod_host.h:36) |
+| 0x005172c0 | 14 | replaced (SDL or the platform layer) | zimg_winfonts: the GDI fonts by name from fonts.zrd's WINDOWS_FONTS (list, find, addref, release, teardown); the SDL text host draws its own fonts (sdl_twod_host.h:36) |
+| 0x005172e0 | 14 | replaced (SDL or the platform layer) | zimg_winfonts: the GDI fonts by name from fonts.zrd's WINDOWS_FONTS (list, find, addref, release, teardown); the SDL text host draws its own fonts (sdl_twod_host.h:36) |
+| 0x00517300 | 13 | replaced (SDL or the platform layer) | zimg_winfonts: the GDI fonts by name from fonts.zrd's WINDOWS_FONTS (list, find, addref, release, teardown); the SDL text host draws its own fonts (sdl_twod_host.h:36) |
+| 0x00517310 | 27 | replaced (SDL or the platform layer) | zimg_winfonts: the GDI fonts by name from fonts.zrd's WINDOWS_FONTS (list, find, addref, release, teardown); the SDL text host draws its own fonts (sdl_twod_host.h:36) |
+| 0x00517370 | 48 | replaced (SDL or the platform layer) | zimg_winfonts: the GDI fonts by name from fonts.zrd's WINDOWS_FONTS (list, find, addref, release, teardown); the SDL text host draws its own fonts (sdl_twod_host.h:36) |
+| 0x00517410 | 47 | replaced (SDL or the platform layer) | zimg_winfonts: the GDI fonts by name from fonts.zrd's WINDOWS_FONTS (list, find, addref, release, teardown); the SDL text host draws its own fonts (sdl_twod_host.h:36) |
+| 0x005174b0 | 61 | replaced (SDL or the platform layer) | zimg_winfonts: the GDI fonts by name from fonts.zrd's WINDOWS_FONTS (list, find, addref, release, teardown); the SDL text host draws its own fonts (sdl_twod_host.h:36) |
+| 0x005175e0 | 29 | replaced (SDL or the platform layer) | zimg_winfonts: the GDI fonts by name from fonts.zrd's WINDOWS_FONTS (list, find, addref, release, teardown); the SDL text host draws its own fonts (sdl_twod_host.h:36) |
+| 0x00517650 | 16 | replaced (SDL or the platform layer) | zimg_winfonts: the GDI fonts by name from fonts.zrd's WINDOWS_FONTS (list, find, addref, release, teardown); the SDL text host draws its own fonts (sdl_twod_host.h:36) |
+| 0x00517680 | 22 | replaced (SDL or the platform layer) | zimg_winfonts: the GDI fonts by name from fonts.zrd's WINDOWS_FONTS (list, find, addref, release, teardown); the SDL text host draws its own fonts (sdl_twod_host.h:36) |
+| 0x005176b0 | 31 | folded | covered by the port where it names it (src/gamez/zimage/zimg_texture.cpp:306) |
+| 0x00517730 | 16 | folded | covered by the port where it names it (src/gamez/zimage/zimg_texture.cpp:291) |
+| 0x00517760 | 16 | folded | covered by the port where it names it (src/frontend/sdl/sdl_twod_host.cpp:173) |
+| 0x00517790 | 13 | folded | covered by the port where it names it (src/gamez/zimage/zimg_texture.cpp:320) |
+| 0x005177a0 | 47 | folded | the texture cache by name and its teardown: g_cache (zimg_texture.cpp:296-321), a std::list freed with the program |
+| 0x00517840 | 20 | folded | covered by the port where it names it (src/gamez/zimage/zimg_texture.cpp:318) |
+| 0x005178a0 | 61 | folded | the texture cache by name and its teardown: g_cache (zimg_texture.cpp:296-321), a std::list freed with the program |
+| 0x00517be0 | 16 | folded | the texture cache by name and its teardown: g_cache (zimg_texture.cpp:296-321), a std::list freed with the program |
+| 0x00517c10 | 9 | folded | covered by the port where it names it (src/frontend/sdl/sdl_twod_host.cpp:67) |
+| 0x00517c30 | 12 | folded | covered by the port where it names it (src/gamez/zimage/zimg_library.cpp:295) |
+| 0x00517c40 | 15 | folded | covered by the port where it names it (src/gamez/zimage/zimg_library.cpp:348) |
+| 0x00517c60 | 12 | folded | covered by the port where it names it (src/gamez/zimage/zimg_library.cpp:294) |
+| 0x00517c70 | 16 | folded | covered by the port where it names it (src/gamez/zmodel/gmod_cull.cpp:350) |
+| 0x00517c90 | 15 | folded | covered by the port where it names it (src/frontend/sdl/sdl_twod_host.cpp:67) |
+| 0x00517f70 | 14 | folded | covered by the port where it names it (src/gamez/zimage/zimg_library.cpp:34) |
+| 0x00517fe0 | 9 | folded | a thunk: one call to another function |
+| 0x00517ff0 | 9 | folded | a thunk: one call to another function |
+| 0x00518020 | 9 | folded | a thunk: one call to another function |
+| 0x00518030 | 9 | folded | a thunk: one call to another function |
+| 0x005184e0 | 47 | replaced (SDL or the platform layer) | the texture table's start-up: zeroes the table and makes the Direct3D default texture record; the port's GPU textures make their own (zimg_texture.cpp:109, fixes.md puffer row) |
+| 0x005185f0 | 13 | folded | covered by the port where it names it (src/frontend/sdl/sdl_twod_host.cpp:174) |
+| 0x00518760 | 14 | folded | covered by the port where it names it (src/gamez/zimage/zimg_library.cpp:386) |
+| 0x00518790 | 11 | folded | one-line setters/lookups the port does inline: zImage's library flag (no effect, app_engine.cpp:307), the texture group (mech_lib.cpp:34, app_mission.cpp:1910), the archive file test (zimg_library.cpp:20), the extension cut (zimg_texture.cpp:94) |
+| 0x005187a0 | 11 | folded | one-line setters/lookups the port does inline: zImage's library flag (no effect, app_engine.cpp:307), the texture group (mech_lib.cpp:34, app_mission.cpp:1910), the archive file test (zimg_library.cpp:20), the extension cut (zimg_texture.cpp:94) |
+| 0x00518c50 | 9 | folded | a thunk: one call to another function |
+| 0x00518f50 | 11 | folded | one-line setters/lookups the port does inline: zImage's library flag (no effect, app_engine.cpp:307), the texture group (mech_lib.cpp:34, app_mission.cpp:1910), the archive file test (zimg_library.cpp:20), the extension cut (zimg_texture.cpp:94) |
+| 0x00518f60 | 8 | folded | returns a constant or a global |
+| 0x005190e0 | 15 | unused: PORT (preserve) | frees a chain of loaded textures; its only caller 0x005374d0 is unreached |
+| 0x00519120 | 25 | software renderer | the software renderer's texture tables: the nth mip of a chain for 0x00563940 (module-starts.md:158) and the 32 light and fog levels of every paletted texture (software-path.md:30) |
+| 0x00519150 | 121 | folded | one-line setters/lookups the port does inline: zImage's library flag (no effect, app_engine.cpp:307), the texture group (mech_lib.cpp:34, app_mission.cpp:1910), the archive file test (zimg_library.cpp:20), the extension cut (zimg_texture.cpp:94) |
+| 0x00519370 | 51 | software renderer | the software renderer's texture tables: the nth mip of a chain for 0x00563940 (module-starts.md:158) and the 32 light and fog levels of every paletted texture (software-path.md:30) |
+| 0x00519510 | 38 | software renderer | the software renderer's texture tables: the nth mip of a chain for 0x00563940 (module-starts.md:158) and the 32 light and fog levels of every paletted texture (software-path.md:30) |
+| 0x005195b0 | 75 | software renderer | the software renderer's texture tables: the nth mip of a chain for 0x00563940 (module-starts.md:158) and the 32 light and fog levels of every paletted texture (software-path.md:30) |
+| 0x005197d0 | 11 | software renderer | follows 0x00519510: the software renderer's texture tables: the nth mip of a chain for 0x00563940 (module-starts.md:158) and the 32 light and fog levels of every paletted texture (software-path.md:30) |
+| 0x00519820 | 65 | replaced (SDL or the platform layer) | the square-only device resize (D3D caps 0x20; render-drawtable.md:124): no modern device needs it |
+| 0x00519df0 | 20 | unused: PORT (preserve) | zFont, the bitmap fonts from fonts.zrd: loaded at start-up (0x00519e50), split into glyphs, measured by id (0x0051a0d0), freed (0x00519f70), but nothing in 1.2 draws them (app_engine.cpp:318, twod.md section 4) |
+| 0x00519e50 | 51 | unused: PORT (preserve) | zFont, the bitmap fonts from fonts.zrd: loaded at start-up (0x00519e50), split into glyphs, measured by id (0x0051a0d0), freed (0x00519f70), but nothing in 1.2 draws them (app_engine.cpp:318, twod.md section 4) |
+| 0x00519f70 | 20 | unused: PORT (preserve) | zFont, the bitmap fonts from fonts.zrd: loaded at start-up (0x00519e50), split into glyphs, measured by id (0x0051a0d0), freed (0x00519f70), but nothing in 1.2 draws them (app_engine.cpp:318, twod.md section 4) |
+| 0x00519fa0 | 52 | unused: PORT (preserve) | zFont, the bitmap fonts from fonts.zrd: loaded at start-up (0x00519e50), split into glyphs, measured by id (0x0051a0d0), freed (0x00519f70), but nothing in 1.2 draws them (app_engine.cpp:318, twod.md section 4) |
+| 0x0051a080 | 30 | unused: PORT (preserve) | zFont, the bitmap fonts from fonts.zrd: loaded at start-up (0x00519e50), split into glyphs, measured by id (0x0051a0d0), freed (0x00519f70), but nothing in 1.2 draws them (app_engine.cpp:318, twod.md section 4) |
+| 0x0051a0d0 | 51 | unused: PORT (preserve) | zFont, the bitmap fonts from fonts.zrd: loaded at start-up (0x00519e50), split into glyphs, measured by id (0x0051a0d0), freed (0x00519f70), but nothing in 1.2 draws them (app_engine.cpp:318, twod.md section 4) |
 
 ### zreader (50 not ported)
 
@@ -3542,36 +3541,6 @@ Fixed 2026-11-13 (mac5/broken-five), the five rows this table had: the radar's v
 | 0x00590d10 | 14 | folded | the scalar deleting destructor (the destructor, then delete) |
 | 0x00590d30 | 21 | folded | zGameApp's small helpers inside ported callers or static teardown: a buffer cursor's init (0x00590850, from 0x00590250 / 0x00590400 / 0x005905a0), its drain at exit, the registry company name 'Zipper Interactive' (zutl_reg's company), two destructors |
 
-### zdeclient (25 not ported)
-
-| Address | Lines | Class | Why |
-|---|---|---|---|
-| 0x00500670 | 16 | folded | read: the static constructor of a decal container (an STL tree's head made by 0x00500cd0, the counts at [0x0060bf94..0x0060bf9c] zeroed), which zdec_init's 0x00500850 / 0x00500af0 / 0x00500c60 use; the port's container |
-| 0x005006b0 | 9 | folded | a thunk: one call to another function |
-| 0x005006f0 | 22 | folded | C++ library container code (a std::map, set or list instance); the port uses its own containers |
-| 0x00500cd0 | 43 | folded | C++ library container code (a std::map, set or list instance); the port uses its own containers |
-| 0x00500da0 | 46 | folded | C++ library container code (a std::map, set or list instance); the port uses its own containers |
-| 0x00500e90 | 58 | folded | C++ library container code (a std::map, set or list instance); the port uses its own containers |
-| 0x00500ff0 | 316 | folded | C++ library container code (a std::map, set or list instance); the port uses its own containers |
-| 0x00501520 | 31 | folded | C++ library container code (a std::map, set or list instance); the port uses its own containers |
-| 0x005015b0 | 196 | folded | C++ library container code (a std::map, set or list instance); the port uses its own containers |
-| 0x005018d0 | 48 | folded | C++ library container code (a std::map, set or list instance); the port uses its own containers |
-| 0x00501980 | 52 | folded | C++ library container code (a std::map, set or list instance); the port uses its own containers |
-| 0x00501a40 | 28 | folded | small helpers inside ported code: the crater set's static constructor and its STL copy and fill (craters.md:126), the effect lookups and the animation records' flags (app_mission.cpp:1248, app_engine.h:506-507), the cockpit flag (app_view.cpp:206), the key player (zeff_anim_events.cpp:627) and its split piece, the ground probe (zeff_anim_events.cpp:1109), the movie objects' destructors and the stream's rect setter, a list's vector-deleting destructor |
-| 0x00501a80 | 24 | folded | small helpers inside ported code: the crater set's static constructor and its STL copy and fill (craters.md:126), the effect lookups and the animation records' flags (app_mission.cpp:1248, app_engine.h:506-507), the cockpit flag (app_view.cpp:206), the key player (zeff_anim_events.cpp:627) and its split piece, the ground probe (zeff_anim_events.cpp:1109), the movie objects' destructors and the stream's rect setter, a list's vector-deleting destructor |
-| 0x00502d30 | 8 | folded | returns a constant or a global |
-| 0x00502da0 | 11 | folded | small helpers inside ported code: the crater set's static constructor and its STL copy and fill (craters.md:126), the effect lookups and the animation records' flags (app_mission.cpp:1248, app_engine.h:506-507), the cockpit flag (app_view.cpp:206), the key player (zeff_anim_events.cpp:627) and its split piece, the ground probe (zeff_anim_events.cpp:1109), the movie objects' destructors and the stream's rect setter, a list's vector-deleting destructor |
-| 0x00502db0 | 13 | folded | covered by the port where it names it (src/mech3/zai_target.h:243) |
-| 0x00502dd0 | 13 | folded | covered by the port where it names it (src/mech3/zai_target.h:244) |
-| 0x0050414d | 11 | folded | a piece of the ported function before it (Ghidra split it there) (0x00503d50) |
-| 0x00504d42 | 203 | folded | a piece of the ported function before it (Ghidra split it there) (0x00504520) |
-| 0x00505520 | 73 | folded | small helpers inside ported code: the crater set's static constructor and its STL copy and fill (craters.md:126), the effect lookups and the animation records' flags (app_mission.cpp:1248, app_engine.h:506-507), the cockpit flag (app_view.cpp:206), the key player (zeff_anim_events.cpp:627) and its split piece, the ground probe (zeff_anim_events.cpp:1109), the movie objects' destructors and the stream's rect setter, a list's vector-deleting destructor |
-| 0x005056b0 | 25 | folded | covered by the port where it names it (src/gamez/zeffect/zeff_anim_events.cpp:602) |
-| 0x00505710 | 116 | folded | small helpers inside ported code: the crater set's static constructor and its STL copy and fill (craters.md:126), the effect lookups and the animation records' flags (app_mission.cpp:1248, app_engine.h:506-507), the cockpit flag (app_view.cpp:206), the key player (zeff_anim_events.cpp:627) and its split piece, the ground probe (zeff_anim_events.cpp:1109), the movie objects' destructors and the stream's rect setter, a list's vector-deleting destructor |
-| 0x00507220 | 53 | folded | small helpers inside ported code: the crater set's static constructor and its STL copy and fill (craters.md:126), the effect lookups and the animation records' flags (app_mission.cpp:1248, app_engine.h:506-507), the cockpit flag (app_view.cpp:206), the key player (zeff_anim_events.cpp:627) and its split piece, the ground probe (zeff_anim_events.cpp:1109), the movie objects' destructors and the stream's rect setter, a list's vector-deleting destructor |
-| 0x005073e0 | 18 | folded | covered by the port where it names it (src/gamez/zeffect/zeff_anim_events.cpp:1175) |
-| 0x00507960 | 8 | folded | returns a constant or a global |
-
 ### zutil (25 not ported)
 
 | Address | Lines | Class | Why |
@@ -3601,6 +3570,36 @@ Fixed 2026-11-13 (mac5/broken-five), the five rows this table had: the radar's v
 | 0x00576ed0 | 12 | replaced (SDL or the platform layer) | DirectDraw's back buffer: lock and unlock (app_engine.h:560, app_fmv.cpp:53), their raw forms, the flip (sdl_platform.h:68), the restore, the window's style for full screen, the size clamp |
 | 0x00576ee0 | 24 | replaced (SDL or the platform layer) | DirectDraw's back buffer: lock and unlock (app_engine.h:560, app_fmv.cpp:53), their raw forms, the flip (sdl_platform.h:68), the restore, the window's style for full screen, the size clamp |
 | 0x00576f70 | 19 | replaced (SDL or the platform layer) | DirectDraw's back buffer: lock and unlock (app_engine.h:560, app_fmv.cpp:53), their raw forms, the flip (sdl_platform.h:68), the restore, the window's style for full screen, the size clamp |
+
+### zdeclient (25 not ported)
+
+| Address | Lines | Class | Why |
+|---|---|---|---|
+| 0x00500670 | 16 | folded | read: the static constructor of a decal container (an STL tree's head made by 0x00500cd0, the counts at [0x0060bf94..0x0060bf9c] zeroed), which zdec_init's 0x00500850 / 0x00500af0 / 0x00500c60 use; the port's container |
+| 0x005006b0 | 9 | folded | a thunk: one call to another function |
+| 0x005006f0 | 22 | folded | C++ library container code (a std::map, set or list instance); the port uses its own containers |
+| 0x00500cd0 | 43 | folded | C++ library container code (a std::map, set or list instance); the port uses its own containers |
+| 0x00500da0 | 46 | folded | C++ library container code (a std::map, set or list instance); the port uses its own containers |
+| 0x00500e90 | 58 | folded | C++ library container code (a std::map, set or list instance); the port uses its own containers |
+| 0x00500ff0 | 316 | folded | C++ library container code (a std::map, set or list instance); the port uses its own containers |
+| 0x00501520 | 31 | folded | C++ library container code (a std::map, set or list instance); the port uses its own containers |
+| 0x005015b0 | 196 | folded | C++ library container code (a std::map, set or list instance); the port uses its own containers |
+| 0x005018d0 | 48 | folded | C++ library container code (a std::map, set or list instance); the port uses its own containers |
+| 0x00501980 | 52 | folded | C++ library container code (a std::map, set or list instance); the port uses its own containers |
+| 0x00501a40 | 28 | folded | small helpers inside ported code: the crater set's static constructor and its STL copy and fill (craters.md:126), the effect lookups and the animation records' flags (app_mission.cpp:1248, app_engine.h:506-507), the cockpit flag (app_view.cpp:206), the key player (zeff_anim_events.cpp:627) and its split piece, the ground probe (zeff_anim_events.cpp:1109), the movie objects' destructors and the stream's rect setter, a list's vector-deleting destructor |
+| 0x00501a80 | 24 | folded | small helpers inside ported code: the crater set's static constructor and its STL copy and fill (craters.md:126), the effect lookups and the animation records' flags (app_mission.cpp:1248, app_engine.h:506-507), the cockpit flag (app_view.cpp:206), the key player (zeff_anim_events.cpp:627) and its split piece, the ground probe (zeff_anim_events.cpp:1109), the movie objects' destructors and the stream's rect setter, a list's vector-deleting destructor |
+| 0x00502d30 | 8 | folded | returns a constant or a global |
+| 0x00502da0 | 11 | folded | small helpers inside ported code: the crater set's static constructor and its STL copy and fill (craters.md:126), the effect lookups and the animation records' flags (app_mission.cpp:1248, app_engine.h:506-507), the cockpit flag (app_view.cpp:206), the key player (zeff_anim_events.cpp:627) and its split piece, the ground probe (zeff_anim_events.cpp:1109), the movie objects' destructors and the stream's rect setter, a list's vector-deleting destructor |
+| 0x00502db0 | 13 | folded | covered by the port where it names it (src/mech3/zai_target.h:243) |
+| 0x00502dd0 | 13 | folded | covered by the port where it names it (src/mech3/zai_target.h:244) |
+| 0x0050414d | 11 | folded | a piece of the ported function before it (Ghidra split it there) (0x00503d50) |
+| 0x00504d42 | 203 | folded | a piece of the ported function before it (Ghidra split it there) (0x00504520) |
+| 0x00505520 | 73 | folded | small helpers inside ported code: the crater set's static constructor and its STL copy and fill (craters.md:126), the effect lookups and the animation records' flags (app_mission.cpp:1248, app_engine.h:506-507), the cockpit flag (app_view.cpp:206), the key player (zeff_anim_events.cpp:627) and its split piece, the ground probe (zeff_anim_events.cpp:1109), the movie objects' destructors and the stream's rect setter, a list's vector-deleting destructor |
+| 0x005056b0 | 25 | folded | covered by the port where it names it (src/gamez/zeffect/zeff_anim_events.cpp:602) |
+| 0x00505710 | 116 | folded | small helpers inside ported code: the crater set's static constructor and its STL copy and fill (craters.md:126), the effect lookups and the animation records' flags (app_mission.cpp:1248, app_engine.h:506-507), the cockpit flag (app_view.cpp:206), the key player (zeff_anim_events.cpp:627) and its split piece, the ground probe (zeff_anim_events.cpp:1109), the movie objects' destructors and the stream's rect setter, a list's vector-deleting destructor |
+| 0x00507220 | 53 | folded | small helpers inside ported code: the crater set's static constructor and its STL copy and fill (craters.md:126), the effect lookups and the animation records' flags (app_mission.cpp:1248, app_engine.h:506-507), the cockpit flag (app_view.cpp:206), the key player (zeff_anim_events.cpp:627) and its split piece, the ground probe (zeff_anim_events.cpp:1109), the movie objects' destructors and the stream's rect setter, a list's vector-deleting destructor |
+| 0x005073e0 | 18 | folded | covered by the port where it names it (src/gamez/zeffect/zeff_anim_events.cpp:1175) |
+| 0x00507960 | 8 | folded | returns a constant or a global |
 
 ### zweapon (19 not ported)
 
