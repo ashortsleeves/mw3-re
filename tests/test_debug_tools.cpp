@@ -69,3 +69,41 @@ TEST(loose_zan_motion_loads_when_no_archive_has_it) {
   zutl::mounts() = keep;
   fs::remove_all(wd, ec);
 }
+
+#include "gamez/zreader/zreader.h"
+#include "gamez/zutil/zutl_zar.h"
+#include "mech3/mech_names.h"
+#include "mech3/node_vehicle_dlg.h"
+
+namespace {
+struct ZrdBytes {
+  std::string b;
+  ZrdBytes& u32(uint32_t v) { b.append(reinterpret_cast<const char*>(&v), 4); return *this; }
+  ZrdBytes& i(int32_t v) { return u32(1).u32(static_cast<uint32_t>(v)); }
+  ZrdBytes& s(const std::string& v) { u32(3).u32(static_cast<uint32_t>(v.size())); b += v; return *this; }
+  ZrdBytes& list(uint32_t items) { return u32(4).u32(items + 1); }
+};
+}  // namespace
+
+// The release's Add veh to node type list (0x0049d350): the 19 mechs, then vehicle.zrd's record names, made once.
+TEST(node_vehicle_types_are_the_mechs_then_vehicle_zrd_records) {
+  const std::string body = ZrdBytes().list(1).list(4).s("ttruck").i(1).s("hovertank").i(2).b;
+  zutl_zar::Entry e{};
+  e.length = static_cast<uint32_t>(body.size());
+  std::strncpy(e.name, "vehicle.zrd", sizeof e.name - 1);
+  std::string data = body;
+  data.append(reinterpret_cast<const char*>(&e), sizeof e);
+  data += ZrdBytes().u32(1).u32(1).b;
+  const std::string path = std::string(MW3_TEST_TMP) + "/test_vehicle_types.zbd";
+  std::FILE* f = std::fopen(path.c_str(), "wb");
+  std::fwrite(data.data(), 1, data.size(), f);
+  std::fclose(f);
+  zrdr::init();
+  EXPECT(zrdr::open_archive(path.c_str(), true));
+  const std::vector<std::string>& t = mech3::node_vehicle_types();
+  EXPECT(t.size() == 21 && t[0] == mech3::mech_name(0) && t[18] == mech3::mech_name(18));
+  EXPECT(t[19] == "ttruck" && t[20] == "hovertank");
+  zrdr::close_archives(true);
+  EXPECT(&mech3::node_vehicle_types() == &t && t.size() == 21);  // made once
+  std::remove(path.c_str());
+}
