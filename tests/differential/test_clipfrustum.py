@@ -21,7 +21,9 @@ from calltrace import load_probe  # noqa: E402
 from original import Original  # noqa: E402
 from unicorn.x86_const import UC_X86_REG_EAX  # noqa: E402
 
-CLIP, COT = 0x7402f8, 0x63d740  # the clip struct; [0x63d740] inv h, v, ..., [0x63d750] cot h, v
+CLIP = 0x7402f8  # the clip struct
+COT, INV = 0x63d750, 0x63d740  # cot h, v; their inverses
+CDECL, EXE = False, None  # test_pm_clipfrustum sets PM's (every argument on the stack, the caller pops)
 FUNCS = [(0x534bf0, ''), (0x530d90, 'tu'), (0x531d90, 'tu'), (0x5331e0, 'tuc')]
 MAX = 64
 
@@ -51,15 +53,15 @@ def rand_case(rng):
 
 class Exe:
     def __init__(self):
-        self.cpu = Original()
+        self.cpu = Original(exe=EXE) if EXE else Original()
         self.pos, self.uv, self.rgb = self.cpu.alloc(MAX * 12), self.cpu.alloc(MAX * 8), self.cpu.alloc(MAX * 12)
         self.tri, self.count = self.cpu.alloc(0x40), self.cpu.alloc(4)
 
     def run(self, which, n, clip, cot, pos, uv, rgb, with_tri):
         cpu = self.cpu
         cpu.write(CLIP, clip)
-        cpu.write(COT, struct.pack('<2f', cot[2], cot[3]))
-        cpu.write(COT + 0x10, struct.pack('<2f', cot[0], cot[1]))
+        cpu.write(INV, struct.pack('<2f', cot[2], cot[3]))
+        cpu.write(COT, struct.pack('<2f', cot[0], cot[1]))
         cpu.write(self.pos, b''.join(struct.pack('<3f', *p) for p in pos) + bytes(MAX * 12 - 12 * n))
         cpu.write(self.uv, b''.join(struct.pack('<2f', *p) for p in uv) + bytes(MAX * 8 - 8 * n))
         cpu.write(self.rgb, b''.join(struct.pack('<3f', *p) for p in rgb) + bytes(MAX * 12 - 12 * n))
@@ -70,7 +72,10 @@ class Exe:
         for a in args:
             stack.append({'t': self.tri if with_tri else 0, 'u': self.uv, 'c': self.rgb}[a])
         stack.append(self.count)
-        cpu.call(addr, ecx=CLIP, edx=self.pos, stack_args=stack)
+        if CDECL:
+            cpu.call(addr, stack_args=[CLIP, self.pos] + stack)
+        else:
+            cpu.call(addr, ecx=CLIP, edx=self.pos, stack_args=stack)
         r = ctypes.c_int32(cpu.uc.reg_read(UC_X86_REG_EAX)).value
         m = struct.unpack('<i', cpu.read(self.count, 4))[0]
         k = max(0, min(m, MAX))
@@ -134,9 +139,9 @@ def leftover_only(want, got, case):
     return first in (6, 8) and all(struct.pack('<f', g[k]) == struct.pack('<f', orig[k]) for k in range(first, min(9, len(g)))) \
         and same(want[3][36:], got[3][36:])
 
-def main():
+def main(lib=None):
     runs = int(sys.argv[1]) if len(sys.argv) > 1 else 3000
-    lib = load_probe()
+    lib = lib or load_probe()
     lib.probe_clipfrustum.restype = ctypes.c_int32
     exe = Exe()
     rng = random.Random(1999)
@@ -172,7 +177,7 @@ def main():
     for which in range(4):
         print(f'{FUNCS[which][0]:#x}: {runs} polygons, {bad[which]} differ'
               + (f' ({ulps[which]} by rounding alone)' if X87_53 else '') + f'; answers and count changes {paths[which]}')
-    print(f'0x530d90: {leftovers} near cuts to three or four corners, the exe copying its stack past them (FIX (A))')
+    print(f'{FUNCS[1][0]:#x}: {leftovers} near cuts to three or four corners, the exe copying its stack past them (FIX (A))')
     print(f'{nans} results equal but for the NaN sign (a 0/0 cut along an edge lying in a plane)')
     ok = not any(bad)
     print('OK' if ok else 'FAIL')
