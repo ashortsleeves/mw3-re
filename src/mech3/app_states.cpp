@@ -787,6 +787,17 @@ void CoreState::leave() {
   active_ = 0;
 }
 
+// Mech3.exe 1.2 @ 0x004810d0 (0x00480b20's, on the app; debug command 0xa3): the GameZ Interpreter console made
+// on the script object, or the one up deleted; while up it is drawn instead of the cockpit (hud below).
+void interp_console_toggle(Engine& en) {
+  if (Handle dv = globals().debug_view) {
+    en.vcall(dv, 0x00, {1});
+    globals().debug_view = 0;
+    return;
+  }
+  globals().debug_view = en.interp_console_new(globals().script);
+}
+
 // Mech3.exe 1.2 @ 0x00481250
 void CoreState::suspend(uint32_t) {
   Engine& en = e();

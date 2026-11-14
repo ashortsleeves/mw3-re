@@ -118,6 +118,7 @@ add_library(mw3core STATIC
   src/gamez/zimage/zimg_library.cpp
   src/gamez/zinterp/zinterp.cpp
   src/gamez/zinterp/zinterp_parse.cpp
+  src/gamez/zinterp/zinterp_console.cpp
   src/gamez/zimage/zimg_texture.cpp
   src/gamez/zmath/zmth_matrix.cpp
   src/gamez/zmath/zmth_vector.cpp
@@ -254,6 +255,7 @@ add_library(mw3core STATIC
   src/mech3/hud.cpp
   src/mech3/message_panel.cpp
   src/mech3/dev_text.cpp
+  src/mech3/debug_keys.cpp
   src/mech3/mech_hud.cpp
   src/mech3/app_cheats.cpp
   src/mech3/app_hud.cpp
@@ -511,6 +513,7 @@ add_library(mw3probe SHARED
   tests/probe_weapons_fly.cpp
   tests/probe_twod.cpp
   tests/probe_dev_text.cpp
+  tests/probe_debug_keys.cpp
   tests/probe_mainmenu.cpp
   tests/probe_pocket_panel.cpp
   tests/probe_menus.cpp
@@ -641,6 +644,7 @@ add_executable(mw3tests
   tests/test_data_folder.cpp
   tests/test_patch12.cpp
   tests/test_video_device.cpp
+  tests/test_debug_tools.cpp
   tests/test_resolution.cpp
   tests/test_zreader.cpp
   tests/test_controls_cfg.cpp

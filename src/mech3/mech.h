@@ -243,6 +243,7 @@ struct Mech : Vehicle {
   void add_heat(float heat) { heat_added += heat; }  // 0x00419e40
   void power(int power_down);   // 0x0041cc30
   void finish_power_down();     // 0x0041cac0
+  int toggle_debug_bit();       // 0x0041ca90: +0x634 bit 1, which nothing reads (debug command 0x6d); 1
   void stop_controls(int arg);  // +0x37c vt+0x4c (0x00426c10)
   Foot* foot(int leg) const;    // 0x0041d4f0
   Calf* calf(int leg) const;    // 0x0041d4d0

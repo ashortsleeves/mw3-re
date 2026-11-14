@@ -1029,6 +1029,7 @@ void unwire_hud() {
 void* program_hud_node_object(void* node) { return hud_hooks().node_object(node); }
 void program_hud_update(float dt) {
   if (Mech* m = program_view_mech()) hud_handoff(*m, dt);
+  else if (void* t = program_view_target()) program_vehicle_hud(t, dt);
 }
 
 void program_hud_force_over(bool on) { g_hooks.force_over = on; }
