@@ -101,6 +101,12 @@ void Mech::power(int power_down) {
   power_down_pending = false;
 }
 
+// Mech3.exe 1.2 @ 0x0041ca90
+int Mech::toggle_debug_bit() {
+  x634 ^= 2u;
+  return 1;
+}
+
 // Mech3.exe 1.2 @ 0x0041cac0
 void Mech::finish_power_down() {
   if (!power_down_pending) return;
