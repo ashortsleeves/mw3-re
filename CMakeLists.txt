@@ -260,6 +260,7 @@ add_library(mw3core STATIC
   src/mech3/debug_dialogs.cpp
   src/mech3/node_vehicle_dlg.cpp
   src/mech3/editor_conform.cpp
+  src/mech3/net_node_dlg.cpp
   src/mech3/mech_hud.cpp
   src/mech3/app_cheats.cpp
   src/mech3/app_hud.cpp
@@ -624,6 +625,7 @@ add_library(mw3probe SHARED
   tests/probe_mech_data.cpp
   tests/probe_debug_dialogs.cpp
   tests/probe_node_vehicle.cpp
+  tests/probe_net_links.cpp
 )
 target_link_libraries(mw3probe PRIVATE mw3core)
 

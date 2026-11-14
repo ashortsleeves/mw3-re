@@ -12,13 +12,13 @@ container code, or covered where the port names it); **replaced** (SDL or the pl
 
 | Class | Functions |
 |---|---|
-| folded | 3048 |
+| folded | 3043 |
 | replaced (SDL or the platform layer) | 225 |
 | software renderer | 113 |
 | unused: PORT (preserve) | 62 |
-| dev dialog (MFC), its window plumbing: replaced | 52 |
-| dev dialog (MFC), its logic: PORT (preserve) | 18 |
+| dev dialog (MFC), its window plumbing: replaced | 50 |
 | unlabelled | 2 |
+| dev dialog (MFC), its logic: PORT (preserve) | 2 |
 | debug or dev tool: PORT (preserve) | 1 |
 
 ## MISSING LOGIC
@@ -46,8 +46,6 @@ Fixed 2026-11-13 (mac5/broken-five), the five rows this table had: the radar's v
 ### dev dialog (MFC), its logic: PORT (preserve)
 
 - 2 functions, 24 decomp lines (0x004bb2e0, 0x004bb5f0): the vehicle editor's list fills (each valve, each region by name into a combo box); covered in the port by game_editor_vehicles 0x004bb300 / 0x004bb620 (valve and region lists)
-- 12 functions, 305 decomp lines (0x004c9140, 0x004c9180, 0x004c9260, 0x004c92b0 ...): read: the steps' link editing (Step's vt+0x30..+0x44, vtable 0x005cb3d0, and the node steps' vt+0x30..+0x50, vtables 0x005cbf3c, 0x005cc6fc, 0x005cc7b4): set, compare, find or count a link (+0x0c / +0x20) from a picked element's behaviour (its vt+0x60 then +0x74), the node's position set: the AI path editor's (ZAiNetEdit's editing side, to port behind --debug, docs/ai.md The developer tools). No run-time caller found: the port's AI, emulator-checked on every shipped net (compile, pilot, orders), has no such slots, and no passing PM AI test reaches the PM twins (block trace); the virtual calls through these offsets could not all be typed statically
-- 4 functions, 126 decomp lines (0x004d9d80, 0x004d9dc0, 0x004d9ed0, 0x004d9fc0): an AI parameters dialog (MFC): what it reads into its list (the net's records) and positions; preserve as logic
 
 ### unused: PORT (preserve)
 
@@ -71,7 +69,7 @@ Fixed 2026-11-13 (mac5/broken-five), the five rows this table had: the radar's v
 
 ## By module
 
-### mech3 (2475 not ported)
+### mech3 (2453 not ported)
 
 | Address | Lines | Class | Why |
 |---|---|---|---|
@@ -304,13 +302,9 @@ Fixed 2026-11-13 (mac5/broken-five), the five rows this table had: the radar's v
 | 0x00410490 | 8 | folded | returns a constant or a global |
 | 0x004104a0 | 12 | folded | covered by ported code beside them: the briefing's list helpers, vector inserts, the cameras' free, the options' getters (implemented in the program's hooks), the message panel's constructors and destructors, the HUD message, the AI steps' base vtable thunks, start-up statics |
 | 0x004104c0 | 8 | folded | returns a constant or a global |
-| 0x004104f0 | 9 | folded | covered by ported code beside them: the briefing's list helpers, vector inserts, the cameras' free, the options' getters (implemented in the program's hooks), the message panel's constructors and destructors, the HUD message, the AI steps' base vtable thunks, start-up statics |
 | 0x00410510 | 8 | folded | returns a constant or a global |
-| 0x00410520 | 9 | folded | covered by ported code beside them: the briefing's list helpers, vector inserts, the cameras' free, the options' getters (implemented in the program's hooks), the message panel's constructors and destructors, the HUD message, the AI steps' base vtable thunks, start-up statics |
-| 0x00410540 | 9 | folded | covered by ported code beside them: the briefing's list helpers, vector inserts, the cameras' free, the options' getters (implemented in the program's hooks), the message panel's constructors and destructors, the HUD message, the AI steps' base vtable thunks, start-up statics |
-| 0x00410560 | 18 | folded | covered by ported code beside them: the briefing's list helpers, vector inserts, the cameras' free, the options' getters (implemented in the program's hooks), the message panel's constructors and destructors, the HUD message, the AI steps' base vtable thunks, start-up statics |
 | 0x004105d0 | 12 | folded | covered by the port where it names it (src/mech3/zai_steps.cpp:8) |
-| 0x004105f0 | 16 | folded | covered by the port where it names it (src/mech3/zainetedit.cpp:117) |
+| 0x004105f0 | 16 | folded | covered by the port where it names it (src/mech3/net_node_dlg.cpp:25) |
 | 0x00410610 | 12 | folded | covered by the port where it names it (src/mech3/zai_brain.h:416) |
 | 0x00410630 | 12 | folded | covered by the port where it names it (src/mech3/zai_brain.h:418) |
 | 0x00410650 | 12 | folded | covered by the port where it names it (src/mech3/zai_brain.cpp:167) |
@@ -1851,7 +1845,7 @@ Fixed 2026-11-13 (mac5/broken-five), the five rows this table had: the radar's v
 | 0x004c5fa0 | 9 | folded | a thunk: one call to another function |
 | 0x004c5fb0 | 37 | folded | covered by the port where it names it (src/mech3/zainet_node.h:30) |
 | 0x004c6030 | 14 | folded | the scalar deleting destructor (the destructor, then delete) |
-| 0x004c6bb0 | 11 | folded | covered by the port where it names it (src/mech3/zrdrainet.cpp:352) |
+| 0x004c6bb0 | 11 | folded | covered by the port where it names it (src/mech3/zrdrainet.cpp:369) |
 | 0x004c6ca0 | 12 | folded | covered by the port where it names it (src/mech3/zainet_node.h:29) |
 | 0x004c6cc0 | 14 | folded | the scalar deleting destructor (the destructor, then delete) |
 | 0x004c6ce0 | 12 | folded | covered by the port where it names it (src/mech3/zainet.cpp:36) |
@@ -1859,8 +1853,8 @@ Fixed 2026-11-13 (mac5/broken-five), the five rows this table had: the radar's v
 | 0x004c6d10 | 14 | folded | the scalar deleting destructor (the destructor, then delete) |
 | 0x004c6e10 | 22 | folded | covered by the port where it names it (src/mech3/zainet.h:59) |
 | 0x004c6e60 | 27 | folded | covered by the port where it names it (src/mech3/zainetedit.cpp:93) |
-| 0x004c6fa0 | 9 | folded | covered by the port where it names it (src/mech3/zainet.cpp:61) |
-| 0x004c7080 | 9 | folded | covered by the port where it names it (src/mech3/zainet.cpp:84) |
+| 0x004c6fa0 | 9 | folded | covered by the port where it names it (src/mech3/zai_steps.cpp:99) |
+| 0x004c7080 | 9 | folded | covered by the port where it names it (src/mech3/zai_steps.cpp:99) |
 | 0x004c70a0 | 27 | folded | covered by the port where it names it (src/mech3/zainet.cpp:85) |
 | 0x004c7110 | 23 | folded | covered: the firing's records, the net editor class's forwarding virtuals, vector and list instances, the region registry's helpers, the AI states' and steps' constructors and destructors, start-up statics |
 | 0x004c71d0 | 9 | folded | covered by the port where it names it (src/gamez/znetwork/znet_view.h:27) |
@@ -1924,26 +1918,13 @@ Fixed 2026-11-13 (mac5/broken-five), the five rows this table had: the radar's v
 | 0x004c8a60 | 12 | folded | AI steps and their states: constructors, make_state factories, destructors and one-line virtuals of the step classes ported in zai_steps/zai_brain/zai_node/zai_attack (the port's make_state switch, zai_brain.cpp:715..745) |
 | 0x004c8f70 | 11 | folded | follows 0x004c8f80: covered: the firing's records, the net editor class's forwarding virtuals, vector and list instances, the region registry's helpers, the AI states' and steps' constructors and destructors, start-up statics |
 | 0x004c8f80 | 102 | folded | covered: the firing's records, the net editor class's forwarding virtuals, vector and list instances, the region registry's helpers, the AI states' and steps' constructors and destructors, start-up statics |
-| 0x004c9100 | 19 | folded | covered by the port where it names it (src/mech3/zai_steps.h:210) |
-| 0x004c9140 | 11 | dev dialog (MFC), its logic: PORT (preserve) | read: the steps' link editing (Step's vt+0x30..+0x44, vtable 0x005cb3d0, and the node steps' vt+0x30..+0x50, vtables 0x005cbf3c, 0x005cc6fc, 0x005cc7b4): set, compare, find or count a link (+0x0c / +0x20) from a picked element's behaviour (its vt+0x60 then +0x74), the node's position set: the AI path editor's (ZAiNetEdit's editing side, to port behind --debug, docs/ai.md The developer tools). No run-time caller found: the port's AI, emulator-checked on every shipped net (compile, pilot, orders), has no such slots, and no passing PM AI test reaches the PM twins (block trace); the virtual calls through these offsets could not all be typed statically |
+| 0x004c9100 | 19 | folded | covered by the port where it names it (src/mech3/zai_steps.h:235) |
 | 0x004c9150 | 14 | folded | ported, by docs/symbols.csv: ported; the node state in place (ai.md 17.4a) |
-| 0x004c9180 | 59 | dev dialog (MFC), its logic: PORT (preserve) | read: the steps' link editing (Step's vt+0x30..+0x44, vtable 0x005cb3d0, and the node steps' vt+0x30..+0x50, vtables 0x005cbf3c, 0x005cc6fc, 0x005cc7b4): set, compare, find or count a link (+0x0c / +0x20) from a picked element's behaviour (its vt+0x60 then +0x74), the node's position set: the AI path editor's (ZAiNetEdit's editing side, to port behind --debug, docs/ai.md The developer tools). No run-time caller found: the port's AI, emulator-checked on every shipped net (compile, pilot, orders), has no such slots, and no passing PM AI test reaches the PM twins (block trace); the virtual calls through these offsets could not all be typed statically |
-| 0x004c9260 | 21 | dev dialog (MFC), its logic: PORT (preserve) | read: the steps' link editing (Step's vt+0x30..+0x44, vtable 0x005cb3d0, and the node steps' vt+0x30..+0x50, vtables 0x005cbf3c, 0x005cc6fc, 0x005cc7b4): set, compare, find or count a link (+0x0c / +0x20) from a picked element's behaviour (its vt+0x60 then +0x74), the node's position set: the AI path editor's (ZAiNetEdit's editing side, to port behind --debug, docs/ai.md The developer tools). No run-time caller found: the port's AI, emulator-checked on every shipped net (compile, pilot, orders), has no such slots, and no passing PM AI test reaches the PM twins (block trace); the virtual calls through these offsets could not all be typed statically |
-| 0x004c92b0 | 35 | dev dialog (MFC), its logic: PORT (preserve) | read: the steps' link editing (Step's vt+0x30..+0x44, vtable 0x005cb3d0, and the node steps' vt+0x30..+0x50, vtables 0x005cbf3c, 0x005cc6fc, 0x005cc7b4): set, compare, find or count a link (+0x0c / +0x20) from a picked element's behaviour (its vt+0x60 then +0x74), the node's position set: the AI path editor's (ZAiNetEdit's editing side, to port behind --debug, docs/ai.md The developer tools). No run-time caller found: the port's AI, emulator-checked on every shipped net (compile, pilot, orders), has no such slots, and no passing PM AI test reaches the PM twins (block trace); the virtual calls through these offsets could not all be typed statically |
-| 0x004c9310 | 22 | dev dialog (MFC), its logic: PORT (preserve) | read: the steps' link editing (Step's vt+0x30..+0x44, vtable 0x005cb3d0, and the node steps' vt+0x30..+0x50, vtables 0x005cbf3c, 0x005cc6fc, 0x005cc7b4): set, compare, find or count a link (+0x0c / +0x20) from a picked element's behaviour (its vt+0x60 then +0x74), the node's position set: the AI path editor's (ZAiNetEdit's editing side, to port behind --debug, docs/ai.md The developer tools). No run-time caller found: the port's AI, emulator-checked on every shipped net (compile, pilot, orders), has no such slots, and no passing PM AI test reaches the PM twins (block trace); the virtual calls through these offsets could not all be typed statically |
-| 0x004c9360 | 35 | dev dialog (MFC), its logic: PORT (preserve) | read: the steps' link editing (Step's vt+0x30..+0x44, vtable 0x005cb3d0, and the node steps' vt+0x30..+0x50, vtables 0x005cbf3c, 0x005cc6fc, 0x005cc7b4): set, compare, find or count a link (+0x0c / +0x20) from a picked element's behaviour (its vt+0x60 then +0x74), the node's position set: the AI path editor's (ZAiNetEdit's editing side, to port behind --debug, docs/ai.md The developer tools). No run-time caller found: the port's AI, emulator-checked on every shipped net (compile, pilot, orders), has no such slots, and no passing PM AI test reaches the PM twins (block trace); the virtual calls through these offsets could not all be typed statically |
-| 0x004c93c0 | 8 | folded | returns a constant or a global |
-| 0x004c9410 | 37 | dev dialog (MFC), its logic: PORT (preserve) | read: the steps' link editing (Step's vt+0x30..+0x44, vtable 0x005cb3d0, and the node steps' vt+0x30..+0x50, vtables 0x005cbf3c, 0x005cc6fc, 0x005cc7b4): set, compare, find or count a link (+0x0c / +0x20) from a picked element's behaviour (its vt+0x60 then +0x74), the node's position set: the AI path editor's (ZAiNetEdit's editing side, to port behind --debug, docs/ai.md The developer tools). No run-time caller found: the port's AI, emulator-checked on every shipped net (compile, pilot, orders), has no such slots, and no passing PM AI test reaches the PM twins (block trace); the virtual calls through these offsets could not all be typed statically |
-| 0x004c9460 | 11 | folded | covered by the port where it names it (src/mech3/zai_steps.h:206) |
-| 0x004c9480 | 11 | dev dialog (MFC), its logic: PORT (preserve) | read: the steps' link editing (Step's vt+0x30..+0x44, vtable 0x005cb3d0, and the node steps' vt+0x30..+0x50, vtables 0x005cbf3c, 0x005cc6fc, 0x005cc7b4): set, compare, find or count a link (+0x0c / +0x20) from a picked element's behaviour (its vt+0x60 then +0x74), the node's position set: the AI path editor's (ZAiNetEdit's editing side, to port behind --debug, docs/ai.md The developer tools). No run-time caller found: the port's AI, emulator-checked on every shipped net (compile, pilot, orders), has no such slots, and no passing PM AI test reaches the PM twins (block trace); the virtual calls through these offsets could not all be typed statically |
+| 0x004c9460 | 11 | folded | covered by the port where it names it (src/mech3/zai_steps.h:231) |
 | 0x004c9730 | 14 | folded | ported, by docs/symbols.csv: ported: Behaviour::make_state (VehMode1) |
 | 0x004c9850 | 14 | folded | the scalar deleting destructor (the destructor, then delete) |
 | 0x004c9870 | 12 | folded | covered: the firing's records, the net editor class's forwarding virtuals, vector and list instances, the region registry's helpers, the AI states' and steps' constructors and destructors, start-up statics |
 | 0x004c9894 | 198 | folded | a piece of the ported function before it (Ghidra split it there) (0x004c9880) |
-| 0x004c9d20 | 25 | dev dialog (MFC), its logic: PORT (preserve) | read: the steps' link editing (Step's vt+0x30..+0x44, vtable 0x005cb3d0, and the node steps' vt+0x30..+0x50, vtables 0x005cbf3c, 0x005cc6fc, 0x005cc7b4): set, compare, find or count a link (+0x0c / +0x20) from a picked element's behaviour (its vt+0x60 then +0x74), the node's position set: the AI path editor's (ZAiNetEdit's editing side, to port behind --debug, docs/ai.md The developer tools). No run-time caller found: the port's AI, emulator-checked on every shipped net (compile, pilot, orders), has no such slots, and no passing PM AI test reaches the PM twins (block trace); the virtual calls through these offsets could not all be typed statically |
-| 0x004c9d70 | 21 | dev dialog (MFC), its logic: PORT (preserve) | read: the steps' link editing (Step's vt+0x30..+0x44, vtable 0x005cb3d0, and the node steps' vt+0x30..+0x50, vtables 0x005cbf3c, 0x005cc6fc, 0x005cc7b4): set, compare, find or count a link (+0x0c / +0x20) from a picked element's behaviour (its vt+0x60 then +0x74), the node's position set: the AI path editor's (ZAiNetEdit's editing side, to port behind --debug, docs/ai.md The developer tools). No run-time caller found: the port's AI, emulator-checked on every shipped net (compile, pilot, orders), has no such slots, and no passing PM AI test reaches the PM twins (block trace); the virtual calls through these offsets could not all be typed statically |
-| 0x004c9db0 | 14 | dev dialog (MFC), its logic: PORT (preserve) | read: the steps' link editing (Step's vt+0x30..+0x44, vtable 0x005cb3d0, and the node steps' vt+0x30..+0x50, vtables 0x005cbf3c, 0x005cc6fc, 0x005cc7b4): set, compare, find or count a link (+0x0c / +0x20) from a picked element's behaviour (its vt+0x60 then +0x74), the node's position set: the AI path editor's (ZAiNetEdit's editing side, to port behind --debug, docs/ai.md The developer tools). No run-time caller found: the port's AI, emulator-checked on every shipped net (compile, pilot, orders), has no such slots, and no passing PM AI test reaches the PM twins (block trace); the virtual calls through these offsets could not all be typed statically |
-| 0x004c9de0 | 14 | dev dialog (MFC), its logic: PORT (preserve) | read: the steps' link editing (Step's vt+0x30..+0x44, vtable 0x005cb3d0, and the node steps' vt+0x30..+0x50, vtables 0x005cbf3c, 0x005cc6fc, 0x005cc7b4): set, compare, find or count a link (+0x0c / +0x20) from a picked element's behaviour (its vt+0x60 then +0x74), the node's position set: the AI path editor's (ZAiNetEdit's editing side, to port behind --debug, docs/ai.md The developer tools). No run-time caller found: the port's AI, emulator-checked on every shipped net (compile, pilot, orders), has no such slots, and no passing PM AI test reaches the PM twins (block trace); the virtual calls through these offsets could not all be typed statically |
 | 0x004c9e00 | 11 | folded | AI steps and their states: constructors, make_state factories, destructors and one-line virtuals of the step classes ported in zai_steps/zai_brain/zai_node/zai_attack (the port's make_state switch, zai_brain.cpp:715..745) |
 | 0x004c9e20 | 11 | folded | AI steps and their states: constructors, make_state factories, destructors and one-line virtuals of the step classes ported in zai_steps/zai_brain/zai_node/zai_attack (the port's make_state switch, zai_brain.cpp:715..745) |
 | 0x004c9e40 | 8 | folded | AI steps and their states: constructors, make_state factories, destructors and one-line virtuals of the step classes ported in zai_steps/zai_brain/zai_node/zai_attack (the port's make_state switch, zai_brain.cpp:715..745) |
@@ -2265,13 +2246,8 @@ Fixed 2026-11-13 (mac5/broken-five), the five rows this table had: the radar's v
 | 0x004d9cc0 | 9 | folded | a thunk: one call to another function |
 | 0x004d9cd0 | 21 | folded | AI support code ported or folded: start-up cosines (the port's constants), the params' vlist copies, squares and destructors (zai_params), the brain's destructor chain, the listeners' constructor and destructor, the steps' states |
 | 0x004d9d40 | 18 | folded | AI support code ported or folded: start-up cosines (the port's constants), the params' vlist copies, squares and destructors (zai_params), the brain's destructor chain, the listeners' constructor and destructor, the steps' states |
-| 0x004d9d80 | 18 | dev dialog (MFC), its logic: PORT (preserve) | an AI parameters dialog (MFC): what it reads into its list (the net's records) and positions; preserve as logic |
-| 0x004d9dc0 | 45 | dev dialog (MFC), its logic: PORT (preserve) | an AI parameters dialog (MFC): what it reads into its list (the net's records) and positions; preserve as logic |
-| 0x004d9ed0 | 31 | dev dialog (MFC), its logic: PORT (preserve) | an AI parameters dialog (MFC): what it reads into its list (the net's records) and positions; preserve as logic |
-| 0x004d9f30 | 18 | dev dialog (MFC), its window plumbing: replaced | the same AI parameters dialog's MFC plumbing (UpdateData, a flag cleared on close) |
-| 0x004d9f70 | 9 | dev dialog (MFC), its window plumbing: replaced | the same AI parameters dialog's MFC plumbing (UpdateData, a flag cleared on close) |
+| 0x004d9f70 | 9 | folded | the net file folder's start-up static: [0x0060b5a0] cleared (0x004d9f60; 0x004d9f80 puts the free 0x004d9f90 at exit), the port's static in NetFile::folder (zrdrainet.cpp, 0x004d9fc0) |
 | 0x004d9f80 | 9 | folded | a thunk: one call to another function |
-| 0x004d9fc0 | 32 | dev dialog (MFC), its logic: PORT (preserve) | an AI parameters dialog (MFC): what it reads into its list (the net's records) and positions; preserve as logic |
 | 0x004da1c0 | 14 | folded | the AI net files' classes (zrdrainet/zrdraiv): the record cache, its edit (the editor's, ported in zrdrainet.cpp 0x004dc2b0), lookups, constructors, destructors and std::map code; the editor's net writer 0x004db8d0 replaced by the port's exact one (net_save) |
 | 0x004da1f0 | 8 | folded | empty: does nothing |
 | 0x004da200 | 11 | folded | the AI net files' classes (zrdrainet/zrdraiv): the record cache, its edit (the editor's, ported in zrdrainet.cpp 0x004dc2b0), lookups, constructors, destructors and std::map code; the editor's net writer 0x004db8d0 replaced by the port's exact one (net_save) |
@@ -2699,7 +2675,7 @@ Fixed 2026-11-13 (mac5/broken-five), the five rows this table had: the radar's v
 | 0x00556240 | 38 | folded | covered by the port where it names it (src/gamez/zreader/zreader.cpp:918) |
 | 0x00557090 | 10 | folded | covered by the port where it names it (src/mech3/veh_basic_object.h:137) |
 
-### znetwork (133 not ported)
+### znetwork (132 not ported)
 
 | Address | Lines | Class | Why |
 |---|---|---|---|
@@ -2775,7 +2751,6 @@ Fixed 2026-11-13 (mac5/broken-five), the five rows this table had: the radar's v
 | 0x0058a870 | 8 | folded | empty: does nothing |
 | 0x0058a880 | 15 | folded | covered by the port where it names it (src/gamez/znetwork/znet_dplay.cpp:272) |
 | 0x0058a8c0 | 335 | folded | covered: the DirectPlay error names (znet_dplay.cpp:142 names each through localize), the sessions' list clear (znet_session.cpp:248), the net view's inlined steps (znet_view.cpp:68, :151), the net object's static, ZGameApp's base InitInstance and engine start (overridden by the app's 0x00480000 / 0x00480570, game-loop.md) |
-| 0x0058ae90 | 20 | folded | covered: the DirectPlay error names (znet_dplay.cpp:142 names each through localize), the sessions' list clear (znet_session.cpp:248), the net view's inlined steps (znet_view.cpp:68, :151), the net object's static, ZGameApp's base InitInstance and engine start (overridden by the app's 0x00480000 / 0x00480570, game-loop.md) |
 | 0x0058afe0 | 14 | folded | the scalar deleting destructor (the destructor, then delete) |
 | 0x0058b0a0 | 53 | folded | ported, by docs/symbols.csv: ported (the dock's net_element): the first element of that name (vt+0x24) |
 | 0x0058b220 | 26 | folded | covered: the DirectPlay error names (znet_dplay.cpp:142 names each through localize), the sessions' list clear (znet_session.cpp:248), the net view's inlined steps (znet_view.cpp:68, :151), the net object's static, ZGameApp's base InitInstance and engine start (overridden by the app's 0x00480000 / 0x00480570, game-loop.md) |
@@ -3283,63 +3258,6 @@ Fixed 2026-11-13 (mac5/broken-five), the five rows this table had: the radar's v
 | 0x00598b30 | 66 | replaced (SDL or the platform layer) | the machine probe (fixes.md:289, (A)): CPUID and its vendor, family and MMX tests, the MHz timing loops (QueryPerformanceCounter, RDTSC, the CMOS port, Intel's cpuspeed with its divide by zero: protection.md:140), GlobalMemoryStatus and the DirectDraw caps; the port fills zutl_reg's Machine itself (zutl_reg.cpp:48) |
 | 0x00598c80 | 13 | replaced (SDL or the platform layer) | the machine probe (fixes.md:289, (A)): CPUID and its vendor, family and MMX tests, the MHz timing loops (QueryPerformanceCounter, RDTSC, the CMOS port, Intel's cpuspeed with its divide by zero: protection.md:140), GlobalMemoryStatus and the DirectDraw caps; the port fills zutl_reg's Machine itself (zutl_reg.cpp:48) |
 
-### zclass (52 not ported)
-
-| Address | Lines | Class | Why |
-|---|---|---|---|
-| 0x004eb030 | 11 | folded | covered by the program's overrides or ports: immediate delete (app_mission.cpp:1567), node flags (app_mech.cpp:200), the node box (cls_di.cpp:1267), stamps frozen (app_mech.cpp:212), the scene walk's callbacks (app_mech.cpp:207), the HUD window's rect (app_hud.cpp:194), the deferred-delete list (list.cpp:189), zClass's start, reset and pool flag (list.cpp:338, :350; app_engine.cpp:853), the copy refusals for light and sound nodes (cls_util.cpp:208) |
-| 0x004eb040 | 8 | folded | returns a constant or a global |
-| 0x004eb420 | 17 | unlabelled |  |
-| 0x004eb6a0 | 17 | folded | covered by the port where it names it (src/gamez/zgeometry/zgeo_model.cpp:431) |
-| 0x004eb710 | 17 | folded | ported, by docs/symbols.csv: ported inline; node +0x24 bit 4 (the program's node_intersects) |
-| 0x004eb8a0 | 17 | folded | covered by the program's overrides or ports: immediate delete (app_mission.cpp:1567), node flags (app_mech.cpp:200), the node box (cls_di.cpp:1267), stamps frozen (app_mech.cpp:212), the scene walk's callbacks (app_mech.cpp:207), the HUD window's rect (app_hud.cpp:194), the deferred-delete list (list.cpp:189), zClass's start, reset and pool flag (list.cpp:338, :350; app_engine.cpp:853), the copy refusals for light and sound nodes (cls_util.cpp:208) |
-| 0x004eb8e0 | 17 | folded | covered by the port where it names it (src/mech3/app_mech.cpp:200) |
-| 0x004ebd50 | 38 | folded | covered by the program's overrides or ports: immediate delete (app_mission.cpp:1567), node flags (app_mech.cpp:200), the node box (cls_di.cpp:1267), stamps frozen (app_mech.cpp:212), the scene walk's callbacks (app_mech.cpp:207), the HUD window's rect (app_hud.cpp:194), the deferred-delete list (list.cpp:189), zClass's start, reset and pool flag (list.cpp:338, :350; app_engine.cpp:853), the copy refusals for light and sound nodes (cls_util.cpp:208) |
-| 0x004ed950 | 11 | folded | covered by the program's overrides or ports: immediate delete (app_mission.cpp:1567), node flags (app_mech.cpp:200), the node box (cls_di.cpp:1267), stamps frozen (app_mech.cpp:212), the scene walk's callbacks (app_mech.cpp:207), the HUD window's rect (app_hud.cpp:194), the deferred-delete list (list.cpp:189), zClass's start, reset and pool flag (list.cpp:338, :350; app_engine.cpp:853), the copy refusals for light and sound nodes (cls_util.cpp:208) |
-| 0x004ed980 | 11 | folded | ported, by docs/symbols.csv: ported inline in gmod_draw: node +0xc0 = [0x5e9e2c] (update_frame) after the static bake |
-| 0x004ed9c0 | 11 | folded | ported, by docs/symbols.csv: ported as zcls::segment_options().first_hit ([0x0060b968]) |
-| 0x004ed9d0 | 11 | folded | covered by the port where it names it (src/gamez/zclass/cls_di.h:85) |
-| 0x004ed9e0 | 15 | folded | covered by the port where it names it (src/gamez/zclass/cls_di.h:86) |
-| 0x004eda00 | 13 | folded | ported, by docs/symbols.csv: ported as zcls::segment_options().exclude ([0x0060b974]) |
-| 0x004f0020 | 249 | folded | covered: a piece of the ported ray query (0x004f0020 runs in its caller's stack frame), a world's ground value (0x004f2480, from the ported sound 0x004f3170) |
-| 0x004f0f00 | 35 | folded | covered by the port where it names it (src/gamez/zclass/cls_di.cpp:1267) |
-| 0x004f1810 | 32 | folded | covered by the port where it names it (src/gamez/zclass/cls_world.cpp:220) |
-| 0x004f22f0 | 21 | folded | covered by the port where it names it (src/gamez/zdeclient/zdec_crater.cpp:365) |
-| 0x004f2480 | 12 | folded | covered: a piece of the ported ray query (0x004f0020 runs in its caller's stack frame), a world's ground value (0x004f2480, from the ported sound 0x004f3170) |
-| 0x004f2490 | 12 | folded | covered by the port where it names it (src/mech3/game_editor_net.cpp:127) |
-| 0x004f33e0 | 24 | folded | covered by the port where it names it (src/gamez/zclass/cls_node.cpp:548) |
-| 0x004f3540 | 13 | unused: PORT (preserve) | no effect in the original (app_engine.cpp's list): a camera word nothing reads (0x004f3540), zClass's start defaults the port's initialisers already hold (0x004f8f20), a zSave registration with flag 0 (0x004f8f60) |
-| 0x004f3630 | 25 | folded | covered by the program's overrides or ports: immediate delete (app_mission.cpp:1567), node flags (app_mech.cpp:200), the node box (cls_di.cpp:1267), stamps frozen (app_mech.cpp:212), the scene walk's callbacks (app_mech.cpp:207), the HUD window's rect (app_hud.cpp:194), the deferred-delete list (list.cpp:189), zClass's start, reset and pool flag (list.cpp:338, :350; app_engine.cpp:853), the copy refusals for light and sound nodes (cls_util.cpp:208) |
-| 0x004f4d4d | 95 | folded | a piece of the ported function before it (Ghidra split it there) (0x004f4ab0) |
-| 0x004f5a00 | 31 | folded | covered by the port where it names it (src/gamez/zclass/camera.cpp:488) |
-| 0x004f6dc0 | 102 | software renderer | the camera's software scene walk (0x004f6dc0 without a device; hud.md: the software path) |
-| 0x004f7630 | 16 | folded | covered by the program's overrides or ports: immediate delete (app_mission.cpp:1567), node flags (app_mech.cpp:200), the node box (cls_di.cpp:1267), stamps frozen (app_mech.cpp:212), the scene walk's callbacks (app_mech.cpp:207), the HUD window's rect (app_hud.cpp:194), the deferred-delete list (list.cpp:189), zClass's start, reset and pool flag (list.cpp:338, :350; app_engine.cpp:853), the copy refusals for light and sound nodes (cls_util.cpp:208) |
-| 0x004f7650 | 16 | folded | covered by the program's overrides or ports: immediate delete (app_mission.cpp:1567), node flags (app_mech.cpp:200), the node box (cls_di.cpp:1267), stamps frozen (app_mech.cpp:212), the scene walk's callbacks (app_mech.cpp:207), the HUD window's rect (app_hud.cpp:194), the deferred-delete list (list.cpp:189), zClass's start, reset and pool flag (list.cpp:338, :350; app_engine.cpp:853), the copy refusals for light and sound nodes (cls_util.cpp:208) |
-| 0x004f8c30 | 9 | folded | a thunk: one call to another function |
-| 0x004f8f20 | 10 | unused: PORT (preserve) | no effect in the original (app_engine.cpp's list): a camera word nothing reads (0x004f3540), zClass's start defaults the port's initialisers already hold (0x004f8f20), a zSave registration with flag 0 (0x004f8f60) |
-| 0x004f8f40 | 9 | folded | covered by the program's overrides or ports: immediate delete (app_mission.cpp:1567), node flags (app_mech.cpp:200), the node box (cls_di.cpp:1267), stamps frozen (app_mech.cpp:212), the scene walk's callbacks (app_mech.cpp:207), the HUD window's rect (app_hud.cpp:194), the deferred-delete list (list.cpp:189), zClass's start, reset and pool flag (list.cpp:338, :350; app_engine.cpp:853), the copy refusals for light and sound nodes (cls_util.cpp:208) |
-| 0x004f8f60 | 11 | unused: PORT (preserve) | no effect in the original (app_engine.cpp's list): a camera word nothing reads (0x004f3540), zClass's start defaults the port's initialisers already hold (0x004f8f20), a zSave registration with flag 0 (0x004f8f60) |
-| 0x004f8f70 | 14 | folded | covered by the program's overrides or ports: immediate delete (app_mission.cpp:1567), node flags (app_mech.cpp:200), the node box (cls_di.cpp:1267), stamps frozen (app_mech.cpp:212), the scene walk's callbacks (app_mech.cpp:207), the HUD window's rect (app_hud.cpp:194), the deferred-delete list (list.cpp:189), zClass's start, reset and pool flag (list.cpp:338, :350; app_engine.cpp:853), the copy refusals for light and sound nodes (cls_util.cpp:208) |
-| 0x004f96b0 | 10 | folded | covered by the program's overrides or ports: immediate delete (app_mission.cpp:1567), node flags (app_mech.cpp:200), the node box (cls_di.cpp:1267), stamps frozen (app_mech.cpp:212), the scene walk's callbacks (app_mech.cpp:207), the HUD window's rect (app_hud.cpp:194), the deferred-delete list (list.cpp:189), zClass's start, reset and pool flag (list.cpp:338, :350; app_engine.cpp:853), the copy refusals for light and sound nodes (cls_util.cpp:208) |
-| 0x004f96d0 | 10 | folded | covered by the program's overrides or ports: immediate delete (app_mission.cpp:1567), node flags (app_mech.cpp:200), the node box (cls_di.cpp:1267), stamps frozen (app_mech.cpp:212), the scene walk's callbacks (app_mech.cpp:207), the HUD window's rect (app_hud.cpp:194), the deferred-delete list (list.cpp:189), zClass's start, reset and pool flag (list.cpp:338, :350; app_engine.cpp:853), the copy refusals for light and sound nodes (cls_util.cpp:208) |
-| 0x004f9820 | 10 | folded | covered by the port where it names it (src/gamez/zclass/cls_util.cpp:207) |
-| 0x004f99b0 | 10 | folded | covered by the port where it names it (src/gamez/zclass/cls_util.cpp:206) |
-| 0x004f99d0 | 10 | folded | covered by the port where it names it (src/gamez/zclass/cls_util.cpp:210) |
-| 0x004f9f60 | 24 | folded | covered by the port where it names it (src/gamez/zclass/cls_node.cpp:548) |
-| 0x004fa540 | 24 | folded | covered by the port where it names it (src/gamez/zclass/cls_node.cpp:548) |
-| 0x004fa900 | 24 | folded | covered by the port where it names it (src/gamez/zclass/cls_node.cpp:549) |
-| 0x004fc470 | 14 | folded | covered by the port where it names it (src/gamez/zclass/cls_mechlib.cpp:126) |
-| 0x004fc4d0 | 18 | unused: PORT (preserve) | mechlib's material writer at close (0x004fc990 -> 0x004fcca0 -> 0x004fc4d0): dead (mechlib.md) |
-| 0x004fc5d0 | 35 | folded | covered by the port where it names it (src/gamez/zclass/cls_mechlib.h:38) |
-| 0x004fc990 | 21 | unused: PORT (preserve) | mechlib's material writer at close (0x004fc990 -> 0x004fcca0 -> 0x004fc4d0): dead (mechlib.md) |
-| 0x004fcca0 | 39 | unused: PORT (preserve) | mechlib's material writer at close (0x004fc990 -> 0x004fcca0 -> 0x004fc4d0): dead (mechlib.md) |
-| 0x004fd1c0 | 13 | folded | covered by the port where it names it (src/mech3/menu_widgets.h:233) |
-| 0x004fd230 | 30 | folded | covered by the port where it names it (src/gamez/zclass/cls_node.cpp:550) |
-| 0x004fd440 | 24 | folded | covered by the port where it names it (src/gamez/zclass/cls_node.cpp:550) |
-| 0x004fd900 | 30 | folded | covered by the port where it names it (src/gamez/zclass/cls_node.cpp:549) |
-| 0x004fe0b0 | 9 | folded | covered by the port where it names it (src/gamez/zclass/cls_node.cpp:584) |
-| 0x004fe0f0 | 9 | folded | covered by the port where it names it (src/gamez/zclass/list.cpp:354) |
-
 ### zimage (52 not ported)
 
 | Address | Lines | Class | Why |
@@ -3396,6 +3314,63 @@ Fixed 2026-11-13 (mac5/broken-five), the five rows this table had: the radar's v
 | 0x00519fa0 | 52 | unused: PORT (preserve) | zFont, the bitmap fonts from fonts.zrd: loaded at start-up (0x00519e50), split into glyphs, measured by id (0x0051a0d0), freed (0x00519f70), but nothing in 1.2 draws them (app_engine.cpp:318, twod.md section 4) |
 | 0x0051a080 | 30 | unused: PORT (preserve) | zFont, the bitmap fonts from fonts.zrd: loaded at start-up (0x00519e50), split into glyphs, measured by id (0x0051a0d0), freed (0x00519f70), but nothing in 1.2 draws them (app_engine.cpp:318, twod.md section 4) |
 | 0x0051a0d0 | 51 | unused: PORT (preserve) | zFont, the bitmap fonts from fonts.zrd: loaded at start-up (0x00519e50), split into glyphs, measured by id (0x0051a0d0), freed (0x00519f70), but nothing in 1.2 draws them (app_engine.cpp:318, twod.md section 4) |
+
+### zclass (52 not ported)
+
+| Address | Lines | Class | Why |
+|---|---|---|---|
+| 0x004eb030 | 11 | folded | covered by the program's overrides or ports: immediate delete (app_mission.cpp:1567), node flags (app_mech.cpp:200), the node box (cls_di.cpp:1267), stamps frozen (app_mech.cpp:212), the scene walk's callbacks (app_mech.cpp:207), the HUD window's rect (app_hud.cpp:194), the deferred-delete list (list.cpp:189), zClass's start, reset and pool flag (list.cpp:338, :350; app_engine.cpp:853), the copy refusals for light and sound nodes (cls_util.cpp:208) |
+| 0x004eb040 | 8 | folded | returns a constant or a global |
+| 0x004eb420 | 17 | unlabelled |  |
+| 0x004eb6a0 | 17 | folded | covered by the port where it names it (src/gamez/zgeometry/zgeo_model.cpp:431) |
+| 0x004eb710 | 17 | folded | ported, by docs/symbols.csv: ported inline; node +0x24 bit 4 (the program's node_intersects) |
+| 0x004eb8a0 | 17 | folded | covered by the program's overrides or ports: immediate delete (app_mission.cpp:1567), node flags (app_mech.cpp:200), the node box (cls_di.cpp:1267), stamps frozen (app_mech.cpp:212), the scene walk's callbacks (app_mech.cpp:207), the HUD window's rect (app_hud.cpp:194), the deferred-delete list (list.cpp:189), zClass's start, reset and pool flag (list.cpp:338, :350; app_engine.cpp:853), the copy refusals for light and sound nodes (cls_util.cpp:208) |
+| 0x004eb8e0 | 17 | folded | covered by the port where it names it (src/mech3/app_mech.cpp:200) |
+| 0x004ebd50 | 38 | folded | covered by the program's overrides or ports: immediate delete (app_mission.cpp:1567), node flags (app_mech.cpp:200), the node box (cls_di.cpp:1267), stamps frozen (app_mech.cpp:212), the scene walk's callbacks (app_mech.cpp:207), the HUD window's rect (app_hud.cpp:194), the deferred-delete list (list.cpp:189), zClass's start, reset and pool flag (list.cpp:338, :350; app_engine.cpp:853), the copy refusals for light and sound nodes (cls_util.cpp:208) |
+| 0x004ed950 | 11 | folded | covered by the program's overrides or ports: immediate delete (app_mission.cpp:1567), node flags (app_mech.cpp:200), the node box (cls_di.cpp:1267), stamps frozen (app_mech.cpp:212), the scene walk's callbacks (app_mech.cpp:207), the HUD window's rect (app_hud.cpp:194), the deferred-delete list (list.cpp:189), zClass's start, reset and pool flag (list.cpp:338, :350; app_engine.cpp:853), the copy refusals for light and sound nodes (cls_util.cpp:208) |
+| 0x004ed980 | 11 | folded | ported, by docs/symbols.csv: ported inline in gmod_draw: node +0xc0 = [0x5e9e2c] (update_frame) after the static bake |
+| 0x004ed9c0 | 11 | folded | ported, by docs/symbols.csv: ported as zcls::segment_options().first_hit ([0x0060b968]) |
+| 0x004ed9d0 | 11 | folded | covered by the port where it names it (src/gamez/zclass/cls_di.h:85) |
+| 0x004ed9e0 | 15 | folded | covered by the port where it names it (src/gamez/zclass/cls_di.h:86) |
+| 0x004eda00 | 13 | folded | ported, by docs/symbols.csv: ported as zcls::segment_options().exclude ([0x0060b974]) |
+| 0x004f0020 | 249 | folded | covered: a piece of the ported ray query (0x004f0020 runs in its caller's stack frame), a world's ground value (0x004f2480, from the ported sound 0x004f3170) |
+| 0x004f0f00 | 35 | folded | covered by the port where it names it (src/gamez/zclass/cls_di.cpp:1267) |
+| 0x004f1810 | 32 | folded | covered by the port where it names it (src/gamez/zclass/cls_world.cpp:220) |
+| 0x004f22f0 | 21 | folded | covered by the port where it names it (src/gamez/zdeclient/zdec_crater.cpp:365) |
+| 0x004f2480 | 12 | folded | covered: a piece of the ported ray query (0x004f0020 runs in its caller's stack frame), a world's ground value (0x004f2480, from the ported sound 0x004f3170) |
+| 0x004f2490 | 12 | folded | covered by the port where it names it (src/mech3/game_editor_net.cpp:127) |
+| 0x004f33e0 | 24 | folded | covered by the port where it names it (src/gamez/zclass/cls_node.cpp:548) |
+| 0x004f3540 | 13 | unused: PORT (preserve) | no effect in the original (app_engine.cpp's list): a camera word nothing reads (0x004f3540), zClass's start defaults the port's initialisers already hold (0x004f8f20), a zSave registration with flag 0 (0x004f8f60) |
+| 0x004f3630 | 25 | folded | covered by the program's overrides or ports: immediate delete (app_mission.cpp:1567), node flags (app_mech.cpp:200), the node box (cls_di.cpp:1267), stamps frozen (app_mech.cpp:212), the scene walk's callbacks (app_mech.cpp:207), the HUD window's rect (app_hud.cpp:194), the deferred-delete list (list.cpp:189), zClass's start, reset and pool flag (list.cpp:338, :350; app_engine.cpp:853), the copy refusals for light and sound nodes (cls_util.cpp:208) |
+| 0x004f4d4d | 95 | folded | a piece of the ported function before it (Ghidra split it there) (0x004f4ab0) |
+| 0x004f5a00 | 31 | folded | covered by the port where it names it (src/gamez/zclass/camera.cpp:488) |
+| 0x004f6dc0 | 102 | software renderer | the camera's software scene walk (0x004f6dc0 without a device; hud.md: the software path) |
+| 0x004f7630 | 16 | folded | covered by the program's overrides or ports: immediate delete (app_mission.cpp:1567), node flags (app_mech.cpp:200), the node box (cls_di.cpp:1267), stamps frozen (app_mech.cpp:212), the scene walk's callbacks (app_mech.cpp:207), the HUD window's rect (app_hud.cpp:194), the deferred-delete list (list.cpp:189), zClass's start, reset and pool flag (list.cpp:338, :350; app_engine.cpp:853), the copy refusals for light and sound nodes (cls_util.cpp:208) |
+| 0x004f7650 | 16 | folded | covered by the program's overrides or ports: immediate delete (app_mission.cpp:1567), node flags (app_mech.cpp:200), the node box (cls_di.cpp:1267), stamps frozen (app_mech.cpp:212), the scene walk's callbacks (app_mech.cpp:207), the HUD window's rect (app_hud.cpp:194), the deferred-delete list (list.cpp:189), zClass's start, reset and pool flag (list.cpp:338, :350; app_engine.cpp:853), the copy refusals for light and sound nodes (cls_util.cpp:208) |
+| 0x004f8c30 | 9 | folded | a thunk: one call to another function |
+| 0x004f8f20 | 10 | unused: PORT (preserve) | no effect in the original (app_engine.cpp's list): a camera word nothing reads (0x004f3540), zClass's start defaults the port's initialisers already hold (0x004f8f20), a zSave registration with flag 0 (0x004f8f60) |
+| 0x004f8f40 | 9 | folded | covered by the program's overrides or ports: immediate delete (app_mission.cpp:1567), node flags (app_mech.cpp:200), the node box (cls_di.cpp:1267), stamps frozen (app_mech.cpp:212), the scene walk's callbacks (app_mech.cpp:207), the HUD window's rect (app_hud.cpp:194), the deferred-delete list (list.cpp:189), zClass's start, reset and pool flag (list.cpp:338, :350; app_engine.cpp:853), the copy refusals for light and sound nodes (cls_util.cpp:208) |
+| 0x004f8f60 | 11 | unused: PORT (preserve) | no effect in the original (app_engine.cpp's list): a camera word nothing reads (0x004f3540), zClass's start defaults the port's initialisers already hold (0x004f8f20), a zSave registration with flag 0 (0x004f8f60) |
+| 0x004f8f70 | 14 | folded | covered by the program's overrides or ports: immediate delete (app_mission.cpp:1567), node flags (app_mech.cpp:200), the node box (cls_di.cpp:1267), stamps frozen (app_mech.cpp:212), the scene walk's callbacks (app_mech.cpp:207), the HUD window's rect (app_hud.cpp:194), the deferred-delete list (list.cpp:189), zClass's start, reset and pool flag (list.cpp:338, :350; app_engine.cpp:853), the copy refusals for light and sound nodes (cls_util.cpp:208) |
+| 0x004f96b0 | 10 | folded | covered by the program's overrides or ports: immediate delete (app_mission.cpp:1567), node flags (app_mech.cpp:200), the node box (cls_di.cpp:1267), stamps frozen (app_mech.cpp:212), the scene walk's callbacks (app_mech.cpp:207), the HUD window's rect (app_hud.cpp:194), the deferred-delete list (list.cpp:189), zClass's start, reset and pool flag (list.cpp:338, :350; app_engine.cpp:853), the copy refusals for light and sound nodes (cls_util.cpp:208) |
+| 0x004f96d0 | 10 | folded | covered by the program's overrides or ports: immediate delete (app_mission.cpp:1567), node flags (app_mech.cpp:200), the node box (cls_di.cpp:1267), stamps frozen (app_mech.cpp:212), the scene walk's callbacks (app_mech.cpp:207), the HUD window's rect (app_hud.cpp:194), the deferred-delete list (list.cpp:189), zClass's start, reset and pool flag (list.cpp:338, :350; app_engine.cpp:853), the copy refusals for light and sound nodes (cls_util.cpp:208) |
+| 0x004f9820 | 10 | folded | covered by the port where it names it (src/gamez/zclass/cls_util.cpp:207) |
+| 0x004f99b0 | 10 | folded | covered by the port where it names it (src/gamez/zclass/cls_util.cpp:206) |
+| 0x004f99d0 | 10 | folded | covered by the port where it names it (src/gamez/zclass/cls_util.cpp:210) |
+| 0x004f9f60 | 24 | folded | covered by the port where it names it (src/gamez/zclass/cls_node.cpp:548) |
+| 0x004fa540 | 24 | folded | covered by the port where it names it (src/gamez/zclass/cls_node.cpp:548) |
+| 0x004fa900 | 24 | folded | covered by the port where it names it (src/gamez/zclass/cls_node.cpp:549) |
+| 0x004fc470 | 14 | folded | covered by the port where it names it (src/gamez/zclass/cls_mechlib.cpp:126) |
+| 0x004fc4d0 | 18 | unused: PORT (preserve) | mechlib's material writer at close (0x004fc990 -> 0x004fcca0 -> 0x004fc4d0): dead (mechlib.md) |
+| 0x004fc5d0 | 35 | folded | covered by the port where it names it (src/gamez/zclass/cls_mechlib.h:38) |
+| 0x004fc990 | 21 | unused: PORT (preserve) | mechlib's material writer at close (0x004fc990 -> 0x004fcca0 -> 0x004fc4d0): dead (mechlib.md) |
+| 0x004fcca0 | 39 | unused: PORT (preserve) | mechlib's material writer at close (0x004fc990 -> 0x004fcca0 -> 0x004fc4d0): dead (mechlib.md) |
+| 0x004fd1c0 | 13 | folded | covered by the port where it names it (src/mech3/menu_widgets.h:233) |
+| 0x004fd230 | 30 | folded | covered by the port where it names it (src/gamez/zclass/cls_node.cpp:550) |
+| 0x004fd440 | 24 | folded | covered by the port where it names it (src/gamez/zclass/cls_node.cpp:550) |
+| 0x004fd900 | 30 | folded | covered by the port where it names it (src/gamez/zclass/cls_node.cpp:549) |
+| 0x004fe0b0 | 9 | folded | covered by the port where it names it (src/gamez/zclass/cls_node.cpp:584) |
+| 0x004fe0f0 | 9 | folded | covered by the port where it names it (src/gamez/zclass/list.cpp:354) |
 
 ### zreader (50 not ported)
 
@@ -3567,36 +3542,6 @@ Fixed 2026-11-13 (mac5/broken-five), the five rows this table had: the radar's v
 | 0x00590d10 | 14 | folded | the scalar deleting destructor (the destructor, then delete) |
 | 0x00590d30 | 21 | folded | zGameApp's small helpers inside ported callers or static teardown: a buffer cursor's init (0x00590850, from 0x00590250 / 0x00590400 / 0x005905a0), its drain at exit, the registry company name 'Zipper Interactive' (zutl_reg's company), two destructors |
 
-### zutil (25 not ported)
-
-| Address | Lines | Class | Why |
-|---|---|---|---|
-| 0x00576bc0 | 34 | folded | covered by the port where it names it (src/gamez/zutil/zutl_zar.cpp:176) |
-| 0x00576c50 | 9 | folded | zUtil and zVideo entries the port does its own way, covered where named: the CRC table's start (app_engine.cpp:314), the search paths' free (app_engine.cpp:323), the mode switch (video_set_mode, app_engine.cpp:724), the frame and lab clears (app_engine.h:196, 562) |
-| 0x00576c60 | 9 | folded | zUtil and zVideo entries the port does its own way, covered where named: the CRC table's start (app_engine.cpp:314), the search paths' free (app_engine.cpp:323), the mode switch (video_set_mode, app_engine.cpp:724), the frame and lab clears (app_engine.h:196, 562) |
-| 0x00576c70 | 8 | folded | returns a constant or a global |
-| 0x00576c80 | 10 | folded | zUtil and zVideo entries the port does its own way, covered where named: the CRC table's start (app_engine.cpp:314), the search paths' free (app_engine.cpp:323), the mode switch (video_set_mode, app_engine.cpp:724), the frame and lab clears (app_engine.h:196, 562) |
-| 0x00576ca0 | 8 | folded | returns a constant or a global |
-| 0x00576cb0 | 8 | folded | returns a constant or a global |
-| 0x00576cc0 | 8 | folded | returns a constant or a global |
-| 0x00576cd0 | 8 | folded | returns a constant or a global |
-| 0x00576cf0 | 11 | folded | zUtil and zVideo entries the port does its own way, covered where named: the CRC table's start (app_engine.cpp:314), the search paths' free (app_engine.cpp:323), the mode switch (video_set_mode, app_engine.cpp:724), the frame and lab clears (app_engine.h:196, 562) |
-| 0x00576d70 | 8 | folded | returns a constant or a global |
-| 0x00576d80 | 8 | folded | returns a constant or a global |
-| 0x00576d90 | 8 | folded | returns a constant or a global |
-| 0x00576da0 | 8 | folded | returns a constant or a global |
-| 0x00576db0 | 8 | folded | returns a constant or a global |
-| 0x00576dc0 | 8 | folded | returns a constant or a global |
-| 0x00576dd0 | 11 | folded | zUtil and zVideo entries the port does its own way, covered where named: the CRC table's start (app_engine.cpp:314), the search paths' free (app_engine.cpp:323), the mode switch (video_set_mode, app_engine.cpp:724), the frame and lab clears (app_engine.h:196, 562) |
-| 0x00576de0 | 17 | replaced (SDL or the platform layer) | DirectDraw's back buffer: lock and unlock (app_engine.h:560, app_fmv.cpp:53), their raw forms, the flip (sdl_platform.h:68), the restore, the window's style for full screen, the size clamp |
-| 0x00576e70 | 11 | replaced (SDL or the platform layer) | DirectDraw's back buffer: lock and unlock (app_engine.h:560, app_fmv.cpp:53), their raw forms, the flip (sdl_platform.h:68), the restore, the window's style for full screen, the size clamp |
-| 0x00576e80 | 11 | replaced (SDL or the platform layer) | DirectDraw's back buffer: lock and unlock (app_engine.h:560, app_fmv.cpp:53), their raw forms, the flip (sdl_platform.h:68), the restore, the window's style for full screen, the size clamp |
-| 0x00576e90 | 11 | replaced (SDL or the platform layer) | DirectDraw's back buffer: lock and unlock (app_engine.h:560, app_fmv.cpp:53), their raw forms, the flip (sdl_platform.h:68), the restore, the window's style for full screen, the size clamp |
-| 0x00576ea0 | 12 | replaced (SDL or the platform layer) | DirectDraw's back buffer: lock and unlock (app_engine.h:560, app_fmv.cpp:53), their raw forms, the flip (sdl_platform.h:68), the restore, the window's style for full screen, the size clamp |
-| 0x00576ed0 | 12 | replaced (SDL or the platform layer) | DirectDraw's back buffer: lock and unlock (app_engine.h:560, app_fmv.cpp:53), their raw forms, the flip (sdl_platform.h:68), the restore, the window's style for full screen, the size clamp |
-| 0x00576ee0 | 24 | replaced (SDL or the platform layer) | DirectDraw's back buffer: lock and unlock (app_engine.h:560, app_fmv.cpp:53), their raw forms, the flip (sdl_platform.h:68), the restore, the window's style for full screen, the size clamp |
-| 0x00576f70 | 19 | replaced (SDL or the platform layer) | DirectDraw's back buffer: lock and unlock (app_engine.h:560, app_fmv.cpp:53), their raw forms, the flip (sdl_platform.h:68), the restore, the window's style for full screen, the size clamp |
-
 ### zdeclient (25 not ported)
 
 | Address | Lines | Class | Why |
@@ -3626,6 +3571,36 @@ Fixed 2026-11-13 (mac5/broken-five), the five rows this table had: the radar's v
 | 0x00507220 | 53 | folded | small helpers inside ported code: the crater set's static constructor and its STL copy and fill (craters.md:126), the effect lookups and the animation records' flags (app_mission.cpp:1248, app_engine.h:506-507), the cockpit flag (app_view.cpp:206), the key player (zeff_anim_events.cpp:627) and its split piece, the ground probe (zeff_anim_events.cpp:1109), the movie objects' destructors and the stream's rect setter, a list's vector-deleting destructor |
 | 0x005073e0 | 18 | folded | covered by the port where it names it (src/gamez/zeffect/zeff_anim_events.cpp:1175) |
 | 0x00507960 | 8 | folded | returns a constant or a global |
+
+### zutil (25 not ported)
+
+| Address | Lines | Class | Why |
+|---|---|---|---|
+| 0x00576bc0 | 34 | folded | covered by the port where it names it (src/gamez/zutil/zutl_zar.cpp:176) |
+| 0x00576c50 | 9 | folded | zUtil and zVideo entries the port does its own way, covered where named: the CRC table's start (app_engine.cpp:314), the search paths' free (app_engine.cpp:323), the mode switch (video_set_mode, app_engine.cpp:724), the frame and lab clears (app_engine.h:196, 562) |
+| 0x00576c60 | 9 | folded | zUtil and zVideo entries the port does its own way, covered where named: the CRC table's start (app_engine.cpp:314), the search paths' free (app_engine.cpp:323), the mode switch (video_set_mode, app_engine.cpp:724), the frame and lab clears (app_engine.h:196, 562) |
+| 0x00576c70 | 8 | folded | returns a constant or a global |
+| 0x00576c80 | 10 | folded | zUtil and zVideo entries the port does its own way, covered where named: the CRC table's start (app_engine.cpp:314), the search paths' free (app_engine.cpp:323), the mode switch (video_set_mode, app_engine.cpp:724), the frame and lab clears (app_engine.h:196, 562) |
+| 0x00576ca0 | 8 | folded | returns a constant or a global |
+| 0x00576cb0 | 8 | folded | returns a constant or a global |
+| 0x00576cc0 | 8 | folded | returns a constant or a global |
+| 0x00576cd0 | 8 | folded | returns a constant or a global |
+| 0x00576cf0 | 11 | folded | zUtil and zVideo entries the port does its own way, covered where named: the CRC table's start (app_engine.cpp:314), the search paths' free (app_engine.cpp:323), the mode switch (video_set_mode, app_engine.cpp:724), the frame and lab clears (app_engine.h:196, 562) |
+| 0x00576d70 | 8 | folded | returns a constant or a global |
+| 0x00576d80 | 8 | folded | returns a constant or a global |
+| 0x00576d90 | 8 | folded | returns a constant or a global |
+| 0x00576da0 | 8 | folded | returns a constant or a global |
+| 0x00576db0 | 8 | folded | returns a constant or a global |
+| 0x00576dc0 | 8 | folded | returns a constant or a global |
+| 0x00576dd0 | 11 | folded | zUtil and zVideo entries the port does its own way, covered where named: the CRC table's start (app_engine.cpp:314), the search paths' free (app_engine.cpp:323), the mode switch (video_set_mode, app_engine.cpp:724), the frame and lab clears (app_engine.h:196, 562) |
+| 0x00576de0 | 17 | replaced (SDL or the platform layer) | DirectDraw's back buffer: lock and unlock (app_engine.h:560, app_fmv.cpp:53), their raw forms, the flip (sdl_platform.h:68), the restore, the window's style for full screen, the size clamp |
+| 0x00576e70 | 11 | replaced (SDL or the platform layer) | DirectDraw's back buffer: lock and unlock (app_engine.h:560, app_fmv.cpp:53), their raw forms, the flip (sdl_platform.h:68), the restore, the window's style for full screen, the size clamp |
+| 0x00576e80 | 11 | replaced (SDL or the platform layer) | DirectDraw's back buffer: lock and unlock (app_engine.h:560, app_fmv.cpp:53), their raw forms, the flip (sdl_platform.h:68), the restore, the window's style for full screen, the size clamp |
+| 0x00576e90 | 11 | replaced (SDL or the platform layer) | DirectDraw's back buffer: lock and unlock (app_engine.h:560, app_fmv.cpp:53), their raw forms, the flip (sdl_platform.h:68), the restore, the window's style for full screen, the size clamp |
+| 0x00576ea0 | 12 | replaced (SDL or the platform layer) | DirectDraw's back buffer: lock and unlock (app_engine.h:560, app_fmv.cpp:53), their raw forms, the flip (sdl_platform.h:68), the restore, the window's style for full screen, the size clamp |
+| 0x00576ed0 | 12 | replaced (SDL or the platform layer) | DirectDraw's back buffer: lock and unlock (app_engine.h:560, app_fmv.cpp:53), their raw forms, the flip (sdl_platform.h:68), the restore, the window's style for full screen, the size clamp |
+| 0x00576ee0 | 24 | replaced (SDL or the platform layer) | DirectDraw's back buffer: lock and unlock (app_engine.h:560, app_fmv.cpp:53), their raw forms, the flip (sdl_platform.h:68), the restore, the window's style for full screen, the size clamp |
+| 0x00576f70 | 19 | replaced (SDL or the platform layer) | DirectDraw's back buffer: lock and unlock (app_engine.h:560, app_fmv.cpp:53), their raw forms, the flip (sdl_platform.h:68), the restore, the window's style for full screen, the size clamp |
 
 ### zweapon (19 not ported)
 
@@ -3690,15 +3665,15 @@ Fixed 2026-11-13 (mac5/broken-five), the five rows this table had: the radar's v
 | 0x0050d260 | 13 | folded | covered by the port where it names it (src/gamez/zeffect/zeff_anim_save.cpp:281) |
 | 0x0050da50 | 16 | replaced (SDL or the platform layer) | mech3.err (0x0050da50): the port's error reports go to stderr (app_engine.cpp:562) |
 
-### zsiscript (1 not ported)
-
-| Address | Lines | Class | Why |
-|---|---|---|---|
-| 0x005a9990 | 23 | folded | covered by the port where it names it (src/mech3/mech_anim.cpp:424) |
-
 ### zerror (1 not ported)
 
 | Address | Lines | Class | Why |
 |---|---|---|---|
 | 0x0050da70 | 9 | folded | a thunk: one call to another function |
+
+### zsiscript (1 not ported)
+
+| Address | Lines | Class | Why |
+|---|---|---|---|
+| 0x005a9990 | 23 | folded | covered by the port where it names it (src/mech3/mech_anim.cpp:424) |
 
