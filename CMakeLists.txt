@@ -483,6 +483,7 @@ add_library(mw3probe SHARED
   tests/probe.cpp
   tests/probe_clip3d.cpp
   tests/probe_clipfrustum.cpp
+  tests/probe_zmodel_unused.cpp
   tests/probe_clip2d.cpp
   tests/probe_fogsort.cpp
   tests/probe_lighting.cpp
