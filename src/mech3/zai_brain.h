@@ -515,12 +515,11 @@ struct Radio {
 };
 
 // 0x004c9d00 then 0x004cd770 (0x10 bytes at the brain's +0x240, vtable
-// 0x005cc290): a step of the brain's own, pointing at the null step.
-struct BrainStep {
-  uint8_t flags = 0;    // +0x04  bit 0 cleared (the rest is the heap's)
-  int32_t x08 = 0;      // +0x08
-  const void* next;     // +0x0c  0x00603fa0, the null step
-  BrainStep();
+// 0x005cc290): a step of the brain's own, pointing at the null step. Nothing
+// orders it; its state (0x004cd790) turns the vehicle in place toward the
+// next step's place, then goes on (ported for preservation; docs/ai.md 17.2).
+struct BrainStep : Step {
+  BrainStep() : Step(StepKind::BrainOwn) {}
 };
 
 // IControls +0x04 (0x004aec00 zeroes it): the last hit's game time, when the

@@ -75,6 +75,7 @@ enum class StepKind : uint32_t {
   McbWaitNode = 0x5cbf30,   // 0x004ccc30
   DeployNode = 0x5cc898,    // 0x004cff10
   Repair = 0x5cc970,        // 0x004d08d0, the refit order's (zai_repair)
+  BrainOwn = 0x5cc290,      // 0x004cd770, the brain's own step at +0x240 (nothing orders it)
 };
 
 // What a scan or canleave entry runs: the exe's function addresses (all in
