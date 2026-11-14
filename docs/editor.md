@@ -106,9 +106,20 @@ exe in `test_debug_dialogs.py` (12,028 cases); nothing calls them.
 | (no item) 40037 | 0x00483430: Select Mech, the pick the default mech (+0x198) | 0x00483460: text message 0x276 with the mech |
 
 The six bytes +0x1ac..+0x1b1 are set to 1 by the defaults; no read of them by address was found outside these
-handlers, so whatever they once switched is likely gone. The Game menu's mission starts (40085..40108, 40114, 0x00483720..0x00484040) and the commands
-40112, 40113, 40115 (0x004840c0, 0x00484190, 0x004841b0) are in the same map; Ghidra made no function of them and
-they are not in the audit yet.
+handlers, so whatever they once switched is likely gone. **The Game menu** (S9b, 2026-11-14; `DebugStartHooks`, test_debug_start.py: 207 cases). Every start first asks
+0x00480420 whether the install has the renderer's files (InstallOptions & 0xff with a 3D card, & 0xff00 without;
+else message 0xf42 or 0xf41 in a box) and does nothing on a no. Start (104, 0x00483100) goes to the main menu. The
+campaign jumps (40085..40104, and 40114 in no menu, which asks for campaign 4 mission 7 and gets 6 by 0x00478a40's
+clamp; 0x00483720..0x00483e20) start the
+"DefaultPlayer" pilot on that mission (0x00478a40) and put mechs in its store with message 0xf20's configuration
+(0x004836e0): the Bushwacker (3) alone for the first mission, then by operation the Owens (11), Firefly (8),
+Strider (14), Shadow Cat (13), Blackhawk (2), Orion (10) and Puma (12), up to seven; 40090 selects the
+campaign game again, and campaign 3 mission 5 also gets weapon 0x20 (tech 3). Training 1..4 (0x00483e80..0x00483f70)
+and the dev levels 7 and 8 (40073, 40074) use a pilot named "Default Player", with a space; the levels put the
+default mech (+0x198) in the lab game's slot. 40112 (0x004840c0) is the lab itself with mech 3, through 0x0047ff60.
+40113 and 40115 are Start, then the network flag on (0x0047fc40) or Instant Action reopened (0x0047fc20). Ghidra
+made no function of these or of several Options handlers; they are hand-listed for the audit in
+tools/analysis/port_audit_extra.tsv.
 
 **Select Mech** (156, 0x00432c60; debug command 0x84 and 40037): a list of the 19 mechs' names (0x00432d30, a null
 name skipped, each row's data its number), the first selected; DoModal (0x00432df0, between the GDI flip 0x00577340
