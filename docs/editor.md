@@ -438,7 +438,14 @@ AI net's nodes answer in `game_editor_net`), so it is engine code, not AI.
   start and 1.75 radii back from the end, pointing to the end) for every
   link, and against (0x0058dfd0, the same from the other end) for both-way
   ones. A head is a chevron of three points (0x0058d9a0) that the line draw
-  closes into a triangle when its node shows.
+  closes into a triangle when its node shows. The mouse hits a head inside
+  its triangle: the against pair by 0x0058d6b0, the along pair by 0x0058d3c0
+  (the same test facing the other way, its first head by the start's radius).
+  The along arrow's constructor gives it the base hit (vtable 0x005cf1d0),
+  but the link's set-up (0x0058c276), the cursor's line (0x0058e4fb) and the
+  links' copy (0x0058f49c) give it 0x005cf050, so every live link's along
+  heads can be pressed. Ported 2026-11-14 (S7a); until then the port's along
+  arrows kept the base hit and their heads could not be pressed.
 - **Colours** (0x00579370, each view sets them): circles red, green under
   the mouse, yellow picked; a link's line green under the mouse, yellow
   pressed, else blue when its ends see each other (the world's segment query
@@ -484,8 +491,8 @@ AI net's nodes answer in `game_editor_net`), so it is engine code, not AI.
 Tests: test_net_view.py (a link between two marks against the exe on
 random cameras, clips and ends in front, behind, past the far plane and off
 screen, all nine pairs of end states: the marks' steps, the cuts, the
-direction, both arrow pairs, the circles' place and hits, the back arrows'
-hits; bit for bit at 24 bits; at 53 the floats a few ulps apart and 6 of
+direction, both arrow pairs, the circles' place and hits, the back and
+ahead arrows' hits; bit for bit at 24 bits; at 53 the floats a few ulps apart and 6 of
 the 600 cases' drawn points a pixel off, none of their states, flags or
 hits); `net_view_links_and_picks` (the links' kinds and makers, the window,
 press, release with and without shift, the hand-over, shift-click);
