@@ -66,6 +66,23 @@ uint32_t probe_zu_project_points(const float* view, const float* proj, const flo
   return code;
 }
 
+// One point through 0x0053d130 (project_point), set up as probe_zu_project_points.
+uint32_t probe_zu_project_point(const float* view, const float* proj, const float* clip, const float* world,
+                                float* out) {
+  std::memcpy(zmth::view().view.m, view, 48);
+  zmth::Projection& p = zmth::projection();
+  p.fx = proj[0], p.fy = proj[1], p.cx = proj[2], p.cy = proj[3];
+  zmod::DrawState& ds = zmod::draw_state();
+  ds.clip.near_z = clip[0];
+  std::memcpy(&ds.clip.side_1c, &clip[1], 4);
+  for (int i = 0; i < 4; ++i) ds.point_rect[i] = clip[2 + i];
+  zmth::Mat34 base;
+  zmth::push(&base);
+  const uint32_t code = zmod::project_point(reinterpret_cast<const zmth::Vec3*>(world), reinterpret_cast<zmth::Vec3*>(out));
+  zmth::pop();
+  return code;
+}
+
 // mats: the matrix under the top then the top (12 floats each), moved in place. which: 0 0x0053de50, 1 0x0053df00.
 void probe_zu_move(int32_t which, const float* v, float* mats) {
   zmth::Mat34 a, b;

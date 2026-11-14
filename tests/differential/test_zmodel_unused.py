@@ -24,24 +24,53 @@ os.environ.setdefault('MW3_X87', '24')
 from calltrace import load_probe  # noqa: E402
 from original import FTOL, IAT_FTOL, Original  # noqa: E402
 from unicorn.x86_const import UC_X86_REG_EAX  # noqa: E402
-from test_project_point import view_matrix, fl, unf  # noqa: E402
 
 F = ctypes.c_float
 VIEW, FX, FY, CX, CY = 0x73fbc0, 0x73fb9c, 0x73fba0, 0x73fb88, 0x73fb8c
 NEAR, CLIP_RIGHT, POINT_RECT = 0x740304, 0x740314, 0x74031c
 SLOTS, TOP = 0x63d760, 0x5eda90
 PRINTF, MALLOC, REALLOC = 0x5bb5f0, 0x5bb664, 0x5bb610
+REALLOC_FN = None  # PM's own realloc (0x596520), stood in for as a function
+FN = {'planar': 0x53a740, 'concave': 0x53a1a0, 'light': 0x53b050, 'point': 0x53d130, 'points': 0x53d360,
+      'below': 0x53de50, 'two': 0x53df00}
+CDECL, EXE = False, None  # test_pm_zmodel_unused sets PM's (ECX, EDX and the rest all on the stack)
 f32 = lambda v: struct.unpack('<f', struct.pack('<f', v))[0]
+FTOL_SLOT = IAT_FTOL
+
+
+def fl(*v):
+    return struct.pack(f'<{len(v)}f', *v)
+
+
+def unf(b):
+    return list(struct.unpack(f'<{len(b) // 4}f', b))
+
+
+def view_matrix(r):
+    """World -> camera for a camera turned by yaw and pitch (as test_project_point.py)."""
+    yaw, pitch = r.uniform(-math.pi, math.pi), r.uniform(-0.6, 0.6)
+    cy, sy, cp, sp = math.cos(yaw), math.sin(yaw), math.cos(pitch), math.sin(pitch)
+    right = (cy, 0.0, -sy)
+    up = (sy * sp, cp, cy * sp)
+    fwd = (sy * cp, -sp, cy * cp)
+    p = [r.uniform(-500, 500), r.uniform(0, 50), r.uniform(-500, 500)]
+    m = [right[0], up[0], fwd[0], right[1], up[1], fwd[1], right[2], up[2], fwd[2]]
+    t = [-sum(p[i] * m[3 * i + j] for i in range(3)) for j in range(3)]
+    return m + t, p, fwd, right, up
+
 
 
 class Exe:
     def __init__(self):
-        self.cpu = cpu = Original()
+        self.cpu = cpu = Original(exe=EXE) if EXE else Original()
         self.out = []
         cpu.stub_import(PRINTF, self.printf)
         cpu.stub_import(MALLOC, lambda c: c.alloc(max(1, c.arg(0))))
-        cpu.stub_import(REALLOC, self.realloc)
-        cpu.import_code(IAT_FTOL, FTOL)
+        if REALLOC_FN:
+            cpu.stub_function(REALLOC_FN, self.realloc)
+        else:
+            cpu.stub_import(REALLOC, self.realloc)
+        cpu.import_code(FTOL_SLOT, FTOL)
         self.buf = cpu.alloc(0x4000)
         self.buf2 = cpu.alloc(0x4000)
         self.eax = lambda: cpu.uc.reg_read(UC_X86_REG_EAX)
@@ -72,6 +101,12 @@ class Exe:
         self.out.append(fmt % tuple(args))
         return 0
 
+    def call(self, fn, ecx, edx, stack=()):
+        if CDECL:
+            self.cpu.call(fn, stack_args=[ecx, edx] + list(stack))
+        else:
+            self.cpu.call(fn, ecx=ecx, edx=edx, stack_args=stack)
+
     def put(self, addr, pts):
         self.cpu.write(addr, b''.join(struct.pack('<3f', *p) for p in pts))
 
@@ -101,9 +136,9 @@ def rand_poly(r, kind):
     return [[f32(v) for v in p] for p in pts]
 
 
-def main():
+def main(lib=None):
     runs = int(sys.argv[1]) if len(sys.argv) > 1 else 2000
-    lib = load_probe()
+    lib = lib or load_probe()
     lib.probe_zu_project_points.restype = ctypes.c_uint32
     exe = Exe()
     cpu = exe.cpu
@@ -123,7 +158,7 @@ def main():
         P = (F * (3 * n))(*[v for p in pts for v in p])
         # 0x53a740
         exe.put(exe.buf, pts)
-        cpu.call(0x53a740, ecx=n, edx=exe.buf)
+        exe.call(FN['planar'], n, exe.buf)
         want = exe.eax() & 0xff
         got = lib.probe_zu_planar(n, P)
         seen['planar'][want & 1] += 1
@@ -133,7 +168,7 @@ def main():
         exe.put(exe.buf, pts)
         cpu.u32(exe.buf2, n)
         exe.out = []
-        cpu.call(0x53a1a0, ecx=exe.buf2, edx=exe.buf)
+        exe.call(FN['concave'], exe.buf2, exe.buf)
         want = exe.eax() & 0xff
         sbuf = ctypes.create_string_buffer(4096)
         got = lib.probe_zu_concave(n, P, sbuf, len(sbuf))
@@ -167,7 +202,7 @@ def main():
         exe.put(exe.buf, pts + [[pts[0][0], f32(pts[0][1] - f32(0.1)) if typ == 1 and n >= 2 else pts[0][1], pts[0][2]]])
         desc = cpu.alloc(0x4c)
         cpu.write(desc, bytes(light))
-        cpu.call(0x53b050, ecx=model, edx=desc, stack_args=(n, exe.buf))
+        exe.call(FN['light'], model, desc, (n, exe.buf))
         cnt = struct.unpack('<i', cpu.read(model + 0x20, 4))[0]
         rec, verts = bytearray(0x4c), b''
         if cnt > int(existing):
@@ -219,14 +254,14 @@ def main():
         clip = (F * 6)(near, clip_right, *rect)
         W = (F * (3 * npts))(*[v for p in world for v in p])
         if npts == 1:
-            cpu.call(0x53d130, ecx=world_b, edx=out_b)
+            exe.call(FN['point'], world_b, out_b)
             code_o = exe.eax()
             o3 = (F * 3)()
-            lib.probe_project_point.restype = ctypes.c_uint32
-            code_r = lib.probe_project_point((F * 12)(*m), (F * 4)(*proj), clip, W, o3)
+            lib.probe_zu_project_point.restype = ctypes.c_uint32
+            code_r = lib.probe_zu_project_point((F * 12)(*m), (F * 4)(*proj), clip, W, o3)
             got_o, got_r = unf(bytes(cpu.read(out_b, 12))), list(o3)
         else:
-            cpu.call(0x53d360, ecx=world_b, edx=out_b, stack_args=(npts,))
+            exe.call(FN['points'], world_b, out_b, (npts,))
             code_o = exe.eax()
             O = (F * (3 * npts))()
             code_r = lib.probe_zu_project_points((F * 12)(*m), (F * 4)(*proj), clip, W, npts, O)
@@ -248,7 +283,7 @@ def main():
         cpu.u32(SLOTS + 8, mats + 0x30)
         cpu.u32(TOP, SLOTS + 8)
         cpu.write(exe.buf, fl(*v))
-        cpu.call((0x53de50, 0x53df00)[which], ecx=exe.buf)
+        exe.call((FN['below'], FN['two'])[which], exe.buf, 0)
         want = cpu.read(mats, 0x60)
         M = (F * 24)(*mm)
         lib.probe_zu_move(which, (F * 3)(*v), M)
