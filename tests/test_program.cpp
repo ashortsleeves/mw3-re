@@ -29950,3 +29950,16 @@ TEST(mission_c1m1_vehicle_editor_p2_shows_the_net_and_sends_home_headless) {
   EXPECT(walls_parents == 1 && walls_models > 0 && walls_polys > 0);
   EXPECT(std::fabs(after[0] - target[0]) < 2.0f && std::fabs(after[2] - target[2]) < 2.0f);
 }
+
+// AiTarget's vt+0x6c (0x004d7160, ported for preservation): on, the node blended toward green at 0.6 and the
+// blend on; off, the blend off and its colour kept.
+TEST(ai_target_tint_blends_green) {
+  zcls::Node* n = zcls::object3d_create();
+  auto* d = static_cast<zcls::Object3d*>(n->data);
+  mech3::ai::target_tint(n, true);
+  EXPECT((d->get<uint32_t>(0) & 4) && d->get<float>(8) == 0.0f && d->get<float>(0xc) == 1.0f &&
+         d->get<float>(0x10) == 0.0f && d->get<float>(0x14) == 0.6f);
+  mech3::ai::target_tint(n, false);
+  EXPECT(!(d->get<uint32_t>(0) & 4) && d->get<float>(0xc) == 1.0f && d->get<float>(0x14) == 0.6f);
+  zcls::node_destroy(n);
+}
