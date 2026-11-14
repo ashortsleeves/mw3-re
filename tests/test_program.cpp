@@ -87,6 +87,7 @@
 #include "mech3/mech_salvage.h"
 #include "mech3/zai_node.h"
 #include "mech3/zai_target.h"
+#include "mech3/zrdraiv.h"
 #include "mech3/zai_valve.h"
 #include "mech3/zainet_region.h"
 #include "mech3/cheats.h"
@@ -29962,4 +29963,22 @@ TEST(ai_target_tint_blends_green) {
   mech3::ai::target_tint(n, false);
   EXPECT(!(d->get<uint32_t>(0) & 4) && d->get<float>(0xc) == 1.0f && d->get<float>(0x14) == 0.6f);
   zcls::node_destroy(n);
+}
+
+// The aiv reader's vt+0x04 (0x004dee50, ported for preservation): a name zEntity knows or the editor's cache
+// holds is taken; another is free; without a cache only zEntity's.
+TEST(aiv_name_free_by_entity_and_cache) {
+  mech3::ai::RdrHooks& h = mech3::ai::rdr_hooks();
+  const auto was = h.entity_find;
+  static int entity;
+  h.entity_find = [](const char* n) -> void* { return std::strcmp(n, "mech_a") == 0 ? &entity : nullptr; };
+  mech3::ai::AivFile f;
+  EXPECT(f.name_free("mech_a") == 0 && f.name_free("mech_b") == 1);
+  std::map<std::string, mech3::ai::AivRecord*> cache{{"mech_b", nullptr}};
+  f.cache = &cache;
+  EXPECT(f.name_free("mech_b") == 0 && f.name_free("mech_c") == 1 && f.name_free("mech_a") == 0);
+  f.cache = nullptr;
+  mech3::ai::RdrFile& base = f;
+  EXPECT(base.name_free("mech_b") == 1);
+  h.entity_find = was;
 }
