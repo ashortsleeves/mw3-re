@@ -130,11 +130,27 @@ void inout_mission_load();
 void inout_select();       // 0x004c3b80 (0x00490bde): the current mission's area
 void inout_mission_end();  // 0x004c3dd0 (the listener's slot +0x10): the areas freed
 
+// The vehicle's record of each in/out query (+0xd8, new 0x3c bytes): the
+// pull 0x004c3000 fills it and nothing reads it (ported for preservation; the
+// pull's own fill is not, docs/ai.md 11).
+struct InOutRecord {
+  uint32_t frame = 0;     // +0x00  the frame counter (0x0072f338) at the reset
+  uint32_t x04 = 0;       // +0x04
+  uint8_t flags[4] = {};  // +0x08
+  float from[3] = {};     // +0x0c
+  float to[3] = {};       // +0x18
+  float normal[3] = {};   // +0x24  (the constructor leaves it)
+  float place[3] = {};    // +0x30
+  InOutRecord();          // 0x004c0ed0: all of it zero (the zero vector 0x0063d870), +0x24 left
+  void reset();           // 0x004c0f70: flags +8..+0xa and both ends zero, the frame now
+};
+static_assert(sizeof(InOutRecord) == 0x3c, "new(0x3c)");
+
 // Mech3.exe 1.2 @ 0x004c3000 (ECX the vehicle, EDX `in`, the stack `out`):
 // with a current area, `in` as the vehicle at `pos` may reach it; true with
-// `out` the place it is pulled to (at `in`'s height). The exe also keeps a
-// record of each query on the vehicle (+0xd8, 0x004c0ed0 / 0x004c0f70) that
-// nothing reads; not kept.
+// `out` the place it is pulled to (at `in`'s height). The exe also fills a
+// record of each query on the vehicle (+0xd8, InOutRecord) that nothing reads;
+// not filled here.
 bool inout_pull(const float pos[3], const float in[3], float out[3]);
 // Mech3.exe 1.2 @ 0x004c3bd0 (ECX the animation, EDX the AI message; from
 // 0x004d4a20): messages 0x39..0x3c test, of the current area's polygons named
