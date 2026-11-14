@@ -126,6 +126,7 @@ add_library(mw3core STATIC
   src/gamez/zmodel/gmod_bake.cpp
   src/gamez/zmodel/gmod_clip2d.cpp
   src/gamez/zmodel/gmod_clip3d.cpp
+  src/gamez/zmodel/gmod_clipfrustum.cpp
   src/gamez/zmodel/gmod_const.cpp
   src/gamez/zmodel/gmod_cull.cpp
   src/gamez/zmodel/gmod_draw.cpp
@@ -480,6 +481,7 @@ set_target_properties(mw3core PROPERTIES POSITION_INDEPENDENT_CODE ON)
 add_library(mw3probe SHARED
   tests/probe.cpp
   tests/probe_clip3d.cpp
+  tests/probe_clipfrustum.cpp
   tests/probe_clip2d.cpp
   tests/probe_fogsort.cpp
   tests/probe_lighting.cpp
