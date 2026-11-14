@@ -15,11 +15,13 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
+if os.environ.get('MW3_EXE') == 'pm':
+    os.environ.setdefault('MW3_PM_MOVED', '1')  # PM's own addresses below
 from original import Original  # noqa: E402
 
 PM = os.environ.get('MW3_EXE') == 'pm'
 if PM:
-    VALVES_FILL, REGIONS_FILL, VALVES, REGIONS, REGION_NAME = 0x4c17f0, 0x4c1af0, 0x62fbe4, 0x62faac, 0x481dd0
+    VALVES_FILL, REGIONS_FILL, VALVES, REGIONS, REGION_NAME = 0x4c17f0, 0x4c1af0, 0x62fbe4, 0x62faac, 0x4d0f50
     VALVE_HWND, REGION_HWND, SEND_MESSAGE = 0x3d8, 0x418, 0x5de73c
 else:
     VALVES_FILL, REGIONS_FILL, VALVES, REGIONS, REGION_NAME = 0x4bb300, 0x4bb620, 0x60b504, 0x60b3f4, 0x47a920
