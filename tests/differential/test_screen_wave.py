@@ -139,7 +139,8 @@ def event(r):
 
 def mask_xy(out, flags, idx, count):
     """x and y of the slot the call went to and of its draw, where the exe's are uninitialised."""
-    if flags & 1 or (flags & 2 and idx > 0) or out[0] == 2 and flags & 1:
+    # Defined: at a node (bit 2, index above 0), a screen place (bit 1 without bit 2), or the done "to"s (bit 1).
+    if (flags & 2 and idx > 0) or (flags & 1 and not flags & 2) or (out[0] == 2 and flags & 1):
         return out
     out = list(out)
     s = 6 + 9 * min(count, 4)
