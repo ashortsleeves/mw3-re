@@ -1649,7 +1649,8 @@ editor's +0x3f8, found by 0x004d93d0). With none, it shows the editor's own
 spare entry (+0x3fc), which nothing else reads (0x004bb360).
 
 **The valve list** (1176, sorted, typed into):
-- **Its items** are every valve by name (0x004bb300 over [0x0060b504]).
+- **Its items** are every valve by name (0x004bb300 over [0x0060b504], each through the functor 0x004bb2e0 holding the
+  combo; a valve without a name goes in as "", FIX (A): the exe hands the combo null).
 - **A pick** is CBN_SELCHANGE (0x004b9f80): the page gathered, then
   0x004bb470, then the page shown again. CBN_SELENDOK (0x004b9fa0 ->
   0x004bb390) does the same unless the item is the valve already shown.
@@ -1664,7 +1665,8 @@ spare entry (+0x3fc), which nothing else reads (0x004bb360).
   the list's pick; Win32's own matching while typing is not modelled.
 
 **The region list** (1177, sorted, typed into):
-- **Its items** are every region (0x004bb620 over [0x0060b3f4]).
+- **Its items** are every region (0x004bb620 over [0x0060b3f4], each through 0x004bb5f0: its vt+0x1c name).
+  Both fills in test_vehicle_lists.py against the exe (487 fills of random names, case-equal ones among them; 2 breaks).
 - **Read back** (0x004bb680, after the fields): the picked item's region by
   name (0x004c5d20). Else a typed name other than "0" finds the region or
   reads it from its file (0x004c5c00) and fills the list again. Else none.

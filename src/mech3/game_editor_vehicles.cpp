@@ -392,16 +392,23 @@ DlgCombo& valve_list() { return g_editor->pages[kPageValve].at(1176).combo; }
 DlgCombo& region_list() { return g_editor->pages[kPageValve].at(1177).combo; }
 bool no_name(const std::string& s) { return s.empty() || s == "0"; }
 
-// Mech3.exe 1.2 @ 0x004bb300 with 0x004bb2e0: every valve, by name.
+// Mech3.exe 1.2 @ 0x004bb2e0: one valve into the list, by name (CB_ADDSTRING; the list's functor). FIX (A): a valve
+// without a name goes in as "", where the exe hands the combo box null.
+void valve_add(const ai::Valve* v) { valve_list().add(v->name ? v->name : ""); }
+
+// Mech3.exe 1.2 @ 0x004bb5f0: one region, by its vt+0x1c name. FIX (A): none, "".
+void region_add(ai::Region* r) { region_list().add(r->name() ? r->name() : ""); }
+
+// Mech3.exe 1.2 @ 0x004bb300: every valve ([0x0060b504]'s list), by name.
 void valves_fill() {
   valve_list().reset();
-  for (const ai::Valve* v : ai::valves()) valve_list().add(v->name ? v->name : "");
+  for (const ai::Valve* v : ai::valves()) valve_add(v);
 }
 
-// Mech3.exe 1.2 @ 0x004bb620 with 0x004bb5f0: every region, by name (vt+0x1c).
+// Mech3.exe 1.2 @ 0x004bb620: every region ([0x0060b3f4]'s list), by name.
 void regions_fill() {
   region_list().reset();
-  for (ai::Region* r : ai::regions()) region_list().add(r->name() ? r->name() : "");
+  for (ai::Region* r : ai::regions()) region_add(r);
 }
 
 // Mech3.exe 1.2 @ 0x004d93d0: the settings' entry whose valve is named so.

@@ -17,7 +17,7 @@ container code, or covered where the port names it); **replaced** (SDL or the pl
 | software renderer | 113 |
 | unused: PORT (preserve) | 62 |
 | dev dialog (MFC), its window plumbing: replaced | 52 |
-| dev dialog (MFC), its logic: PORT (preserve) | 18 |
+| dev dialog (MFC), its logic: PORT (preserve) | 16 |
 | unlabelled | 2 |
 | debug or dev tool: PORT (preserve) | 1 |
 
@@ -45,7 +45,6 @@ Fixed 2026-11-13 (mac5/broken-five), the five rows this table had: the radar's v
 
 ### dev dialog (MFC), its logic: PORT (preserve)
 
-- 2 functions, 24 decomp lines (0x004bb2e0, 0x004bb5f0): the vehicle editor's list fills (each valve, each region by name into a combo box); covered in the port by game_editor_vehicles 0x004bb300 / 0x004bb620 (valve and region lists)
 - 12 functions, 305 decomp lines (0x004c9140, 0x004c9180, 0x004c9260, 0x004c92b0 ...): read: the steps' link editing (Step's vt+0x30..+0x44, vtable 0x005cb3d0, and the node steps' vt+0x30..+0x50, vtables 0x005cbf3c, 0x005cc6fc, 0x005cc7b4): set, compare, find or count a link (+0x0c / +0x20) from a picked element's behaviour (its vt+0x60 then +0x74), the node's position set: the AI path editor's (ZAiNetEdit's editing side, to port behind --debug, docs/ai.md The developer tools). No run-time caller found: the port's AI, emulator-checked on every shipped net (compile, pilot, orders), has no such slots, and no passing PM AI test reaches the PM twins (block trace); the virtual calls through these offsets could not all be typed statically
 - 4 functions, 126 decomp lines (0x004d9d80, 0x004d9dc0, 0x004d9ed0, 0x004d9fc0): an AI parameters dialog (MFC): what it reads into its list (the net's records) and positions; preserve as logic
 
@@ -71,7 +70,7 @@ Fixed 2026-11-13 (mac5/broken-five), the five rows this table had: the radar's v
 
 ## By module
 
-### mech3 (2475 not ported)
+### mech3 (2473 not ported)
 
 | Address | Lines | Class | Why |
 |---|---|---|---|
@@ -1642,9 +1641,7 @@ Fixed 2026-11-13 (mac5/broken-five), the five rows this table had: the radar's v
 | 0x004bb1e0 | 13 | folded | the vehicle editor's logic and the AI parameters it edits, ported in game_editor_vehicles / zai_params / zrdraiv (their comments name these): the vehicle list, the valve and region lists, the params' comparisons, the vlist's appends and defaults; the firing plan's std algorithms |
 | 0x004bb200 | 44 | folded | the vehicle editor's logic and the AI parameters it edits, ported in game_editor_vehicles / zai_params / zrdraiv (their comments name these): the vehicle list, the valve and region lists, the params' comparisons, the vlist's appends and defaults; the firing plan's std algorithms |
 | 0x004bb290 | 17 | folded | the vehicle editor's logic and the AI parameters it edits, ported in game_editor_vehicles / zai_params / zrdraiv (their comments name these): the vehicle list, the valve and region lists, the params' comparisons, the vlist's appends and defaults; the firing plan's std algorithms |
-| 0x004bb2e0 | 11 | dev dialog (MFC), its logic: PORT (preserve) | the vehicle editor's list fills (each valve, each region by name into a combo box); covered in the port by game_editor_vehicles 0x004bb300 / 0x004bb620 (valve and region lists) |
 | 0x004bb390 | 58 | folded | the vehicle editor's logic and the AI parameters it edits, ported in game_editor_vehicles / zai_params / zrdraiv (their comments name these): the vehicle list, the valve and region lists, the params' comparisons, the vlist's appends and defaults; the firing plan's std algorithms |
-| 0x004bb5f0 | 13 | dev dialog (MFC), its logic: PORT (preserve) | the vehicle editor's list fills (each valve, each region by name into a combo box); covered in the port by game_editor_vehicles 0x004bb300 / 0x004bb620 (valve and region lists) |
 | 0x004bbd70 | 16 | folded | the vehicle editor's logic and the AI parameters it edits, ported in game_editor_vehicles / zai_params / zrdraiv (their comments name these): the vehicle list, the valve and region lists, the params' comparisons, the vlist's appends and defaults; the firing plan's std algorithms |
 | 0x004bbdd0 | 21 | folded | the vehicle editor's logic and the AI parameters it edits, ported in game_editor_vehicles / zai_params / zrdraiv (their comments name these): the vehicle list, the valve and region lists, the params' comparisons, the vlist's appends and defaults; the firing plan's std algorithms |
 | 0x004bbe60 | 18 | folded | the vehicle editor's logic and the AI parameters it edits, ported in game_editor_vehicles / zai_params / zrdraiv (their comments name these): the vehicle list, the valve and region lists, the params' comparisons, the vlist's appends and defaults; the firing plan's std algorithms |
@@ -2260,7 +2257,7 @@ Fixed 2026-11-13 (mac5/broken-five), the five rows this table had: the radar's v
 | 0x004d9580 | 71 | folded | the vehicle editor's logic and the AI parameters it edits, ported in game_editor_vehicles / zai_params / zrdraiv (their comments name these): the vehicle list, the valve and region lists, the params' comparisons, the vlist's appends and defaults; the firing plan's std algorithms |
 | 0x004d9680 | 103 | folded | the vehicle editor's logic and the AI parameters it edits, ported in game_editor_vehicles / zai_params / zrdraiv (their comments name these): the vehicle list, the valve and region lists, the params' comparisons, the vlist's appends and defaults; the firing plan's std algorithms |
 | 0x004d9840 | 33 | folded | ported, by docs/symbols.csv: ported: PlayerControls::settings (an AiParams with the defaults) |
-| 0x004d9940 | 38 | folded | covered by the port where it names it (src/mech3/game_editor_vehicles.cpp:535) |
+| 0x004d9940 | 38 | folded | covered by the port where it names it (src/mech3/game_editor_vehicles.cpp:542) |
 | 0x004d9bf0 | 13 | folded | AI support code ported or folded: start-up cosines (the port's constants), the params' vlist copies, squares and destructors (zai_params), the brain's destructor chain, the listeners' constructor and destructor, the steps' states |
 | 0x004d9cc0 | 9 | folded | a thunk: one call to another function |
 | 0x004d9cd0 | 21 | folded | AI support code ported or folded: start-up cosines (the port's constants), the params' vlist copies, squares and destructors (zai_params), the brain's destructor chain, the listeners' constructor and destructor, the steps' states |
@@ -2343,8 +2340,8 @@ Fixed 2026-11-13 (mac5/broken-five), the five rows this table had: the radar's v
 | 0x004df620 | 9 | folded | a thunk: one call to another function |
 | 0x004df640 | 13 | folded | covered by the port where it names it (src/mech3/zrdraiv.h:70) |
 | 0x004df670 | 9 | folded | a thunk: one call to another function |
-| 0x004df6f0 | 12 | folded | covered by the port where it names it (src/mech3/game_editor_vehicles.cpp:589) |
-| 0x004df710 | 11 | folded | covered by the port where it names it (src/mech3/game_editor_vehicles.cpp:553) |
+| 0x004df6f0 | 12 | folded | covered by the port where it names it (src/mech3/game_editor_vehicles.cpp:596) |
+| 0x004df710 | 11 | folded | covered by the port where it names it (src/mech3/game_editor_vehicles.cpp:560) |
 | 0x004e001a | 168 | folded | a piece of the ported function before it (Ghidra split it there) (0x004df730) |
 | 0x004e0020 | 190 | folded | covered where the port does it: src/mech3/zrdraiv.cpp:265 (read: a destructor, a container insert or assign, or the work beside the function that comment names) |
 | 0x004e0082 | 155 | folded | follows 0x004e0020: covered where the port does it: src/mech3/zrdraiv.cpp:265 (read: a destructor, a container insert or assign, or the work beside the function that comment names) |
@@ -3690,15 +3687,15 @@ Fixed 2026-11-13 (mac5/broken-five), the five rows this table had: the radar's v
 | 0x0050d260 | 13 | folded | covered by the port where it names it (src/gamez/zeffect/zeff_anim_save.cpp:281) |
 | 0x0050da50 | 16 | replaced (SDL or the platform layer) | mech3.err (0x0050da50): the port's error reports go to stderr (app_engine.cpp:562) |
 
-### zsiscript (1 not ported)
-
-| Address | Lines | Class | Why |
-|---|---|---|---|
-| 0x005a9990 | 23 | folded | covered by the port where it names it (src/mech3/mech_anim.cpp:424) |
-
 ### zerror (1 not ported)
 
 | Address | Lines | Class | Why |
 |---|---|---|---|
 | 0x0050da70 | 9 | folded | a thunk: one call to another function |
+
+### zsiscript (1 not ported)
+
+| Address | Lines | Class | Why |
+|---|---|---|---|
+| 0x005a9990 | 23 | folded | covered by the port where it names it (src/mech3/mech_anim.cpp:424) |
 
