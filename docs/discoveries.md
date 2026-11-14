@@ -885,6 +885,17 @@ From the weapon code (weapons.md).
 
 ## Startup
 
+- **The game keeps two log files beside itself, emptied at every start.**
+  When MW3 opens its window it sends its text output to `mech3.out` and its
+  error output to `mech3.err` in the game's folder (in the temp folder as
+  `gamez.out` / `gamez.err` when the game's folder can't be written), each
+  starting "File started". After a crash, `mech3.err` is the place to look,
+  but it is wiped the next time the game starts (docs/screenshots.md).
+- **There is a screenshot key nobody can press.** The game has a command
+  that saves the screen as a .bmp through a Save dialog (or, inside a
+  multiplayer lobby, as `mw3_a12345.bmp` and the like), but no key is ever
+  bound to it in MW3 1.2 (docs/screenshots.md).
+
 - **The exe checks itself for stat hacks.** The very first thing the game does
   is a CRC-32 over two tables built into `Mech3.exe`: the mech roster (each
   mech's name, tonnage and class) and the BattleTech internal-structure table
@@ -1855,6 +1866,16 @@ From the mech definitions (mechdef-configs.md).
 ## Mechs: how a mech is built
 
 From the mech's constructor and the launch (mech-build.md).
+
+- **The game reads mech animations from plain text.** If a motion is
+  missing from `motion.zbd`, MW3 looks for a text file named after it
+  (`<name>.zan`) and reads it: frames, then for each part its rotation in
+  radians and its position, likely how the developers tried animations
+  before packing them. Shipped motions always come from the archive, so a
+  text file can only add a motion the game asks for and doesn't have.
+  The shipped data lacks one the game asks for, the Elemental's limp
+  (`elemental_limp`), so a text file of that name would give it one
+  (docs/motion.md, The text side).
 
 - **Every mech is built from two models.** Each part looks for its node in
   the full model and in the low-detail one (`mech_<name>_1`) and claims
