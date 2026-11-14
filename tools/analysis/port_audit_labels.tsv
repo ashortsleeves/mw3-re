@@ -483,8 +483,6 @@
 0x004d9fc0	devdialog-logic	an AI parameters dialog (MFC): what it reads into its list (the net's records) and positions; preserve as logic
 0x004d9f30	devdialog-shell	the same AI parameters dialog's MFC plumbing (UpdateData, a flag cleared on close)
 0x004d9f70	devdialog-shell	the same AI parameters dialog's MFC plumbing (UpdateData, a flag cleared on close)
-0x004c0ed0	unused	the vehicle's +0xd8 record of each in/out query (its constructor and reset): written, never read (docs/symbols.csv: not kept; ai.md 11)
-0x004c0f70	unused	the vehicle's +0xd8 record of each in/out query (its constructor and reset): written, never read (docs/symbols.csv: not kept; ai.md 11)
 0x004c4980	folded	the AI's mission boundary and region views (zainet_inout, zainet_inout_view; ai.md section 11): vector and list instances, the polygon and area constructors and destructors, the walks the port does as loops, getters, start-up templates
 0x004c4a40	folded	the AI's mission boundary and region views (zainet_inout, zainet_inout_view; ai.md section 11): vector and list instances, the polygon and area constructors and destructors, the walks the port does as loops, getters, start-up templates
 0x004c4a60	folded	the AI's mission boundary and region views (zainet_inout, zainet_inout_view; ai.md section 11): vector and list instances, the polygon and area constructors and destructors, the walks the port does as loops, getters, start-up templates
@@ -1031,7 +1029,6 @@
 0x0040bb00	devdialog-logic	the camera dialog (resource 0x6a: the camera's place and angles in degrees, editable; 0x0040bd00 its window): a dev tool's logic
 0x00403820	devdialog-logic	the editor's 'add vehicle to node' (0x00403820 -> 0x0049d350, editor.md); ours does it as meant: upgrades/editor/add_vehicle.cpp
 0x0049d350	devdialog-logic	the editor's 'add vehicle to node' (0x00403820 -> 0x0049d350, editor.md); ours does it as meant: upgrades/editor/add_vehicle.cpp
-0x004b1170	unused	the static the AI's planner builds at 0x0060b240 (two reserved vectors): read by nothing (weapon_planner.h:7)
 0x00403c00	folded	covered where the port does it: src/mech3/zainetedit.cpp:107 (read: a destructor, a container insert or assign, or the work beside the function that comment names)
 0x00404140	folded	covered where the port does it: src/mech3/game_editor_net.cpp:29 (read: a destructor, a container insert or assign, or the work beside the function that comment names)
 0x0040e120	folded	covered where the port does it: src/mech3/game_editor_net.cpp:229 (read: a destructor, a container insert or assign, or the work beside the function that comment names)

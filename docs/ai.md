@@ -762,7 +762,9 @@ pulled when the answer is not `in`, `out` then the answer with `in`'s
 height (read after the copy, so when the caller passes one buffer the
 answer's own height). It also fills a record on the vehicle (+0xd8: new
 0x3c bytes, 0x4c0ed0 / 0x4c0f70, the frame counter, both ends, the flags,
-the normal, the vehicle's place) that nothing in the exe reads; not kept.
+the normal, the vehicle's place) that nothing in the exe reads. Its
+constructor and reset are ported for preservation (`InOutRecord`,
+`test_inout_record.py`); the pull does not fill it.
 The callers ported so far: the attack's return 0x4cae90 (its way point),
 the drive 0x4c8a70 (its destination), the follow 0x4d1980 (the target's
 place) and the walk 0x4cee80 (its carrot, in and out one buffer). Three
