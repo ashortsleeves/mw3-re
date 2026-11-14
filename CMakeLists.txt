@@ -481,6 +481,7 @@ set_target_properties(mw3core PROPERTIES POSITION_INDEPENDENT_CODE ON)
 add_library(mw3probe SHARED
   tests/probe.cpp
   tests/probe_clip3d.cpp
+  tests/probe_zmodel_unused.cpp
   tests/probe_clip2d.cpp
   tests/probe_fogsort.cpp
   tests/probe_lighting.cpp
