@@ -73,7 +73,7 @@ uint32_t current_process_id() {
 std::string debug_screenshot(const ShotHooks& h) {
   zimg::ScreenShot shot;  // 0x005199e0
   std::string name;
-  if (shot.grab(h.grab)) {  // 0x00519990
+  if (shot.grab(h.grab, h.free_image)) {  // 0x00519990
     if (!(h.lobby && h.lobby())) {
       screenshot_save_dialog(shot, h, &name);
     } else {
