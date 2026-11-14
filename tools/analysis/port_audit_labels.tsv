@@ -641,8 +641,6 @@
 0x00410920	folded	covered by ported code beside them: the briefing's list helpers, vector inserts, the cameras' free, the options' getters (implemented in the program's hooks), the message panel's constructors and destructors, the HUD message, the AI steps' base vtable thunks, start-up statics
 0x0041d220	folded	read: the mech's vt+0x128 (vtable 0x005bcef8, the network mech's 0x005c3508 too): vt+0x120 of +0x518 x share, the stopping distance at a throttle share; its two callers, the AI attack's 0x004c9880 and 0x004d13c0, are ported as vt+0x120 of vt+0x118(share) (zai_attack.cpp:693, 741), the same value (vt+0x118 is +0x518 x share, 0x0041d1c0)
 0x0041cee0	debug	read: the mech's vt+0xf8 (the player's view pick: the crosshair's ground point, +0x1d48 of 0x00430aa0's object, when this is the viewed mech), called only by the AI net editor's commands 0x00402d60 and 0x00403160 (game_editor_net.cpp:146, 229) through the viewed vehicle; the port's editor answers for the stealth object only (app_vehicle.cpp:475)
-0x00432d30	devdialog-logic	a mech list dialog (resource 0x9c, from a debug key command in 0x0040db60): its fill of every mech name (0x00484650)
-0x00432c60	devdialog-logic	a mech list dialog (resource 0x9c, from a debug key command in 0x0040db60): its fill of every mech name (0x00484650)
 0x00432b60	devdialog-shell	the mech list dialog's MFC plumbing (constructor, destructor, DDX, OnOK, DoModal)
 0x00432be0	devdialog-shell	the mech list dialog's MFC plumbing (constructor, destructor, DDX, OnOK, DoModal)
 0x00432c30	devdialog-shell	the mech list dialog's MFC plumbing (constructor, destructor, DDX, OnOK, DoModal)
@@ -741,22 +739,7 @@
 0x004841d0	sdl	Win32 and MFC frame plumbing the SDL program replaces: the single-instance check and close (FindWindow Mech3Class; startup.md), the frame window's create, OnCreate, OnSetFocus, OnNcActivate, OnSize, WindowProc, WM_CLOSE
 0x00482c50	sdl	Win32 and MFC frame plumbing the SDL program replaces: the single-instance check and close (FindWindow Mech3Class; startup.md), the frame window's create, OnCreate, OnSetFocus, OnNcActivate, OnSize, WindowProc, WM_CLOSE
 0x00482cc0	sdl	Win32 and MFC frame plumbing the SDL program replaces: the single-instance check and close (FindWindow Mech3Class; startup.md), the frame window's create, OnCreate, OnSetFocus, OnNcActivate, OnSize, WindowProc, WM_CLOSE
-0x00483170	devdialog-logic	the frame window's debug menu (editor.md: the debug menu; MFC message map entries 0x005c41..0x005c45): its commands and their check marks or enables (display driver, video modes, a mech picked from a list, the training game, input flags)
-0x00483200	devdialog-logic	the frame window's debug menu (editor.md: the debug menu; MFC message map entries 0x005c41..0x005c45): its commands and their check marks or enables (display driver, video modes, a mech picked from a list, the training game, input flags)
-0x00483230	devdialog-logic	the frame window's debug menu (editor.md: the debug menu; MFC message map entries 0x005c41..0x005c45): its commands and their check marks or enables (display driver, video modes, a mech picked from a list, the training game, input flags)
-0x004832e0	devdialog-logic	the frame window's debug menu (editor.md: the debug menu; MFC message map entries 0x005c41..0x005c45): its commands and their check marks or enables (display driver, video modes, a mech picked from a list, the training game, input flags)
-0x00483330	devdialog-logic	the frame window's debug menu (editor.md: the debug menu; MFC message map entries 0x005c41..0x005c45): its commands and their check marks or enables (display driver, video modes, a mech picked from a list, the training game, input flags)
-0x004833f0	devdialog-logic	the frame window's debug menu (editor.md: the debug menu; MFC message map entries 0x005c41..0x005c45): its commands and their check marks or enables (display driver, video modes, a mech picked from a list, the training game, input flags)
-0x00483400	devdialog-logic	the frame window's debug menu (editor.md: the debug menu; MFC message map entries 0x005c41..0x005c45): its commands and their check marks or enables (display driver, video modes, a mech picked from a list, the training game, input flags)
-0x00483410	devdialog-logic	the frame window's debug menu (editor.md: the debug menu; MFC message map entries 0x005c41..0x005c45): its commands and their check marks or enables (display driver, video modes, a mech picked from a list, the training game, input flags)
-0x00483430	devdialog-logic	the frame window's debug menu (editor.md: the debug menu; MFC message map entries 0x005c41..0x005c45): its commands and their check marks or enables (display driver, video modes, a mech picked from a list, the training game, input flags)
-0x00483460	devdialog-logic	the frame window's debug menu (editor.md: the debug menu; MFC message map entries 0x005c41..0x005c45): its commands and their check marks or enables (display driver, video modes, a mech picked from a list, the training game, input flags)
-0x004834b0	devdialog-logic	the frame window's debug menu (editor.md: the debug menu; MFC message map entries 0x005c41..0x005c45): its commands and their check marks or enables (display driver, video modes, a mech picked from a list, the training game, input flags)
-0x00483570	devdialog-logic	the frame window's debug menu (editor.md: the debug menu; MFC message map entries 0x005c41..0x005c45): its commands and their check marks or enables (display driver, video modes, a mech picked from a list, the training game, input flags)
-0x004835c0	devdialog-logic	the frame window's debug menu (editor.md: the debug menu; MFC message map entries 0x005c41..0x005c45): its commands and their check marks or enables (display driver, video modes, a mech picked from a list, the training game, input flags)
-0x00483600	devdialog-logic	the frame window's debug menu (editor.md: the debug menu; MFC message map entries 0x005c41..0x005c45): its commands and their check marks or enables (display driver, video modes, a mech picked from a list, the training game, input flags)
-0x00483620	devdialog-logic	the frame window's debug menu (editor.md: the debug menu; MFC message map entries 0x005c41..0x005c45): its commands and their check marks or enables (display driver, video modes, a mech picked from a list, the training game, input flags)
-0x00483640	devdialog-logic	the frame window's debug menu (editor.md: the debug menu; MFC message map entries 0x005c41..0x005c45): its commands and their check marks or enables (display driver, video modes, a mech picked from a list, the training game, input flags)
+0x004832e0	sdl	the frame's WM_ACTIVATE (message map 0x005c41c0..): CFrameWnd::OnActivate, then the keyboard reset (0x0051a300); the SDL program has no frame window (editor.md, The debug menu)
 0x00483260	devdialog-shell	the debug menu's About box (resource 0x67)
 0x0047dac0	folded	covered: the screens' destructors and constructors (unwind callers), the app states' constructors (their names), InitInstance's body (0x00480020, app.cpp's 0x00480000 port), RunDir (the program's data folder replaces it), the world defaults (no effect, app_engine.cpp)
 0x0047ea10	folded	covered: the screens' destructors and constructors (unwind callers), the app states' constructors (their names), InitInstance's body (0x00480020, app.cpp's 0x00480000 port), RunDir (the program's data folder replaces it), the world defaults (no effect, app_engine.cpp)
@@ -789,7 +772,6 @@
 0x004a48e0	unused	the turn limits' clamp (vt+0x04) for the Fixed, Narrow and Wide kinds (vtables 0x005c8310/20/30): the turret never asks clamp (turret.h:31) and the AI's track keeps its answer only for a dot product it drops (vehicles.md, zai_firing.cpp:554)
 0x004a3fb0	unused	the turn limits' clamp (vt+0x04) for the Fixed, Narrow and Wide kinds (vtables 0x005c8310/20/30): the turret never asks clamp (turret.h:31) and the AI's track keeps its answer only for a dot product it drops (vehicles.md, zai_firing.cpp:554)
 0x004a3fe0	unused	the turn limits' clamp (vt+0x04) for the Fixed, Narrow and Wide kinds (vtables 0x005c8310/20/30): the turret never asks clamp (turret.h:31) and the AI's track keeps its answer only for a dot product it drops (vehicles.md, zai_firing.cpp:554)
-0x004a3550	debug	the vehicle pick of debug command 0x8a (app_key, never bound in the release): an MFC dialog (resource 0x430's list, 0x004aef00) whose chosen vehicle gets the view (its vt+0x108); with the dialog sittings
 0x004a35e0	devdialog-shell	the vehicle pick dialog's destructor (0x004a3550's MFC plumbing: its combo box and CDialog)
 0x004a4ca0	devdialog-shell	the vehicle pick dialog's DoDataExchange (vtable 0x005c8414: the combo box 0x430 at +0x6c)
 0x0049d710	devdialog-logic	the editor's 'add vehicle to node' dialog (editor.md: a vehicle picked from a dialog, 0x0049d350 / 0x0049d8b0): its list fill, its team and target bits from the player's mech (+0xc4, +0xc8), the yaw in radians
@@ -835,7 +817,6 @@
 0x0049dc40	folded	covered: the screens' and states' constructors and destructors, list and vector instances (mechdef-configs.md names 0x0049da10), string copies, the missions object's queries (the program's GameEngine overrides them: app_engine.h:128 and the rest), the fade wrapper, the mission cleanup
 0x0049fe70	folded	covered: the screens' and states' constructors and destructors, list and vector instances (mechdef-configs.md names 0x0049da10), string copies, the missions object's queries (the program's GameEngine overrides them: app_engine.h:128 and the rest), the fade wrapper, the mission cleanup
 0x004a4050	folded	covered: the screens' and states' constructors and destructors, list and vector instances (mechdef-configs.md names 0x0049da10), string copies, the missions object's queries (the program's GameEngine overrides them: app_engine.h:128 and the rest), the fade wrapper, the mission cleanup
-0x004af000	devdialog-logic	a vehicle-pick dev dialog (resource 0x8f, from the debug key's 0x004a3550): its list of zEntity's vehicles
 0x004aef00	devdialog-shell	the vehicle-pick dialog's MFC plumbing
 0x004aef80	devdialog-shell	the vehicle-pick dialog's MFC plumbing
 0x004aefb0	devdialog-shell	the vehicle-pick dialog's MFC plumbing
@@ -1000,7 +981,6 @@
 0x00548e60	folded	covered: zModel's reset of its materials (module-starts.md: the port's initialisers), small helpers and list initialisers beside ported code
 0x0054b680	folded	covered: zModel's reset of its materials (module-starts.md: the port's initialisers), small helpers and list initialisers beside ported code
 0x0054b6f0	folded	covered: zModel's reset of its materials (module-starts.md: the port's initialisers), small helpers and list initialisers beside ported code
-0x0040bb00	devdialog-logic	the camera dialog (resource 0x6a: the camera's place and angles in degrees, editable; 0x0040bd00 its window): a dev tool's logic
 0x00403820	devdialog-logic	the editor's 'add vehicle to node' (0x00403820 -> 0x0049d350, editor.md); ours does it as meant: upgrades/editor/add_vehicle.cpp
 0x0049d350	devdialog-logic	the editor's 'add vehicle to node' (0x00403820 -> 0x0049d350, editor.md); ours does it as meant: upgrades/editor/add_vehicle.cpp
 0x00403c00	folded	covered where the port does it: src/mech3/zainetedit.cpp:107 (read: a destructor, a container insert or assign, or the work beside the function that comment names)
@@ -1613,3 +1593,5 @@
 0x004c79e0	folded	read: a static float made once from a double constant ([0x0060b44c] to [0x0060b46c]), read by nothing: no effect
 0x00500670	folded	read: the static constructor of a decal container (an STL tree's head made by 0x00500cd0, the counts at [0x0060bf94..0x0060bf9c] zeroed), which zdec_init's 0x00500850 / 0x00500af0 / 0x00500c60 use; the port's container
 0x00555d00	folded	read: the static constructor of an STL list's shared head (malloc(0xc), 0x00555d20, the instance count up), zreader's; the port's containers
+0x00483360	sdl	the frame's WM_KILLFOCUS (message map 0x005c41c0): Default, then the input released (0x0051b050); the SDL program has no frame window
+0x004841f0	sdl	the frame's WM_MOVE (message map 0x005c41c0): Default only; the SDL program has no frame window
