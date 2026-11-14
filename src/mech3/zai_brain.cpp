@@ -767,6 +767,21 @@ void FaceState::run(float dt) {
   c.set_turn(keep);
 }
 
+// Mech3.exe 1.2 @ 0x004e95b0
+bool Brain::drop_target(zgame::Handle entity) {
+  BrainHooks& h = brain_hooks();
+  bool r = !(entity && h.entity_on_path(entity));
+  const zgame::Handle v = controls->vehicle();
+  AiTarget* t = h.targetable(v);
+  const zgame::Handle on = t && t->target ? t->target->seen : 0;  // +0x6c, the contact's +0x04
+  if (on == entity) {
+    r = true;
+    h.select_target(v, nullptr);  // vt+0xc0(0, 0)
+    h.firing_reset(*this);        // 0x004e9590
+  }
+  return r;
+}
+
 BehaviourState* Behaviour::make_state(Order& o) {
   switch (kind) {
     case StepKind::Behaviour: return new DefaultState(&o, this);

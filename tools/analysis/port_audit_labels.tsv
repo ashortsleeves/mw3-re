@@ -201,7 +201,6 @@
 0x004d9d40	folded	AI support code ported or folded: start-up cosines (the port's constants), the params' vlist copies, squares and destructors (zai_params), the brain's destructor chain, the listeners' constructor and destructor, the steps' states
 0x004e7090	folded	AI support code ported or folded: start-up cosines (the port's constants), the params' vlist copies, squares and destructors (zai_params), the brain's destructor chain, the listeners' constructor and destructor, the steps' states
 0x004e7290	folded	AI support code ported or folded: start-up cosines (the port's constants), the params' vlist copies, squares and destructors (zai_params), the brain's destructor chain, the listeners' constructor and destructor, the steps' states
-0x004e95b0	unused	IControls vt+0x84 of the AI controls (drop the target if it is the given entity's, stand the firing down): no caller reaches that slot (docs/ai.md, the AI controls' unreached slots)
 0x004eaab0	sdl	the start's video device picker: an MFC CDialog with a list box (0x004eaab0 and its constructor, destructor, data exchange and init); the SDL GPU device replaces it
 0x004ea9b0	sdl	the start's video device picker: an MFC CDialog with a list box (0x004eaab0 and its constructor, destructor, data exchange and init); the SDL GPU device replaces it
 0x004eaa30	sdl	the start's video device picker: an MFC CDialog with a list box (0x004eaab0 and its constructor, destructor, data exchange and init); the SDL GPU device replaces it

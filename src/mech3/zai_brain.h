@@ -63,6 +63,9 @@ class BrainHooks : public zgame::Unported {
     unported("attacker.ictl.vt+0x98", {attacker, victim});
   }
   virtual void allies_turn() { unported("0x004d5dc0", {}); }
+  // 0x004e95b0's: an entity's mech (vt+0x40), its controls (vt+0x140) and
+  // whether they keep to a path (IControls vt+0x70: only the AI's).
+  virtual bool entity_on_path(zgame::Handle e) { return unported("entity.vt+0x40.vt+0x140.ictl.vt+0x70", {e}) & 0xff; }
   // 0x004ea260 (the refit order, zai_repair.cpp): the repair behaviour
   // pushed when a field base is up and the dock takes the pilot.
   virtual bool refit(Brain& b);
@@ -623,6 +626,11 @@ class Brain {
     firing.obstacle = victim;
     firing.stand_down();
   }
+  // 0x004e95b0, the AI controls' IControls vt+0x84 (no caller reaches it;
+  // ported for preservation, docs/ai.md 12): the vehicle's target dropped and
+  // the firing stood down when the target is on `entity` (or neither has
+  // one); 0 when `entity` keeps to a path (an AI's) and is not the target.
+  bool drop_target(zgame::Handle entity);
   bool may_fire();                                 // 0x004e9070
   // The vlist triggers (docs/ai.md 17.5): 0x004e9550 -> 0x004d9290 over the
   // settings' list, the nearest enemy picked once between them and the frame.
