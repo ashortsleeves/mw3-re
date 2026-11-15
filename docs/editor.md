@@ -539,6 +539,12 @@ AI net's nodes answer in `game_editor_net`), so it is engine code, not AI.
   point through the world from the camera's near plane to its far one, the
   nearest crossing (0x004eece0), or the far end when nothing is crossed,
   kept on the stealth's overlay (the image's +0xbc) for vt+0xf8.
+- **A mech's vt+0xf8** (0x0041cee0; S21, `Engine::view_pick`, preserved, unwired): when the mech is the one the
+  player's view is on ([0x005f4c8c] +0x64), its pilot HUD's (0x00430aa0 on its +0x684) pick point, the HUD's
+  +0x1d48: copied into the caller's three floats (that pointer returned) or the HUD's own address; 0 otherwise. So
+  the editor's frame and New Node would have taken the crosshair's ground point when the view was on a mech; the
+  port's editor runs with the view on the stealth object only. `test_s21_preserve.py`: 600 picks (the viewed mech or
+  another, no HUD, out given or not) identical.
 - **Not yet** (at 3b; the record cache came with 4a, below): a moved or
   linked node was not in the save; the frame's pixel-doubled branch (0x0040d4b0: the
   projection on the half window) is not the port's (no doubling).

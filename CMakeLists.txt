@@ -495,6 +495,7 @@ add_library(mw3probe SHARED
   tests/probe_zmath_unused.cpp
   tests/probe_zimg_fonts.cpp
   tests/probe_s14_misc.cpp
+  tests/probe_s21.cpp
   tests/probe_screen.cpp
   tests/probe_strips.cpp
   tests/probe_ripple.cpp

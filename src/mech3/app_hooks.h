@@ -445,6 +445,11 @@ class Engine : public zgame::AppHooks {
   // has its cockpit refitted (0x0041cdc0). The program keeps its own list.
   virtual void screen_mode_cockpits();
   virtual void cockpit_refit(Handle mech);   // 0x0041cdc0, ported
+  // Mech3.exe 1.2 @ 0x0041cee0: a mech's vt+0xf8, the view's pick (the crosshair's ground point, the pilot HUD's
+  // +0x1d48) when it is the viewed mech: copied into `out` (returned) when given, else the HUD's own; 0 for any
+  // other mech or no HUD. Asked only by the AI net editor's commands 0x00402d60 / 0x00403160 through the viewed
+  // vehicle; the port's editor answers for the stealth object only (app_vehicle.cpp). Preserved, unwired.
+  virtual Handle view_pick(Handle mech, Handle out);
   virtual void hud_setup(Handle hud, Handle mech) { unported("0x0043bb80", {hud, mech}); }
   // What the controls screen calls (docs/menus.md, The controls screen): zInput's
   // key and button capture and its command map (the current map's 0x0051d2xx

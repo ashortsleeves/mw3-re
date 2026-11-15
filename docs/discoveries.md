@@ -4242,6 +4242,11 @@ The screen after the pilot for INSTANT ACTION, 0x00488bc0 (details:
   equipment and no weapons. The lesson starts with powering up and
   walking. (docs/mission-plan.md, item 21)
 
+- **MechWarrior 3 can drop a model's textures and load them back, but nothing uses it.** Each material has a spare
+  flag that marks it as one whose textures may be unloaded; code exists to set that flag on every textured part of a
+  model and to free those textures (animated ones' every frame too), leaving them marked to be read from disk again
+  when next needed. Nothing in the game ever sets the flag or calls either, so every texture stays in memory for the
+  whole mission. (docs/render.md, The unused zModel helpers)
 - **The game ships bitmap fonts it never uses.** fonts.zrd lists bitmap
   fonts (images of the 95 printable characters), and the game loads them
   at start-up. Every text you see is drawn with Windows fonts instead

@@ -16,8 +16,6 @@ container code, or covered where the port names it); **replaced** (SDL or the pl
 | replaced (SDL or the platform layer) | 249 |
 | software renderer | 113 |
 | dev dialog (MFC), its window plumbing: replaced | 56 |
-| unused: PORT (preserve) | 6 |
-| debug or dev tool: PORT (preserve) | 1 |
 
 ## MISSING LOGIC
 
@@ -37,22 +35,12 @@ Fixed 2026-11-13 (mac5/broken-five), the five rows this table had: the radar's v
 
 ## PORT (preserve)
 
-### debug or dev tool: PORT (preserve)
-
-- 1 functions, 25 decomp lines (0x0041cee0): read: the mech's vt+0xf8 (the player's view pick: the crosshair's ground point, +0x1d48 of 0x00430aa0's object, when this is the viewed mech), called only by the AI net editor's commands 0x00402d60 and 0x00403160 (game_editor_net.cpp:146, 229) through the viewed vehicle; the port's editor answers for the stealth object only (app_vehicle.cpp:475)
-
-### unused: PORT (preserve)
-
-- 1 functions, 15 decomp lines (0x005190e0): frees a chain of loaded textures; its only caller 0x005374d0 is unreached
-- 4 functions, 82 decomp lines (0x005374b0, 0x005374d0, 0x0053bb90, 0x0053bbd0): large zModel functions nothing calls or tables (no static reference anywhere): clippers and matrix work beside the software path, material flag setters over a model's materials, light helpers
-- 1 functions, 16 decomp lines (0x00557450): the defines list's constructor and destructor, no caller reaches them (zreader.md:103)
-
 ## UNSURE
 
 
 ## By module
 
-### mech3 (2800 not ported)
+### mech3 (2799 not ported)
 
 | Address | Lines | Class | Why |
 |---|---|---|---|
@@ -375,7 +363,6 @@ Fixed 2026-11-13 (mac5/broken-five), the five rows this table had: the radar's v
 | 0x0041cdf0 | 10 | folded | covered by ported code beside them: controls file and landmine helpers, getters and setters, the mech's IControls cast, the animation's members, list helpers, constructors and destructors, the force feedback's release and reset (input.md) |
 | 0x0041ce00 | 9 | folded | a thunk: one call to another function |
 | 0x0041ce10 | 9 | folded | a thunk: one call to another function |
-| 0x0041cee0 | 25 | debug or dev tool: PORT (preserve) | read: the mech's vt+0xf8 (the player's view pick: the crosshair's ground point, +0x1d48 of 0x00430aa0's object, when this is the viewed mech), called only by the AI net editor's commands 0x00402d60 and 0x00403160 (game_editor_net.cpp:146, 229) through the viewed vehicle; the port's editor answers for the stealth object only (app_vehicle.cpp:475) |
 | 0x0041d1c0 | 8 | folded | ported, by docs/symbols.csv: ported; Mech::speed_at (vt+0x118): max_speed * share |
 | 0x0041d200 | 8 | folded | returns a constant or a global |
 | 0x0041d210 | 8 | folded | ported, by docs/symbols.csv: ported; Mech::stopping_distance (vt+0x120): speed / decel_rate |
@@ -1106,7 +1093,7 @@ Fixed 2026-11-13 (mac5/broken-five), the five rows this table had: the radar's v
 | 0x004729d0 | 26 | folded | covered by ported code beside them: the force feedback's release, the game classes' small virtuals (first enemy, record slots, flags; mission-start.md), list and vector instances (mechdef-*.md name 0x0046cc00, 0x00475bf0, 0x00475c20), static list initialisers, the pilot's game-type getters (0x00479460/80, 0x004794a0, used by the port), part classes' constant virtuals and their damage path, constructors and destructors, the mcbwaynet's calls (app_vehicle.cpp) |
 | 0x004730d0 | 10 | folded | covered by the port where it names it (src/mech3/mech_config.h:34) |
 | 0x004731e0 | 19 | folded | covered by ported code beside them: the force feedback's release, the game classes' small virtuals (first enemy, record slots, flags; mission-start.md), list and vector instances (mechdef-*.md name 0x0046cc00, 0x00475bf0, 0x00475c20), static list initialisers, the pilot's game-type getters (0x00479460/80, 0x004794a0, used by the port), part classes' constant virtuals and their damage path, constructors and destructors, the mcbwaynet's calls (app_vehicle.cpp) |
-| 0x00473740 | 19 | folded | covered by the port where it names it (src/mech3/app_hooks.h:947) |
+| 0x00473740 | 19 | folded | covered by the port where it names it (src/mech3/app_hooks.h:952) |
 | 0x00473780 | 39 | folded | covered by the port where it names it (src/mech3/mech_salvage.cpp:149) |
 | 0x00473860 | 21 | folded | covered by the port where it names it (src/mech3/mech_salvage.cpp:148) |
 | 0x004738b0 | 19 | folded | ported, by docs/symbols.csv: ported: item_label |
@@ -1656,13 +1643,13 @@ Fixed 2026-11-13 (mac5/broken-five), the five rows this table had: the radar's v
 | 0x004aded0 | 156 | folded | covered: the stealth's controls (app_vehicle.cpp:604), the turret's slots, the sensors' vector instances (ai.md 15), the vehicles' list instances, the controls' constant virtuals (controls.md), the weapon lists, the firing's thunks, start-up statics |
 | 0x004ae220 | 2 | folded | a virtual-base adjustor thunk (this moved by the vtordisp, then the function it jumps to; from the disassembly) |
 | 0x004ae230 | 17 | folded | a virtual-base scalar deleting destructor (behind its adjustor thunk, found by the S20 sweep): the destructor, the vtable reset, delete when asked; the port's classes destroy themselves |
-| 0x004ae340 | 8 | folded | covered by the port where it names it (src/mech3/veh_basic_controls.h:87) |
+| 0x004ae340 | 8 | folded | covered by the port where it names it (src/mech3/veh_basic_controls.h:84) |
 | 0x004ae360 | 12 | folded | a destructor (the exception unwinds call it; it resets the vtable) |
-| 0x004ae380 | 16 | folded | covered by the port where it names it (src/mech3/veh_basic_controls.h:83) |
+| 0x004ae380 | 16 | folded | covered by the port where it names it (src/mech3/veh_basic_controls.h:80) |
 | 0x004ae690 | 5 | folded | ported: BasicControls::on_path (IControls vt+0x70, behind the adjustor 0x004aeaf0) |
-| 0x004ae6a0 | 8 | folded | covered by the port where it names it (src/mech3/veh_basic_controls.h:92) |
+| 0x004ae6a0 | 8 | folded | covered by the port where it names it (src/mech3/veh_basic_controls.h:89) |
 | 0x004ae840 | 1 | folded | a thunk: one jump to another function (from the disassembly) |
-| 0x004ae850 | 21 | folded | covered by the port where it names it (src/mech3/veh_basic_controls.h:88) |
+| 0x004ae850 | 21 | folded | covered by the port where it names it (src/mech3/veh_basic_controls.h:85) |
 | 0x004ae8a0 | 2 | folded | a static initializer (from the disassembly: the constructor it calls, then its destructor registered with atexit); the port's statics construct and destroy themselves |
 | 0x004ae8b0 | 9 | folded | a thunk: one call to another function |
 | 0x004ae8c0 | 9 | folded | a thunk: one call to another function |
@@ -2999,7 +2986,7 @@ Fixed 2026-11-13 (mac5/broken-five), the five rows this table had: the radar's v
 | 0x0058fc30 | 11 | folded | the engine's stop (the app's vt+0xb0, docs/game-loop.md): the modules' shutdowns in order (0x0051b170 .. 0x00555d90), covered where app_hooks.h names each |
 | 0x0058fcd0 | 39 | folded | covered by the port where it names it (src/gamez/zgame/zgameapp.h:59) |
 
-### zmodel (132 not ported)
+### zmodel (128 not ported)
 
 | Address | Lines | Class | Why |
 |---|---|---|---|
@@ -3025,8 +3012,6 @@ Fixed 2026-11-13 (mac5/broken-five), the five rows this table had: the radar's v
 | 0x00536830 | 80 | folded | covered: zModel's reset of its materials (module-starts.md: the port's initialisers), small helpers and list initialisers beside ported code |
 | 0x00536a60 | 8 | folded | empty: does nothing |
 | 0x005372c0 | 54 | folded | covered: the puffers' setters and wind (gmod_puff.cpp:136..157, world-params.md), their vector instances, the materials' free with the models (app_mission.cpp:1868), the reader's link pool (the port's C++ containers; startup.md) and RdrSetPath / RdrAddPath (zinterp.cpp:128, the mounts) |
-| 0x005374b0 | 15 | unused: PORT (preserve) | large zModel functions nothing calls or tables (no static reference anywhere): clippers and matrix work beside the software path, material flag setters over a model's materials, light helpers |
-| 0x005374d0 | 21 | unused: PORT (preserve) | large zModel functions nothing calls or tables (no static reference anywhere): clippers and matrix work beside the software path, material flag setters over a model's materials, light helpers |
 | 0x00537520 | 31 | replaced (SDL or the platform layer) | the used textures' system surfaces released after the launch (DirectDraw; the port's record is one Render3D handle: app_engine.cpp no effect) |
 | 0x00538050 | 10 | folded | covered by the port where it names it (src/gamez/zmodel/gmod_const.cpp:601) |
 | 0x00538060 | 11 | folded | covered by the port where it names it (src/gamez/zmodel/gmod_const.cpp:602) |
@@ -3036,8 +3021,6 @@ Fixed 2026-11-13 (mac5/broken-five), the five rows this table had: the radar's v
 | 0x00539d50 | 11 | folded | covered by the port where it names it (src/gamez/zclass/cls_node.cpp:506) |
 | 0x00539d60 | 11 | folded | covered by the port where it names it (src/gamez/zclass/cls_node.cpp:503) |
 | 0x00539d70 | 10 | folded | a getter of a member |
-| 0x0053bb90 | 23 | unused: PORT (preserve) | large zModel functions nothing calls or tables (no static reference anywhere): clippers and matrix work beside the software path, material flag setters over a model's materials, light helpers |
-| 0x0053bbd0 | 23 | unused: PORT (preserve) | large zModel functions nothing calls or tables (no static reference anywhere): clippers and matrix work beside the software path, material flag setters over a model's materials, light helpers |
 | 0x0053ce20 | 17 | folded | covered by the port where it names it (src/gamez/ztwod/twod_host.h:134) |
 | 0x0053cf00 | 10 | folded | covered by the port where it names it (src/gamez/zinterp/zinterp.h:329) |
 | 0x0053d560 | 56 | software renderer | the software model draw's projection and clippers, its own lighting, the span buffer's pick and hidden-surface test, the small polygon reject, palette shading (software-path.md, render-clip3d.md, render-lighting.md: the software renderer, not ported by decision) |
@@ -3133,7 +3116,7 @@ Fixed 2026-11-13 (mac5/broken-five), the five rows this table had: the radar's v
 | 0x00556160 | 13 | folded | covered: the puffers' setters and wind (gmod_puff.cpp:136..157, world-params.md), their vector instances, the materials' free with the models (app_mission.cpp:1868), the reader's link pool (the port's C++ containers; startup.md) and RdrSetPath / RdrAddPath (zinterp.cpp:128, the mounts) |
 | 0x005561a0 | 14 | folded | covered: the puffers' setters and wind (gmod_puff.cpp:136..157, world-params.md), their vector instances, the materials' free with the models (app_mission.cpp:1868), the reader's link pool (the port's C++ containers; startup.md) and RdrSetPath / RdrAddPath (zinterp.cpp:128, the mounts) |
 | 0x005561e0 | 13 | folded | covered: the puffers' setters and wind (gmod_puff.cpp:136..157, world-params.md), their vector instances, the materials' free with the models (app_mission.cpp:1868), the reader's link pool (the port's C++ containers; startup.md) and RdrSetPath / RdrAddPath (zinterp.cpp:128, the mounts) |
-| 0x00556240 | 38 | folded | covered by the port where it names it (src/gamez/zreader/zreader.cpp:921) |
+| 0x00556240 | 38 | folded | covered by the port where it names it (src/gamez/zreader/zreader.cpp:926) |
 | 0x00557090 | 10 | folded | covered by the port where it names it (src/mech3/veh_basic_object.h:137) |
 
 ### zsound (83 not ported)
@@ -3171,7 +3154,7 @@ Fixed 2026-11-13 (mac5/broken-five), the five rows this table had: the radar's v
 | 0x005728b0 | 19 | folded | covered by the port where it names it (src/gamez/zsound/zsnd_cd.cpp:24) |
 | 0x00572ec0 | 14 | replaced (SDL or the platform layer) | the CD music volume through the Windows mixer and aux API (sound.md:264: the music output's own volume stands in) |
 | 0x00572ee0 | 40 | replaced (SDL or the platform layer) | the CD music volume through the Windows mixer and aux API (sound.md:264: the music output's own volume stands in) |
-| 0x00573040 | 8 | folded | covered by the port where it names it (src/mech3/app_hooks.h:508) |
+| 0x00573040 | 8 | folded | covered by the port where it names it (src/mech3/app_hooks.h:513) |
 | 0x00573060 | 40 | replaced (SDL or the platform layer) | the CD music volume through the Windows mixer and aux API (sound.md:264: the music output's own volume stands in) |
 | 0x00573140 | 18 | replaced (SDL or the platform layer) | the CD music volume through the Windows mixer and aux API (sound.md:264: the music output's own volume stands in) |
 | 0x00573170 | 29 | replaced (SDL or the platform layer) | the CD music volume through the Windows mixer and aux API (sound.md:264: the music output's own volume stands in) |
@@ -3217,7 +3200,7 @@ Fixed 2026-11-13 (mac5/broken-five), the five rows this table had: the radar's v
 | 0x00576080 | 12 | folded | covered by the port where it names it (src/gamez/zsound/zsnd_parm.cpp:222) |
 | 0x005760b0 | 19 | folded | covered by the port where it names it (src/gamez/zsound/zsnd_create.cpp:129) |
 | 0x00576100 | 12 | folded | zUtil's search path lists: each user keeps its own path string (zsnd_init.cpp:223, mech_fieldbase.h:295, zinterp.cpp:240) and the file finder is the platform's (zimg_library.h:75, zsnd_parm.cpp:17, FIX (A)); the default list's free has nothing to free (mission-frame.md:184) |
-| 0x00576120 | 10 | folded | covered by the port where it names it (src/gamez/zreader/zreader.cpp:629) |
+| 0x00576120 | 10 | folded | covered by the port where it names it (src/gamez/zreader/zreader.cpp:634) |
 | 0x00576140 | 40 | folded | zUtil's search path lists: each user keeps its own path string (zsnd_init.cpp:223, mech_fieldbase.h:295, zinterp.cpp:240) and the file finder is the platform's (zimg_library.h:75, zsnd_parm.cpp:17, FIX (A)); the default list's free has nothing to free (mission-frame.md:184) |
 | 0x00576250 | 12 | folded | covered by the port where it names it (src/mech3/app_engine.cpp:328) |
 | 0x00576270 | 15 | folded | zUtil's search path lists: each user keeps its own path string (zsnd_init.cpp:223, mech_fieldbase.h:295, zinterp.cpp:240) and the file finder is the platform's (zimg_library.h:75, zsnd_parm.cpp:17, FIX (A)); the default list's free has nothing to free (mission-frame.md:184) |
@@ -3599,11 +3582,10 @@ Fixed 2026-11-13 (mac5/broken-five), the five rows this table had: the radar's v
 | 0x00598b30 | 66 | replaced (SDL or the platform layer) | the machine probe (fixes.md:289, (A)): CPUID and its vendor, family and MMX tests, the MHz timing loops (QueryPerformanceCounter, RDTSC, the CMOS port, Intel's cpuspeed with its divide by zero: protection.md:140), GlobalMemoryStatus and the DirectDraw caps; the port fills zutl_reg's Machine itself (zutl_reg.cpp:48) |
 | 0x00598c80 | 13 | replaced (SDL or the platform layer) | the machine probe (fixes.md:289, (A)): CPUID and its vendor, family and MMX tests, the MHz timing loops (QueryPerformanceCounter, RDTSC, the CMOS port, Intel's cpuspeed with its divide by zero: protection.md:140), GlobalMemoryStatus and the DirectDraw caps; the port fills zutl_reg's Machine itself (zutl_reg.cpp:48) |
 
-### zreader (50 not ported)
+### zreader (49 not ported)
 
 | Address | Lines | Class | Why |
 |---|---|---|---|
-| 0x00557450 | 16 | unused: PORT (preserve) | the defines list's constructor and destructor, no caller reaches them (zreader.md:103) |
 | 0x00557480 | 2 | folded | a static initializer (from the disassembly: the constructor it calls, then its destructor registered with atexit); the port's statics construct and destroy themselves |
 | 0x005574c0 | 9 | folded | a thunk: one call to another function |
 | 0x00557b10 | 9 | folded | start-up and stop plumbing with no effect in the port: zRender's two buffers freed at stop (app_engine.cpp:326), the pitch store that is only written (app_engine.cpp:311) |
@@ -3654,7 +3636,7 @@ Fixed 2026-11-13 (mac5/broken-five), the five rows this table had: the radar's v
 | 0x00566230 | 15 | software renderer | the software renderer: zRender's reset and span table (0x00557b20/30), its perspective step (SetPerspectiveTextureDeltaX), the mip toggle on a debug key (0x00557f70, only software reads [0x00800814]), the span fillers and depth spans, the 8- and 16-bit polygon fills and blits, the pixel-plotted lights and flares (weapon-effects.md:61), the fog and light table picks, the span buffer's init, clear and free and its screen pick (software-path.md:28,46) |
 | 0x00566250 | 19 | folded | covered by the port where it names it (src/mech3/mission_world.h:89) |
 
-### zimage (48 not ported)
+### zimage (47 not ported)
 
 | Address | Lines | Class | Why |
 |---|---|---|---|
@@ -3698,7 +3680,6 @@ Fixed 2026-11-13 (mac5/broken-five), the five rows this table had: the radar's v
 | 0x00518c50 | 9 | folded | a thunk: one call to another function |
 | 0x00518f50 | 11 | folded | one-line setters/lookups the port does inline: zImage's library flag (no effect, app_engine.cpp:307), the texture group (mech_lib.cpp:34, app_mission.cpp:1910), the archive file test (zimg_library.cpp:20), the extension cut (zimg_texture.cpp:94) |
 | 0x00518f60 | 8 | folded | returns a constant or a global |
-| 0x005190e0 | 15 | unused: PORT (preserve) | frees a chain of loaded textures; its only caller 0x005374d0 is unreached |
 | 0x00519120 | 25 | software renderer | the software renderer's texture tables: the nth mip of a chain for 0x00563940 (module-starts.md:158) and the 32 light and fog levels of every paletted texture (software-path.md:30) |
 | 0x00519150 | 121 | folded | one-line setters/lookups the port does inline: zImage's library flag (no effect, app_engine.cpp:307), the texture group (mech_lib.cpp:34, app_mission.cpp:1910), the archive file test (zimg_library.cpp:20), the extension cut (zimg_texture.cpp:94) |
 | 0x00519370 | 51 | software renderer | the software renderer's texture tables: the nth mip of a chain for 0x00563940 (module-starts.md:158) and the 32 light and fog levels of every paletted texture (software-path.md:30) |
@@ -4003,15 +3984,15 @@ Fixed 2026-11-13 (mac5/broken-five), the five rows this table had: the radar's v
 | 0x0050d260 | 13 | folded | covered by the port where it names it (src/gamez/zeffect/zeff_anim_save.cpp:281) |
 | 0x0050da50 | 16 | replaced (SDL or the platform layer) | mech3.err (0x0050da50): the port's error reports go to stderr (app_engine.cpp:562) |
 
-### zerror (1 not ported)
-
-| Address | Lines | Class | Why |
-|---|---|---|---|
-| 0x0050da70 | 9 | folded | a thunk: one call to another function |
-
 ### zsiscript (1 not ported)
 
 | Address | Lines | Class | Why |
 |---|---|---|---|
 | 0x005a9990 | 23 | folded | covered by the port where it names it (src/mech3/mech_anim.cpp:424) |
+
+### zerror (1 not ported)
+
+| Address | Lines | Class | Why |
+|---|---|---|---|
+| 0x0050da70 | 9 | folded | a thunk: one call to another function |
 

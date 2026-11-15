@@ -623,7 +623,6 @@
 0x004106d0	folded	covered by ported code beside them: the briefing's list helpers, vector inserts, the cameras' free, the options' getters (implemented in the program's hooks), the message panel's constructors and destructors, the HUD message, the AI steps' base vtable thunks, start-up statics
 0x00410920	folded	covered by ported code beside them: the briefing's list helpers, vector inserts, the cameras' free, the options' getters (implemented in the program's hooks), the message panel's constructors and destructors, the HUD message, the AI steps' base vtable thunks, start-up statics
 0x0041d220	folded	read: the mech's vt+0x128 (vtable 0x005bcef8, the network mech's 0x005c3508 too): vt+0x120 of +0x518 x share, the stopping distance at a throttle share; its two callers, the AI attack's 0x004c9880 and 0x004d13c0, are ported as vt+0x120 of vt+0x118(share) (zai_attack.cpp:693, 741), the same value (vt+0x118 is +0x518 x share, 0x0041d1c0)
-0x0041cee0	debug	read: the mech's vt+0xf8 (the player's view pick: the crosshair's ground point, +0x1d48 of 0x00430aa0's object, when this is the viewed mech), called only by the AI net editor's commands 0x00402d60 and 0x00403160 (game_editor_net.cpp:146, 229) through the viewed vehicle; the port's editor answers for the stealth object only (app_vehicle.cpp:475)
 0x00432b60	devdialog-shell	the mech list dialog's MFC plumbing (constructor, destructor, DDX, OnOK, DoModal)
 0x00432be0	devdialog-shell	the mech list dialog's MFC plumbing (constructor, destructor, DDX, OnOK, DoModal)
 0x00432c30	devdialog-shell	the mech list dialog's MFC plumbing (constructor, destructor, DDX, OnOK, DoModal)
@@ -928,10 +927,6 @@
 0x0053d6f0	software	the software model draw's projection and clippers, its own lighting, the span buffer's pick and hidden-surface test, the small polygon reject, palette shading (software-path.md, render-clip3d.md, render-lighting.md: the software renderer, not ported by decision)
 0x0053d750	software	the software model draw's projection and clippers, its own lighting, the span buffer's pick and hidden-surface test, the small polygon reject, palette shading (software-path.md, render-clip3d.md, render-lighting.md: the software renderer, not ported by decision)
 0x00544060	software	the software model draw's projection and clippers, its own lighting, the span buffer's pick and hidden-surface test, the small polygon reject, palette shading (software-path.md, render-clip3d.md, render-lighting.md: the software renderer, not ported by decision)
-0x005374b0	unused	large zModel functions nothing calls or tables (no static reference anywhere): clippers and matrix work beside the software path, material flag setters over a model's materials, light helpers
-0x005374d0	unused	large zModel functions nothing calls or tables (no static reference anywhere): clippers and matrix work beside the software path, material flag setters over a model's materials, light helpers
-0x0053bb90	unused	large zModel functions nothing calls or tables (no static reference anywhere): clippers and matrix work beside the software path, material flag setters over a model's materials, light helpers
-0x0053bbd0	unused	large zModel functions nothing calls or tables (no static reference anywhere): clippers and matrix work beside the software path, material flag setters over a model's materials, light helpers
 0x00537520	sdl	the used textures' system surfaces released after the launch (DirectDraw; the port's record is one Render3D handle: app_engine.cpp no effect)
 0x00536830	folded	covered: zModel's reset of its materials (module-starts.md: the port's initialisers), small helpers and list initialisers beside ported code
 0x00548d90	folded	covered: zModel's reset of its materials (module-starts.md: the port's initialisers), small helpers and list initialisers beside ported code
@@ -1269,7 +1264,6 @@
 0x00518f50	folded	one-line setters/lookups the port does inline: zImage's library flag (no effect, app_engine.cpp:307), the texture group (mech_lib.cpp:34, app_mission.cpp:1910), the archive file test (zimg_library.cpp:20), the extension cut (zimg_texture.cpp:94)
 0x005187a0	folded	one-line setters/lookups the port does inline: zImage's library flag (no effect, app_engine.cpp:307), the texture group (mech_lib.cpp:34, app_mission.cpp:1910), the archive file test (zimg_library.cpp:20), the extension cut (zimg_texture.cpp:94)
 0x00519150	folded	one-line setters/lookups the port does inline: zImage's library flag (no effect, app_engine.cpp:307), the texture group (mech_lib.cpp:34, app_mission.cpp:1910), the archive file test (zimg_library.cpp:20), the extension cut (zimg_texture.cpp:94)
-0x005190e0	unused	frees a chain of loaded textures; its only caller 0x005374d0 is unreached
 0x00519120	software	the software renderer's texture tables: the nth mip of a chain for 0x00563940 (module-starts.md:158) and the 32 light and fog levels of every paletted texture (software-path.md:30)
 0x00519370	software	the software renderer's texture tables: the nth mip of a chain for 0x00563940 (module-starts.md:158) and the 32 light and fog levels of every paletted texture (software-path.md:30)
 0x00519510	software	the software renderer's texture tables: the nth mip of a chain for 0x00563940 (module-starts.md:158) and the 32 light and fog levels of every paletted texture (software-path.md:30)
@@ -1281,7 +1275,6 @@
 0x00519fa0	unused	zFont, the bitmap fonts from fonts.zrd: loaded at start-up (0x00519e50), split into glyphs, measured by id (0x0051a0d0), freed (0x00519f70), but nothing in 1.2 draws them (app_engine.cpp:318, twod.md section 4)
 0x0051a080	unused	zFont, the bitmap fonts from fonts.zrd: loaded at start-up (0x00519e50), split into glyphs, measured by id (0x0051a0d0), freed (0x00519f70), but nothing in 1.2 draws them (app_engine.cpp:318, twod.md section 4)
 0x0051a0d0	unused	zFont, the bitmap fonts from fonts.zrd: loaded at start-up (0x00519e50), split into glyphs, measured by id (0x0051a0d0), freed (0x00519f70), but nothing in 1.2 draws them (app_engine.cpp:318, twod.md section 4)
-0x00557450	unused	the defines list's constructor and destructor, no caller reaches them (zreader.md:103)
 0x00557490	unused	the defines list's constructor and destructor, no caller reaches them (zreader.md:103)
 0x00557b10	folded	start-up and stop plumbing with no effect in the port: zRender's two buffers freed at stop (app_engine.cpp:326), the pitch store that is only written (app_engine.cpp:311)
 0x00558070	folded	start-up and stop plumbing with no effect in the port: zRender's two buffers freed at stop (app_engine.cpp:326), the pitch store that is only written (app_engine.cpp:311)
