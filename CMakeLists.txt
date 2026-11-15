@@ -124,6 +124,7 @@ add_library(mw3core STATIC
   src/gamez/zimage/zimg_texture.cpp
   src/gamez/zmath/zmth_matrix.cpp
   src/gamez/zmath/zmth_vector.cpp
+  src/gamez/zmath/zmth_unused.cpp
   src/gamez/zmodel/gmod_bake.cpp
   src/gamez/zmodel/gmod_clip2d.cpp
   src/gamez/zmodel/gmod_clip3d.cpp
@@ -490,6 +491,7 @@ add_library(mw3probe SHARED
   tests/probe_lighting.cpp
   tests/probe_drawtable.cpp
   tests/probe_matrix.cpp
+  tests/probe_zmath_unused.cpp
   tests/probe_screen.cpp
   tests/probe_strips.cpp
   tests/probe_ripple.cpp

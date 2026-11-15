@@ -12,11 +12,11 @@ container code, or covered where the port names it); **replaced** (SDL or the pl
 
 | Class | Functions |
 |---|---|
-| folded | 3044 |
+| folded | 3043 |
 | replaced (SDL or the platform layer) | 228 |
 | software renderer | 113 |
 | dev dialog (MFC), its window plumbing: replaced | 50 |
-| unused: PORT (preserve) | 48 |
+| unused: PORT (preserve) | 30 |
 | unlabelled | 2 |
 | debug or dev tool: PORT (preserve) | 1 |
 
@@ -50,7 +50,6 @@ Fixed 2026-11-13 (mac5/broken-five), the five rows this table had: the radar's v
 - 1 functions, 15 decomp lines (0x005190e0): frees a chain of loaded textures; its only caller 0x005374d0 is unreached
 - 6 functions, 224 decomp lines (0x00519df0, 0x00519e50, 0x00519f70, 0x00519fa0 ...): zFont, the bitmap fonts from fonts.zrd: loaded at start-up (0x00519e50), split into glyphs, measured by id (0x0051a0d0), freed (0x00519f70), but nothing in 1.2 draws them (app_engine.cpp:318, twod.md section 4)
 - 1 functions, 51 decomp lines (0x0051af90): the input module's static object's list walk, whose caller 0x0051af70 nothing reaches (input.md:567)
-- 18 functions, 1112 decomp lines (0x0051e160, 0x00520c60, 0x00521080, 0x005214f0 ...): zMath routines nothing calls: vector and quaternion add, subtract, negate and dot, single-axis rotations, a plane from three points, 2D side tests, cameras from euler angles and a position, the projection as a matrix, screen-space box extents, a point-set fit (render-matrix.md:183-193)
 - 4 functions, 82 decomp lines (0x005374b0, 0x005374d0, 0x0053bb90, 0x0053bbd0): large zModel functions nothing calls or tables (no static reference anywhere): clippers and matrix work beside the software path, material flag setters over a model's materials, light helpers
 - 1 functions, 52 decomp lines (0x00548840): the puffers' wind step with a dt argument: dead code, never called (puffers.md)
 - 2 functions, 33 decomp lines (0x00557450, 0x00557490): the defines list's constructor and destructor, no caller reaches them (zreader.md:103)
@@ -2794,94 +2793,6 @@ Fixed 2026-11-13 (mac5/broken-five), the five rows this table had: the radar's v
 | 0x0058fac0 | 72 | folded | covered: the DirectPlay error names (znet_dplay.cpp:142 names each through localize), the sessions' list clear (znet_session.cpp:248), the net view's inlined steps (znet_view.cpp:68, :151), the net object's static, ZGameApp's base InitInstance and engine start (overridden by the app's 0x00480000 / 0x00480570, game-loop.md) |
 | 0x0058fcd0 | 39 | folded | covered by the port where it names it (src/gamez/zgame/zgameapp.h:59) |
 
-### zinput (83 not ported)
-
-| Address | Lines | Class | Why |
-|---|---|---|---|
-| 0x0051af60 | 9 | folded | follows 0x0051b020: the input module's static object's constructor (zeroes its lists); the port's members start empty |
-| 0x0051af70 | 9 | folded | a thunk: one call to another function |
-| 0x0051af90 | 51 | unused: PORT (preserve) | the input module's static object's list walk, whose caller 0x0051af70 nothing reaches (input.md:567) |
-| 0x0051b020 | 16 | folded | the input module's static object's constructor (zeroes its lists); the port's members start empty |
-| 0x0051b1e0 | 8 | folded | covered by the port where it names it (src/gamez/zinput/zin_init.cpp:71) |
-| 0x0051b1f0 | 8 | folded | covered by the port where it names it (src/gamez/zinput/zin_init.cpp:71) |
-| 0x0051b200 | 12 | folded | covered by the port where it names it (src/gamez/zinput/zin_init.cpp:88) |
-| 0x0051b220 | 12 | folded | covered by the port where it names it (src/gamez/zinput/zin_init.cpp:88) |
-| 0x0051b240 | 12 | folded | covered by the port where it names it (src/gamez/zinput/zin_init.cpp:88) |
-| 0x0051b260 | 9 | folded | covered by the port where it names it (src/gamez/zinput/zin_init.cpp:82) |
-| 0x0051b270 | 9 | folded | covered by the port where it names it (src/gamez/zinput/zin_init.cpp:81) |
-| 0x0051b280 | 9 | folded | covered by the port where it names it (src/gamez/zinput/zin_init.cpp:83) |
-| 0x0051bf20 | 10 | folded | covered by the port where it names it (src/gamez/zinput/zin_cmdmap.cpp:136) |
-| 0x0051bf40 | 10 | folded | covered by the port where it names it (src/gamez/zinput/zin_cmdmap.cpp:136) |
-| 0x0051bf60 | 10 | folded | covered by the port where it names it (src/gamez/zinput/zin_cmdmap.cpp:136) |
-| 0x0051bf90 | 10 | folded | covered by the port where it names it (src/gamez/zinput/zin_cmdmap.cpp:148) |
-| 0x0051bfc0 | 10 | folded | covered by the port where it names it (src/gamez/zinput/zin_cmdmap.cpp:148) |
-| 0x0051bfd0 | 10 | folded | covered by the port where it names it (src/gamez/zinput/zin_cmdmap.cpp:148) |
-| 0x0051c440 | 11 | folded | a thunk: one call to another function |
-| 0x0051d130 | 18 | folded | covered by the port where it names it (src/gamez/zinput/zin_cmdmap.cpp:397) |
-| 0x0051d160 | 18 | folded | covered by the port where it names it (src/gamez/zinput/zin_cmdmap.cpp:396) |
-| 0x0051d190 | 18 | folded | covered by the port where it names it (src/gamez/zinput/zin_cmdmap.cpp:395) |
-| 0x0051d1d0 | 11 | folded | a thunk: one call to another function |
-| 0x0051d1f0 | 11 | folded | a thunk: one call to another function |
-| 0x0051d200 | 11 | folded | a thunk: one call to another function |
-| 0x0051d210 | 11 | folded | a thunk: one call to another function |
-| 0x0051d220 | 11 | folded | a thunk: one call to another function |
-| 0x0051d230 | 11 | folded | a thunk: one call to another function |
-| 0x0051d240 | 11 | folded | a thunk: one call to another function |
-| 0x0051d250 | 11 | folded | a thunk: one call to another function |
-| 0x0051d260 | 11 | folded | a thunk: one call to another function |
-| 0x0051d270 | 11 | folded | a thunk: one call to another function |
-| 0x0051d280 | 12 | folded | a thunk: one call to another function |
-| 0x0051d290 | 12 | folded | a thunk: one call to another function |
-| 0x0051d2a0 | 12 | folded | a thunk: one call to another function |
-| 0x0051d2b0 | 12 | folded | a thunk: one call to another function |
-| 0x0051d2c0 | 12 | folded | a thunk: one call to another function |
-| 0x0051d2f0 | 12 | folded | a thunk: one call to another function |
-| 0x0051d300 | 11 | folded | a thunk: one call to another function |
-| 0x0051d310 | 12 | folded | a thunk: one call to another function |
-| 0x0051d330 | 12 | folded | a thunk: one call to another function |
-| 0x0051d350 | 12 | folded | a thunk: one call to another function |
-| 0x0051d370 | 12 | folded | a thunk: one call to another function |
-| 0x0051daa0 | 16 | replaced (SDL or the platform layer) | DirectInput joystick properties (range and dead zone per axis); the port sets the dead zones through the platform (zin_joy.cpp:60) |
-| 0x0051dae0 | 18 | replaced (SDL or the platform layer) | DirectInput joystick properties (range and dead zone per axis); the port sets the dead zones through the platform (zin_joy.cpp:60) |
-| 0x0051db30 | 21 | folded | covered by the port where it names it (src/gamez/zinput/zin_joy.cpp:47) |
-| 0x0051db80 | 21 | folded | covered by the port where it names it (src/gamez/zinput/zin_joy.cpp:46) |
-| 0x0051dda0 | 8 | folded | returns a constant or a global |
-| 0x0051e060 | 13 | folded | covered by the port where it names it (src/mech3/zai_repair.cpp:196) |
-| 0x0051e0a0 | 13 | folded | ported, by docs/symbols.csv: ported inline (zai_node flat_distance) |
-| 0x0051e160 | 29 | unused: PORT (preserve) | zMath routines nothing calls: vector and quaternion add, subtract, negate and dot, single-axis rotations, a plane from three points, 2D side tests, cameras from euler angles and a position, the projection as a matrix, screen-space box extents, a point-set fit (render-matrix.md:183-193) |
-| 0x0051e1c0 | 17 | folded | the 2D normalise, inline in its ported caller (0x00524247) |
-| 0x0051e380 | 16 | folded | covered by the port where it names it (src/mech3/mech_net.cpp:596) |
-| 0x00520082 | 83 | folded | a piece of the ported function before it (Ghidra split it there) (0x0051fee0) |
-| 0x00520c60 | 154 | unused: PORT (preserve) | zMath routines nothing calls: vector and quaternion add, subtract, negate and dot, single-axis rotations, a plane from three points, 2D side tests, cameras from euler angles and a position, the projection as a matrix, screen-space box extents, a point-set fit (render-matrix.md:183-193) |
-| 0x00521080 | 169 | unused: PORT (preserve) | zMath routines nothing calls: vector and quaternion add, subtract, negate and dot, single-axis rotations, a plane from three points, 2D side tests, cameras from euler angles and a position, the projection as a matrix, screen-space box extents, a point-set fit (render-matrix.md:183-193) |
-| 0x005214f0 | 67 | unused: PORT (preserve) | zMath routines nothing calls: vector and quaternion add, subtract, negate and dot, single-axis rotations, a plane from three points, 2D side tests, cameras from euler angles and a position, the projection as a matrix, screen-space box extents, a point-set fit (render-matrix.md:183-193) |
-| 0x00521a90 | 61 | unused: PORT (preserve) | zMath routines nothing calls: vector and quaternion add, subtract, negate and dot, single-axis rotations, a plane from three points, 2D side tests, cameras from euler angles and a position, the projection as a matrix, screen-space box extents, a point-set fit (render-matrix.md:183-193) |
-| 0x00521e10 | 89 | unused: PORT (preserve) | zMath routines nothing calls: vector and quaternion add, subtract, negate and dot, single-axis rotations, a plane from three points, 2D side tests, cameras from euler angles and a position, the projection as a matrix, screen-space box extents, a point-set fit (render-matrix.md:183-193) |
-| 0x00522210 | 30 | folded | covered by the port where it names it (src/gamez/zeffect/zeff_anim_events.cpp:373) |
-| 0x00522280 | 49 | unused: PORT (preserve) | zMath routines nothing calls: vector and quaternion add, subtract, negate and dot, single-axis rotations, a plane from three points, 2D side tests, cameras from euler angles and a position, the projection as a matrix, screen-space box extents, a point-set fit (render-matrix.md:183-193) |
-| 0x005223c0 | 17 | unused: PORT (preserve) | zMath routines nothing calls: vector and quaternion add, subtract, negate and dot, single-axis rotations, a plane from three points, 2D side tests, cameras from euler angles and a position, the projection as a matrix, screen-space box extents, a point-set fit (render-matrix.md:183-193) |
-| 0x00522460 | 16 | folded | covered by the port where it names it (src/mech3/player_view.cpp:107) |
-| 0x005224b0 | 50 | unused: PORT (preserve) | zMath routines nothing calls: vector and quaternion add, subtract, negate and dot, single-axis rotations, a plane from three points, 2D side tests, cameras from euler angles and a position, the projection as a matrix, screen-space box extents, a point-set fit (render-matrix.md:183-193) |
-| 0x00523650 | 118 | unused: PORT (preserve) | zMath routines nothing calls: vector and quaternion add, subtract, negate and dot, single-axis rotations, a plane from three points, 2D side tests, cameras from euler angles and a position, the projection as a matrix, screen-space box extents, a point-set fit (render-matrix.md:183-193) |
-| 0x00523df0 | 32 | unused: PORT (preserve) | zMath routines nothing calls: vector and quaternion add, subtract, negate and dot, single-axis rotations, a plane from three points, 2D side tests, cameras from euler angles and a position, the projection as a matrix, screen-space box extents, a point-set fit (render-matrix.md:183-193) |
-| 0x00523ef0 | 33 | unused: PORT (preserve) | zMath routines nothing calls: vector and quaternion add, subtract, negate and dot, single-axis rotations, a plane from three points, 2D side tests, cameras from euler angles and a position, the projection as a matrix, screen-space box extents, a point-set fit (render-matrix.md:183-193) |
-| 0x005241b7 | 35 | folded | a piece of the ported function before it (Ghidra split it there) (0x00524020) |
-| 0x00524477 | 35 | folded | a piece of the ported function before it (Ghidra split it there) (0x00524020) |
-| 0x00524544 | 30 | folded | a piece of the ported function before it (Ghidra split it there) (0x00524020) |
-| 0x00524554 | 32 | folded | a piece of the ported function before it (Ghidra split it there) (0x00524020) |
-| 0x005245c7 | 85 | folded | a piece of the ported function before it (Ghidra split it there) (0x00524020) |
-| 0x00524967 | 97 | folded | a piece of the ported function before it (Ghidra split it there) (0x00524020) |
-| 0x00524f80 | 23 | unused: PORT (preserve) | zMath routines nothing calls: vector and quaternion add, subtract, negate and dot, single-axis rotations, a plane from three points, 2D side tests, cameras from euler angles and a position, the projection as a matrix, screen-space box extents, a point-set fit (render-matrix.md:183-193) |
-| 0x00524fd0 | 19 | unused: PORT (preserve) | zMath routines nothing calls: vector and quaternion add, subtract, negate and dot, single-axis rotations, a plane from three points, 2D side tests, cameras from euler angles and a position, the projection as a matrix, screen-space box extents, a point-set fit (render-matrix.md:183-193) |
-| 0x00525020 | 23 | unused: PORT (preserve) | zMath routines nothing calls: vector and quaternion add, subtract, negate and dot, single-axis rotations, a plane from three points, 2D side tests, cameras from euler angles and a position, the projection as a matrix, screen-space box extents, a point-set fit (render-matrix.md:183-193) |
-| 0x005250a0 | 12 | unused: PORT (preserve) | zMath routines nothing calls: vector and quaternion add, subtract, negate and dot, single-axis rotations, a plane from three points, 2D side tests, cameras from euler angles and a position, the projection as a matrix, screen-space box extents, a point-set fit (render-matrix.md:183-193) |
-| 0x005250f0 | 11 | unused: PORT (preserve) | zMath routines nothing calls: vector and quaternion add, subtract, negate and dot, single-axis rotations, a plane from three points, 2D side tests, cameras from euler angles and a position, the projection as a matrix, screen-space box extents, a point-set fit (render-matrix.md:183-193) |
-| 0x005251a0 | 28 | folded | covered by the port where it names it (src/gamez/zmath/zmth_vector.cpp:286) |
-| 0x00525fa0 | 156 | unused: PORT (preserve) | zMath routines nothing calls: vector and quaternion add, subtract, negate and dot, single-axis rotations, a plane from three points, 2D side tests, cameras from euler angles and a position, the projection as a matrix, screen-space box extents, a point-set fit (render-matrix.md:183-193) |
-| 0x00526510 | 81 | folded | zModel's start, stop and per-mission free: the render state's defaults (gmod_draw.h:37), the pools freed at the app's stop (memory only, app_engine.cpp:325) and the mission's (models_free, app_mission.cpp:1868) |
-| 0x00526780 | 25 | folded | zModel's start, stop and per-mission free: the render state's defaults (gmod_draw.h:37), the pools freed at the app's stop (memory only, app_engine.cpp:325) and the mission's (models_free, app_mission.cpp:1868) |
-| 0x00526920 | 25 | folded | zModel's start, stop and per-mission free: the render state's defaults (gmod_draw.h:37), the pools freed at the app's stop (memory only, app_engine.cpp:325) and the mission's (models_free, app_mission.cpp:1868) |
-
 ### zsound (78 not ported)
 
 | Address | Lines | Class | Why |
@@ -3107,6 +3018,75 @@ Fixed 2026-11-13 (mac5/broken-five), the five rows this table had: the radar's v
 | 0x00581e30 | 8 | folded | returns a constant or a global |
 | 0x00581e40 | 8 | folded | returns a constant or a global |
 | 0x00583730 | 11 | folded | covered by the program's overrides: the load screen's driver and mode lines (app_mission.cpp:1896), ClearScreenBuffer (app_engine.h:508), video shutdown and restore (app_engine.h:547, :549), a weapon hit's health after (zweapon.h:171) |
+
+### zinput (64 not ported)
+
+| Address | Lines | Class | Why |
+|---|---|---|---|
+| 0x0051af60 | 9 | folded | follows 0x0051b020: the input module's static object's constructor (zeroes its lists); the port's members start empty |
+| 0x0051af70 | 9 | folded | a thunk: one call to another function |
+| 0x0051af90 | 51 | unused: PORT (preserve) | the input module's static object's list walk, whose caller 0x0051af70 nothing reaches (input.md:567) |
+| 0x0051b020 | 16 | folded | the input module's static object's constructor (zeroes its lists); the port's members start empty |
+| 0x0051b1e0 | 8 | folded | covered by the port where it names it (src/gamez/zinput/zin_init.cpp:71) |
+| 0x0051b1f0 | 8 | folded | covered by the port where it names it (src/gamez/zinput/zin_init.cpp:71) |
+| 0x0051b200 | 12 | folded | covered by the port where it names it (src/gamez/zinput/zin_init.cpp:88) |
+| 0x0051b220 | 12 | folded | covered by the port where it names it (src/gamez/zinput/zin_init.cpp:88) |
+| 0x0051b240 | 12 | folded | covered by the port where it names it (src/gamez/zinput/zin_init.cpp:88) |
+| 0x0051b260 | 9 | folded | covered by the port where it names it (src/gamez/zinput/zin_init.cpp:82) |
+| 0x0051b270 | 9 | folded | covered by the port where it names it (src/gamez/zinput/zin_init.cpp:81) |
+| 0x0051b280 | 9 | folded | covered by the port where it names it (src/gamez/zinput/zin_init.cpp:83) |
+| 0x0051bf20 | 10 | folded | covered by the port where it names it (src/gamez/zinput/zin_cmdmap.cpp:136) |
+| 0x0051bf40 | 10 | folded | covered by the port where it names it (src/gamez/zinput/zin_cmdmap.cpp:136) |
+| 0x0051bf60 | 10 | folded | covered by the port where it names it (src/gamez/zinput/zin_cmdmap.cpp:136) |
+| 0x0051bf90 | 10 | folded | covered by the port where it names it (src/gamez/zinput/zin_cmdmap.cpp:148) |
+| 0x0051bfc0 | 10 | folded | covered by the port where it names it (src/gamez/zinput/zin_cmdmap.cpp:148) |
+| 0x0051bfd0 | 10 | folded | covered by the port where it names it (src/gamez/zinput/zin_cmdmap.cpp:148) |
+| 0x0051c440 | 11 | folded | a thunk: one call to another function |
+| 0x0051d130 | 18 | folded | covered by the port where it names it (src/gamez/zinput/zin_cmdmap.cpp:397) |
+| 0x0051d160 | 18 | folded | covered by the port where it names it (src/gamez/zinput/zin_cmdmap.cpp:396) |
+| 0x0051d190 | 18 | folded | covered by the port where it names it (src/gamez/zinput/zin_cmdmap.cpp:395) |
+| 0x0051d1d0 | 11 | folded | a thunk: one call to another function |
+| 0x0051d1f0 | 11 | folded | a thunk: one call to another function |
+| 0x0051d200 | 11 | folded | a thunk: one call to another function |
+| 0x0051d210 | 11 | folded | a thunk: one call to another function |
+| 0x0051d220 | 11 | folded | a thunk: one call to another function |
+| 0x0051d230 | 11 | folded | a thunk: one call to another function |
+| 0x0051d240 | 11 | folded | a thunk: one call to another function |
+| 0x0051d250 | 11 | folded | a thunk: one call to another function |
+| 0x0051d260 | 11 | folded | a thunk: one call to another function |
+| 0x0051d270 | 11 | folded | a thunk: one call to another function |
+| 0x0051d280 | 12 | folded | a thunk: one call to another function |
+| 0x0051d290 | 12 | folded | a thunk: one call to another function |
+| 0x0051d2a0 | 12 | folded | a thunk: one call to another function |
+| 0x0051d2b0 | 12 | folded | a thunk: one call to another function |
+| 0x0051d2c0 | 12 | folded | a thunk: one call to another function |
+| 0x0051d2f0 | 12 | folded | a thunk: one call to another function |
+| 0x0051d300 | 11 | folded | a thunk: one call to another function |
+| 0x0051d310 | 12 | folded | a thunk: one call to another function |
+| 0x0051d330 | 12 | folded | a thunk: one call to another function |
+| 0x0051d350 | 12 | folded | a thunk: one call to another function |
+| 0x0051d370 | 12 | folded | a thunk: one call to another function |
+| 0x0051daa0 | 16 | replaced (SDL or the platform layer) | DirectInput joystick properties (range and dead zone per axis); the port sets the dead zones through the platform (zin_joy.cpp:60) |
+| 0x0051dae0 | 18 | replaced (SDL or the platform layer) | DirectInput joystick properties (range and dead zone per axis); the port sets the dead zones through the platform (zin_joy.cpp:60) |
+| 0x0051db30 | 21 | folded | covered by the port where it names it (src/gamez/zinput/zin_joy.cpp:47) |
+| 0x0051db80 | 21 | folded | covered by the port where it names it (src/gamez/zinput/zin_joy.cpp:46) |
+| 0x0051dda0 | 8 | folded | returns a constant or a global |
+| 0x0051e060 | 13 | folded | covered by the port where it names it (src/mech3/zai_repair.cpp:196) |
+| 0x0051e0a0 | 13 | folded | ported, by docs/symbols.csv: ported inline (zai_node flat_distance) |
+| 0x0051e380 | 16 | folded | covered by the port where it names it (src/mech3/mech_net.cpp:596) |
+| 0x00520082 | 83 | folded | a piece of the ported function before it (Ghidra split it there) (0x0051fee0) |
+| 0x00522210 | 30 | folded | covered by the port where it names it (src/gamez/zeffect/zeff_anim_events.cpp:373) |
+| 0x00522460 | 16 | folded | covered by the port where it names it (src/mech3/player_view.cpp:107) |
+| 0x005241b7 | 35 | folded | a piece of the ported function before it (Ghidra split it there) (0x00524020) |
+| 0x00524477 | 35 | folded | a piece of the ported function before it (Ghidra split it there) (0x00524020) |
+| 0x00524544 | 30 | folded | a piece of the ported function before it (Ghidra split it there) (0x00524020) |
+| 0x00524554 | 32 | folded | a piece of the ported function before it (Ghidra split it there) (0x00524020) |
+| 0x005245c7 | 85 | folded | a piece of the ported function before it (Ghidra split it there) (0x00524020) |
+| 0x00524967 | 97 | folded | a piece of the ported function before it (Ghidra split it there) (0x00524020) |
+| 0x005251a0 | 28 | folded | covered by the port where it names it (src/gamez/zmath/zmth_vector.cpp:286) |
+| 0x00526510 | 81 | folded | zModel's start, stop and per-mission free: the render state's defaults (gmod_draw.h:37), the pools freed at the app's stop (memory only, app_engine.cpp:325) and the mission's (models_free, app_mission.cpp:1868) |
+| 0x00526780 | 25 | folded | zModel's start, stop and per-mission free: the render state's defaults (gmod_draw.h:37), the pools freed at the app's stop (memory only, app_engine.cpp:325) and the mission's (models_free, app_mission.cpp:1868) |
+| 0x00526920 | 25 | folded | zModel's start, stop and per-mission free: the render state's defaults (gmod_draw.h:37), the pools freed at the app's stop (memory only, app_engine.cpp:325) and the mission's (models_free, app_mission.cpp:1868) |
 
 ### ztwod (63 not ported)
 
@@ -3524,36 +3504,6 @@ Fixed 2026-11-13 (mac5/broken-five), the five rows this table had: the radar's v
 | 0x00590d10 | 14 | folded | the scalar deleting destructor (the destructor, then delete) |
 | 0x00590d30 | 21 | folded | zGameApp's small helpers inside ported callers or static teardown: a buffer cursor's init (0x00590850, from 0x00590250 / 0x00590400 / 0x005905a0), its drain at exit, the registry company name 'Zipper Interactive' (zutl_reg's company), two destructors |
 
-### zdeclient (25 not ported)
-
-| Address | Lines | Class | Why |
-|---|---|---|---|
-| 0x00500670 | 16 | folded | read: the static constructor of a decal container (an STL tree's head made by 0x00500cd0, the counts at [0x0060bf94..0x0060bf9c] zeroed), which zdec_init's 0x00500850 / 0x00500af0 / 0x00500c60 use; the port's container |
-| 0x005006b0 | 9 | folded | a thunk: one call to another function |
-| 0x005006f0 | 22 | folded | C++ library container code (a std::map, set or list instance); the port uses its own containers |
-| 0x00500cd0 | 43 | folded | C++ library container code (a std::map, set or list instance); the port uses its own containers |
-| 0x00500da0 | 46 | folded | C++ library container code (a std::map, set or list instance); the port uses its own containers |
-| 0x00500e90 | 58 | folded | C++ library container code (a std::map, set or list instance); the port uses its own containers |
-| 0x00500ff0 | 316 | folded | C++ library container code (a std::map, set or list instance); the port uses its own containers |
-| 0x00501520 | 31 | folded | C++ library container code (a std::map, set or list instance); the port uses its own containers |
-| 0x005015b0 | 196 | folded | C++ library container code (a std::map, set or list instance); the port uses its own containers |
-| 0x005018d0 | 48 | folded | C++ library container code (a std::map, set or list instance); the port uses its own containers |
-| 0x00501980 | 52 | folded | C++ library container code (a std::map, set or list instance); the port uses its own containers |
-| 0x00501a40 | 28 | folded | small helpers inside ported code: the crater set's static constructor and its STL copy and fill (craters.md:126), the effect lookups and the animation records' flags (app_mission.cpp:1248, app_engine.h:506-507), the cockpit flag (app_view.cpp:206), the key player (zeff_anim_events.cpp:627) and its split piece, the ground probe (zeff_anim_events.cpp:1109), the movie objects' destructors and the stream's rect setter, a list's vector-deleting destructor |
-| 0x00501a80 | 24 | folded | small helpers inside ported code: the crater set's static constructor and its STL copy and fill (craters.md:126), the effect lookups and the animation records' flags (app_mission.cpp:1248, app_engine.h:506-507), the cockpit flag (app_view.cpp:206), the key player (zeff_anim_events.cpp:627) and its split piece, the ground probe (zeff_anim_events.cpp:1109), the movie objects' destructors and the stream's rect setter, a list's vector-deleting destructor |
-| 0x00502d30 | 8 | folded | returns a constant or a global |
-| 0x00502da0 | 11 | folded | small helpers inside ported code: the crater set's static constructor and its STL copy and fill (craters.md:126), the effect lookups and the animation records' flags (app_mission.cpp:1248, app_engine.h:506-507), the cockpit flag (app_view.cpp:206), the key player (zeff_anim_events.cpp:627) and its split piece, the ground probe (zeff_anim_events.cpp:1109), the movie objects' destructors and the stream's rect setter, a list's vector-deleting destructor |
-| 0x00502db0 | 13 | folded | covered by the port where it names it (src/mech3/zai_target.h:243) |
-| 0x00502dd0 | 13 | folded | covered by the port where it names it (src/mech3/zai_target.h:244) |
-| 0x0050414d | 11 | folded | a piece of the ported function before it (Ghidra split it there) (0x00503d50) |
-| 0x00504d42 | 203 | folded | a piece of the ported function before it (Ghidra split it there) (0x00504520) |
-| 0x00505520 | 73 | folded | small helpers inside ported code: the crater set's static constructor and its STL copy and fill (craters.md:126), the effect lookups and the animation records' flags (app_mission.cpp:1248, app_engine.h:506-507), the cockpit flag (app_view.cpp:206), the key player (zeff_anim_events.cpp:627) and its split piece, the ground probe (zeff_anim_events.cpp:1109), the movie objects' destructors and the stream's rect setter, a list's vector-deleting destructor |
-| 0x005056b0 | 25 | folded | covered by the port where it names it (src/gamez/zeffect/zeff_anim_events.cpp:602) |
-| 0x00505710 | 116 | folded | small helpers inside ported code: the crater set's static constructor and its STL copy and fill (craters.md:126), the effect lookups and the animation records' flags (app_mission.cpp:1248, app_engine.h:506-507), the cockpit flag (app_view.cpp:206), the key player (zeff_anim_events.cpp:627) and its split piece, the ground probe (zeff_anim_events.cpp:1109), the movie objects' destructors and the stream's rect setter, a list's vector-deleting destructor |
-| 0x00507220 | 53 | folded | small helpers inside ported code: the crater set's static constructor and its STL copy and fill (craters.md:126), the effect lookups and the animation records' flags (app_mission.cpp:1248, app_engine.h:506-507), the cockpit flag (app_view.cpp:206), the key player (zeff_anim_events.cpp:627) and its split piece, the ground probe (zeff_anim_events.cpp:1109), the movie objects' destructors and the stream's rect setter, a list's vector-deleting destructor |
-| 0x005073e0 | 18 | folded | covered by the port where it names it (src/gamez/zeffect/zeff_anim_events.cpp:1175) |
-| 0x00507960 | 8 | folded | returns a constant or a global |
-
 ### zutil (25 not ported)
 
 | Address | Lines | Class | Why |
@@ -3583,6 +3533,36 @@ Fixed 2026-11-13 (mac5/broken-five), the five rows this table had: the radar's v
 | 0x00576ed0 | 12 | replaced (SDL or the platform layer) | DirectDraw's back buffer: lock and unlock (app_engine.h:560, app_fmv.cpp:53), their raw forms, the flip (sdl_platform.h:68), the restore, the window's style for full screen, the size clamp |
 | 0x00576ee0 | 24 | replaced (SDL or the platform layer) | DirectDraw's back buffer: lock and unlock (app_engine.h:560, app_fmv.cpp:53), their raw forms, the flip (sdl_platform.h:68), the restore, the window's style for full screen, the size clamp |
 | 0x00576f70 | 19 | replaced (SDL or the platform layer) | DirectDraw's back buffer: lock and unlock (app_engine.h:560, app_fmv.cpp:53), their raw forms, the flip (sdl_platform.h:68), the restore, the window's style for full screen, the size clamp |
+
+### zdeclient (25 not ported)
+
+| Address | Lines | Class | Why |
+|---|---|---|---|
+| 0x00500670 | 16 | folded | read: the static constructor of a decal container (an STL tree's head made by 0x00500cd0, the counts at [0x0060bf94..0x0060bf9c] zeroed), which zdec_init's 0x00500850 / 0x00500af0 / 0x00500c60 use; the port's container |
+| 0x005006b0 | 9 | folded | a thunk: one call to another function |
+| 0x005006f0 | 22 | folded | C++ library container code (a std::map, set or list instance); the port uses its own containers |
+| 0x00500cd0 | 43 | folded | C++ library container code (a std::map, set or list instance); the port uses its own containers |
+| 0x00500da0 | 46 | folded | C++ library container code (a std::map, set or list instance); the port uses its own containers |
+| 0x00500e90 | 58 | folded | C++ library container code (a std::map, set or list instance); the port uses its own containers |
+| 0x00500ff0 | 316 | folded | C++ library container code (a std::map, set or list instance); the port uses its own containers |
+| 0x00501520 | 31 | folded | C++ library container code (a std::map, set or list instance); the port uses its own containers |
+| 0x005015b0 | 196 | folded | C++ library container code (a std::map, set or list instance); the port uses its own containers |
+| 0x005018d0 | 48 | folded | C++ library container code (a std::map, set or list instance); the port uses its own containers |
+| 0x00501980 | 52 | folded | C++ library container code (a std::map, set or list instance); the port uses its own containers |
+| 0x00501a40 | 28 | folded | small helpers inside ported code: the crater set's static constructor and its STL copy and fill (craters.md:126), the effect lookups and the animation records' flags (app_mission.cpp:1248, app_engine.h:506-507), the cockpit flag (app_view.cpp:206), the key player (zeff_anim_events.cpp:627) and its split piece, the ground probe (zeff_anim_events.cpp:1109), the movie objects' destructors and the stream's rect setter, a list's vector-deleting destructor |
+| 0x00501a80 | 24 | folded | small helpers inside ported code: the crater set's static constructor and its STL copy and fill (craters.md:126), the effect lookups and the animation records' flags (app_mission.cpp:1248, app_engine.h:506-507), the cockpit flag (app_view.cpp:206), the key player (zeff_anim_events.cpp:627) and its split piece, the ground probe (zeff_anim_events.cpp:1109), the movie objects' destructors and the stream's rect setter, a list's vector-deleting destructor |
+| 0x00502d30 | 8 | folded | returns a constant or a global |
+| 0x00502da0 | 11 | folded | small helpers inside ported code: the crater set's static constructor and its STL copy and fill (craters.md:126), the effect lookups and the animation records' flags (app_mission.cpp:1248, app_engine.h:506-507), the cockpit flag (app_view.cpp:206), the key player (zeff_anim_events.cpp:627) and its split piece, the ground probe (zeff_anim_events.cpp:1109), the movie objects' destructors and the stream's rect setter, a list's vector-deleting destructor |
+| 0x00502db0 | 13 | folded | covered by the port where it names it (src/mech3/zai_target.h:243) |
+| 0x00502dd0 | 13 | folded | covered by the port where it names it (src/mech3/zai_target.h:244) |
+| 0x0050414d | 11 | folded | a piece of the ported function before it (Ghidra split it there) (0x00503d50) |
+| 0x00504d42 | 203 | folded | a piece of the ported function before it (Ghidra split it there) (0x00504520) |
+| 0x00505520 | 73 | folded | small helpers inside ported code: the crater set's static constructor and its STL copy and fill (craters.md:126), the effect lookups and the animation records' flags (app_mission.cpp:1248, app_engine.h:506-507), the cockpit flag (app_view.cpp:206), the key player (zeff_anim_events.cpp:627) and its split piece, the ground probe (zeff_anim_events.cpp:1109), the movie objects' destructors and the stream's rect setter, a list's vector-deleting destructor |
+| 0x005056b0 | 25 | folded | covered by the port where it names it (src/gamez/zeffect/zeff_anim_events.cpp:602) |
+| 0x00505710 | 116 | folded | small helpers inside ported code: the crater set's static constructor and its STL copy and fill (craters.md:126), the effect lookups and the animation records' flags (app_mission.cpp:1248, app_engine.h:506-507), the cockpit flag (app_view.cpp:206), the key player (zeff_anim_events.cpp:627) and its split piece, the ground probe (zeff_anim_events.cpp:1109), the movie objects' destructors and the stream's rect setter, a list's vector-deleting destructor |
+| 0x00507220 | 53 | folded | small helpers inside ported code: the crater set's static constructor and its STL copy and fill (craters.md:126), the effect lookups and the animation records' flags (app_mission.cpp:1248, app_engine.h:506-507), the cockpit flag (app_view.cpp:206), the key player (zeff_anim_events.cpp:627) and its split piece, the ground probe (zeff_anim_events.cpp:1109), the movie objects' destructors and the stream's rect setter, a list's vector-deleting destructor |
+| 0x005073e0 | 18 | folded | covered by the port where it names it (src/gamez/zeffect/zeff_anim_events.cpp:1175) |
+| 0x00507960 | 8 | folded | returns a constant or a global |
 
 ### zweapon (19 not ported)
 
@@ -3647,15 +3627,15 @@ Fixed 2026-11-13 (mac5/broken-five), the five rows this table had: the radar's v
 | 0x0050d260 | 13 | folded | covered by the port where it names it (src/gamez/zeffect/zeff_anim_save.cpp:281) |
 | 0x0050da50 | 16 | replaced (SDL or the platform layer) | mech3.err (0x0050da50): the port's error reports go to stderr (app_engine.cpp:562) |
 
-### zerror (1 not ported)
-
-| Address | Lines | Class | Why |
-|---|---|---|---|
-| 0x0050da70 | 9 | folded | a thunk: one call to another function |
-
 ### zsiscript (1 not ported)
 
 | Address | Lines | Class | Why |
 |---|---|---|---|
 | 0x005a9990 | 23 | folded | covered by the port where it names it (src/mech3/mech_anim.cpp:424) |
+
+### zerror (1 not ported)
+
+| Address | Lines | Class | Why |
+|---|---|---|---|
+| 0x0050da70 | 9 | folded | a thunk: one call to another function |
 
