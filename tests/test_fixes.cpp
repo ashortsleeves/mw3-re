@@ -132,7 +132,7 @@ TEST(small_fixes_list_matches_its_gates) {
       {"A turret's charge or glow goes out when it dies.", {{"mech3/turret.cpp", 1}}},
       {"Two c4 enemies follow their scripted orders.", {{"mech3/zrdraiv.cpp", 1}}},
       {"Tripod turrets aim when facing straight up or down.", {{"mech3/turret.cpp", 1}}},
-      {"A vehicle's gun stops at its true aiming limit.", {{"mech3/veh_controls.cpp", 1}}},
+      {"A vehicle's gun stops at its true aiming limit.", {{"mech3/veh_controls.cpp", 1}, {"mech3/turret.cpp", 1}}},  // and the turrets' unused clamps
       {"A vehicle file with pitch and no roll keeps its pitch.", {{"mech3/veh_controls.cpp", 1}}},
       {"The reticle locks and reads past 800 m when weapons reach.", {{"mech3/hud.cpp", 2}}},
       {"The mech lab offers the plain PPC the data defines.", {{"mech3/mech_names.cpp", 2}}},
@@ -1460,6 +1460,53 @@ TEST(fix_vehicle_motion_chas_roll_and_missing_lists) {
   zfix::set_all(bugs);
   items[1].s = nullptr;  // not the reader's to free
   zrdr::free_contents(&mode);
+}
+
+// sound.md, the SYNTAX 1 reader 0x5706f0: what the exe reads through whatever it finds (a missing SETS, a set
+// or sound that is no list, a sound too short for its three words, words that are no strings) is read as
+// nothing there; the rest as the exe.
+TEST(fix_sounds_syntax1_malformed_items) {
+  auto list = [](std::initializer_list<zrdr::Node> items) {
+    zrdr::Node n{};
+    n.type = zrdr::List;
+    n.list = zrdr::new_nodes(zrdr::Int, static_cast<int32_t>(items.size()) + 1);
+    n.list[0].i = static_cast<int32_t>(items.size()) + 1;
+    int32_t k = 1;
+    for (const zrdr::Node& x : items) n.list[k++] = x;
+    return n;
+  };
+  auto str = [](const char* t) {
+    zrdr::Node n{};
+    n.type = zrdr::String, n.s = strdup(t);
+    return n;
+  };
+  auto num = [](int32_t v) {
+    zrdr::Node n{};
+    n.type = zrdr::Int, n.i = v;
+    return n;
+  };
+  zrdr::Node none = list({str("SOUND_PATH"), list({str("x")})});
+  zsnd::state().sets.clear();
+  EXPECT(zsnd::read_syntax1(&none) == 1 && zsnd::state().sets.empty());
+  zrdr::free_contents(&none);
+  zrdr::Node root = list({str("SETS"), list({str("a"),
+                                            list({list({str("n"), str("f.wav")}), num(5),
+                                                  list({str("n2"), str("f2.wav"), str("TRUE")}),
+                                                  list({str("n3"), str("f3.wav"), num(1), str("TRUE"), str("TRUE")})}),
+                                            str("b"), num(7)})});
+  zsnd::read_syntax1(&root);
+  auto& sets = zsnd::state().sets;
+  EXPECT(sets.size() == 2 && sets[0]->sounds.size() == 4 && sets[1]->sounds.empty());
+  if (sets.size() == 2 && sets[0]->sounds.size() == 4) {
+    const auto& v = sets[0]->sounds;
+    EXPECT(v[0].name && std::strcmp(v[0].name, "n") == 0 && v[0].flags == 0);  // no words: none TRUE
+    EXPECT(v[1].name == nullptr);                                  // no list: left empty
+    EXPECT(v[2].flags == zsnd::kLooped && v[2].volume == 1.0f);    // one word of three
+    EXPECT(v[3].flags == (zsnd::k3D | zsnd::kPurgeable));          // an int where the first word is
+    EXPECT(v[2].range_min == 50.0f && v[3].range_max == 400.0f);
+  }
+  zsnd::state().sets.clear();  // not freed: the sounds point into the tree
+  zrdr::free_contents(&root);
 }
 
 TEST(fix_vehicle_gun_clamp) {

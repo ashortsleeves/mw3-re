@@ -750,11 +750,11 @@
 0x00485a80	folded	covered: the screens' destructors and constructors (unwind callers), the app states' constructors (their names), InitInstance's body (0x00480020, app.cpp's 0x00480000 port), RunDir (the program's data folder replaces it), the world defaults (no effect, app_engine.cpp)
 0x00485ba0	folded	covered: the screens' destructors and constructors (unwind callers), the app states' constructors (their names), InitInstance's body (0x00480020, app.cpp's 0x00480000 port), RunDir (the program's data folder replaces it), the world defaults (no effect, app_engine.cpp)
 0x00485cc0	folded	covered: the screens' destructors and constructors (unwind callers), the app states' constructors (their names), InitInstance's body (0x00480020, app.cpp's 0x00480000 port), RunDir (the program's data folder replaces it), the world defaults (no effect, app_engine.cpp)
-0x004a43c0	unused	the turn limits' clamp (vt+0x04) for the Fixed, Narrow and Wide kinds (vtables 0x005c8310/20/30): the turret never asks clamp (turret.h:31) and the AI's track keeps its answer only for a dot product it drops (vehicles.md, zai_firing.cpp:554)
-0x004a4660	unused	the turn limits' clamp (vt+0x04) for the Fixed, Narrow and Wide kinds (vtables 0x005c8310/20/30): the turret never asks clamp (turret.h:31) and the AI's track keeps its answer only for a dot product it drops (vehicles.md, zai_firing.cpp:554)
-0x004a48e0	unused	the turn limits' clamp (vt+0x04) for the Fixed, Narrow and Wide kinds (vtables 0x005c8310/20/30): the turret never asks clamp (turret.h:31) and the AI's track keeps its answer only for a dot product it drops (vehicles.md, zai_firing.cpp:554)
-0x004a3fb0	unused	the turn limits' clamp (vt+0x04) for the Fixed, Narrow and Wide kinds (vtables 0x005c8310/20/30): the turret never asks clamp (turret.h:31) and the AI's track keeps its answer only for a dot product it drops (vehicles.md, zai_firing.cpp:554)
-0x004a3fe0	unused	the turn limits' clamp (vt+0x04) for the Fixed, Narrow and Wide kinds (vtables 0x005c8310/20/30): the turret never asks clamp (turret.h:31) and the AI's track keeps its answer only for a dot product it drops (vehicles.md, zai_firing.cpp:554)
+0x004a43c0	folded	ported: TurnLimits::clamp, the Fixed kind (turret.cpp)
+0x004a4660	folded	ported: TurnLimits::clamp, the Narrow kind (turret.cpp)
+0x004a48e0	folded	ported: TurnLimits::clamp, the Wide kind (turret.cpp)
+0x004a3fb0	folded	ported inline in TurnLimits::clamp: a sine and cosine of (0, 1)
+0x004a3fe0	folded	ported inline in TurnLimits::clamp: the sine and cosine from a sine, sqrt(1 - s s)
 0x004a35e0	devdialog-shell	the vehicle pick dialog's destructor (0x004a3550's MFC plumbing: its combo box and CDialog)
 0x004a4ca0	devdialog-shell	the vehicle pick dialog's DoDataExchange (vtable 0x005c8414: the combo box 0x430 at +0x6c)
 0x0049d100	devdialog-shell	MFC plumbing of the editor's dialogs (DDX, UpdateData, OnDestroy, DoModal, a static list)
@@ -1363,7 +1363,6 @@
 0x0056ffc0	folded	covered where named: the sound set's build (zsnd_init.cpp:260, 265), the archive load (zsnd_parm.cpp:63), 3D placement (zsnd_3d.cpp:138), the group chain step (zsnd_grp.cpp:170)
 0x00572050	folded	covered where named: the sound set's build (zsnd_init.cpp:260, 265), the archive load (zsnd_parm.cpp:63), 3D placement (zsnd_3d.cpp:138), the group chain step (zsnd_grp.cpp:170)
 0x00573f90	folded	covered where named: the sound set's build (zsnd_init.cpp:260, 265), the archive load (zsnd_parm.cpp:63), 3D placement (zsnd_3d.cpp:138), the group chain step (zsnd_grp.cpp:170)
-0x005706f0	unused	sounds.zrd's SYNTAX 1 reader: no shipped or community data uses syntax 1 (symbols.csv, sound.md:41)
 0x00571380	sdl	the Aureal A3D path (a 1998 sound card's COM API: its init through CoCreateInstance, 3D placement and error names), replaced like DirectSound by the port's SDL audio; never run in the release either: only 0x570625 writes the selector [0x72c2cc], and only to 0 (DirectSound) when A3D fails (sound.md:38)
 0x00571f70	sdl	the Aureal A3D path (a 1998 sound card's COM API: its init through CoCreateInstance, 3D placement and error names), replaced like DirectSound by the port's SDL audio; never run in the release either: only 0x570625 writes the selector [0x72c2cc], and only to 0 (DirectSound) when A3D fails (sound.md:38)
 0x005746b0	sdl	the Aureal A3D path (a 1998 sound card's COM API: its init through CoCreateInstance, 3D placement and error names), replaced like DirectSound by the port's SDL audio; never run in the release either: only 0x570625 writes the selector [0x72c2cc], and only to 0 (DirectSound) when A3D fails (sound.md:38)
@@ -1391,8 +1390,8 @@
 0x005762b0	folded	zUtil's search path lists: each user keeps its own path string (zsnd_init.cpp:223, mech_fieldbase.h:295, zinterp.cpp:240) and the file finder is the platform's (zimg_library.h:75, zsnd_parm.cpp:17, FIX (A)); the default list's free has nothing to free (mission-frame.md:184)
 0x00594ec0	folded	the script log line's formatter, covered where named (zinterp.cpp:288)
 0x005961d0	sdl	a text object's font set from a GDI font handle (GetObjectA into a LOGFONT; twod.h:319): the SDL text host keeps fonts by name
-0x00596a70	unused	list teardown helpers whose callers (0x00596930, 0x00596c60) nothing reaches
-0x00596c80	unused	list teardown helpers whose callers (0x00596930, 0x00596c60) nothing reaches
+0x00596a70	folded	at exit: the destructor of zinterp's static map at 0x00731868 (0x00596930, registered with atexit by its initializer 0x005968f0 in the CRT's table; correction: not unreached) deletes each value's list of pointers; the port's statics free themselves
+0x00596c80	folded	at exit: the scroll list's (0x00731888, made by 0x005962a0) destructor (registered with atexit by 0x00596c40 in the CRT's table; correction: not unreached) frees each entry, then its nodes; the port's g_scroll (zinterp.cpp) frees itself
 0x00597680	software	SetPaletteName's palette brightness step for the 8-bit palette (0x005975e0's helper; only the software path uses a palette)
 0x00597e60	sdl	the machine probe (fixes.md:289, (A)): CPUID and its vendor, family and MMX tests, the MHz timing loops (QueryPerformanceCounter, RDTSC, the CMOS port, Intel's cpuspeed with its divide by zero: protection.md:140), GlobalMemoryStatus and the DirectDraw caps; the port fills zutl_reg's Machine itself (zutl_reg.cpp:48)
 0x00597eb0	sdl	the machine probe (fixes.md:289, (A)): CPUID and its vendor, family and MMX tests, the MHz timing loops (QueryPerformanceCounter, RDTSC, the CMOS port, Intel's cpuspeed with its divide by zero: protection.md:140), GlobalMemoryStatus and the DirectDraw caps; the port fills zutl_reg's Machine itself (zutl_reg.cpp:48)
@@ -1611,3 +1610,27 @@
 0x004a0100	folded	the vehicle controls' collision lists freed (+0x360, +0x354, +0x35c; next at +0x44), called by 0x00401400 and 0x0049ff80: the port's vectors (veh_controls.h, the collisions) clear themselves
 0x004eb420	folded	the node's model getter (+0x3c; a null node reports and returns 5): the port reads node->model where its callers (0x004a12c0, 0x004ac8a0, 0x004f84b0, 0x004f90e0, 0x004ff7a0) call it, on nodes they hold
 0x004a5c00	folded	a vtordisp adjustor thunk (the turret's virtual-base vtables 0x005c8638 and 0x005c8ae0): this adjusted, then 0x004a5c10, a constant
+0x00453000	folded	the mech lab item list's right-button up (vtable 0x005c1b70 +0x34): forwarded to the row under the mouse (0x00452da0), whose +0x34 is 0x0049bfd0, nothing; the port's base does nothing (lab_items.h)
+0x004b8db0	devdialog-shell	the vehicle editor's MFC plumbing (its pages' CDialog constructors, its destructor, message map); its layout is the exe's dialog resources (0xa5..0xb7). The port's editor covers the job: game_editor_vehicles (vehicle_editor_open / the page handlers); a page's OnInitDialog (vtable 0x005c9a24): CDialog's, then 1
+0x004bf720	devdialog-shell	the AI and editor dialogs' MFC base: an OnInitDialog (vtable 0x005ca5cc) running the base's 0x004d55d0, then 1
+0x004c7190	folded	the net editor's Node Params dialog's handler (vtable 0x005ca418): 0x004c7840, then 1; covered by the port's Node Params (upgrades/editor/node_params.h)
+0x00590b70	sdl	the MFC frame window's WM_MOVE (message map 0x005cf450): CFrameWnd's OnMove, then 0x00590b60; the SDL window replaces it
+0x0058fc30	folded	the engine's stop (the app's vt+0xb0, docs/game-loop.md): the modules' shutdowns in order (0x0051b170 .. 0x00555d90), covered where app_hooks.h names each
+0x0046b580	folded	a virtual-base scalar deleting destructor (behind its adjustor thunk, found by the S20 sweep): the destructor, the vtable reset, delete when asked; the port's classes destroy themselves
+0x00470c80	folded	a virtual-base scalar deleting destructor (behind its adjustor thunk, found by the S20 sweep): the destructor, the vtable reset, delete when asked; the port's classes destroy themselves
+0x004a5a90	folded	a virtual-base scalar deleting destructor (behind its adjustor thunk, found by the S20 sweep): the destructor, the vtable reset, delete when asked; the port's classes destroy themselves
+0x004ae230	folded	a virtual-base scalar deleting destructor (behind its adjustor thunk, found by the S20 sweep): the destructor, the vtable reset, delete when asked; the port's classes destroy themselves
+0x004d8a90	folded	a virtual-base scalar deleting destructor (behind its adjustor thunk, found by the S20 sweep): the destructor, the vtable reset, delete when asked; the port's classes destroy themselves
+0x004d8c00	folded	a virtual-base scalar deleting destructor (behind its adjustor thunk, found by the S20 sweep): the destructor, the vtable reset, delete when asked; the port's classes destroy themselves
+0x004e7620	folded	a virtual-base scalar deleting destructor (behind its adjustor thunk, found by the S20 sweep): the destructor, the vtable reset, delete when asked; the port's classes destroy themselves
+0x004e7830	folded	a virtual-base scalar deleting destructor (behind its adjustor thunk, found by the S20 sweep): the destructor, the vtable reset, delete when asked; the port's classes destroy themselves
+0x0046ef60	folded	the network controls' frame (IControls vt+0x0c, behind the adjustor 0x00470cb0): the base's 0x00426960; covered (mech_move.h controls_update, mech_control.h)
+0x004ae650	folded	ported: BasicControls::let_go (IControls vt+0x64, behind the adjustor 0x004aeae0)
+0x004ae690	folded	ported: BasicControls::on_path (IControls vt+0x70, behind the adjustor 0x004aeaf0)
+0x004ae9c0	folded	a virtual-base scalar deleting destructor (behind its adjustor thunk, found by the S20 sweep): the destructor, the vtable reset, delete when asked; the port's classes destroy themselves
+0x004d1df0	folded	a virtual-base scalar deleting destructor (behind its adjustor thunk, found by the S20 sweep): the destructor, the vtable reset, delete when asked; the port's classes destroy themselves
+0x005a75a0	folded	the message box's answers (vtable 0x005c5f88; Ghidra folded them into 0x005a7580): the result and the frame count set; covered (twod.h MessageBox::answer_*)
+0x005a75c0	folded	the message box's answers (vtable 0x005c5f88; Ghidra folded them into 0x005a7580): the result and the frame count set; covered (twod.h MessageBox::answer_*)
+0x005a75e0	folded	the message box's answers (vtable 0x005c5f88; Ghidra folded them into 0x005a7580): the result and the frame count set; covered (twod.h MessageBox::answer_*)
+0x005a7600	folded	the message box's answers (vtable 0x005c5f88; Ghidra folded them into 0x005a7580): the result and the frame count set; covered (twod.h MessageBox::answer_*)
+0x005a7620	folded	the message box's answers (vtable 0x005c5f88; Ghidra folded them into 0x005a7580): the result and the frame count set; covered (twod.h MessageBox::answer_*)

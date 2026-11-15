@@ -378,4 +378,12 @@ void probe_turret_lead(float* d, float slope) { mech3::tur::lead_dir(d, slope); 
 void probe_turret_delete_all() { mech3::tur::turrets_delete_all(); }
 void probe_turret_end() { mech3::tur::turrets_end(); }
 
+// test_turn_clamp.py: TurnLimits::clamp (vt+0x04) on the exe's record (0x2c bytes: the vtable, then the floats).
+int probe_turn_clamp(const uint32_t* rec, const float* d, float* out) {
+  mech3::tur::TurnLimits t;
+  t.kind = static_cast<mech3::tur::LimitKind>(rec[0]);
+  std::memcpy(&t.lo_sin, rec + 1, 4 * 10);
+  return t.clamp(d, out) ? 1 : 0;
+}
+
 }  // extern "C"

@@ -7,9 +7,10 @@ Prints, below the C runtime (the audit's own boundary):
 - created: functions Ghidra was made to decompile (analysis-output/decomp, CreateAndDecompile) that func2file lacks;
 - msgmap: every AFX message map (a GetBaseMessageMap pointer followed by its entries, 24 bytes each: message, code,
   id, last id, signature, handler) and each handler the list lacks;
-- data: every dword in a non-code section holding a code address that is no known function's start: a known
-  function's inside (a switch's jump table, read as such when its neighbours point into the same function) or an
-  unknown start.
+- behind: a function a listed thunk without a decomp jumps to (often a virtual-base destructor) that is not listed;
+- data: every dword in a non-code section holding a code address that is no known function's start: a switch's
+  table (only where code jumps through it, jmp [4*reg + base]; this exe keeps them in .text), an unknown start (after
+  a ret, jmp, int3 or nop: often a vtable slot into a function Ghidra made too long), or inside an instruction run.
 No dependencies.
 """
 import argparse
@@ -81,14 +82,18 @@ def main():
         i = bisect.bisect_right(starts, v) - 1
         return starts[i] if i >= 0 else None
 
-    ins = re.compile(r'^\s*([0-9a-f]+):\s+(?:[0-9a-f]{2} )*\s*([a-z]\S*)')
-    prev_mn, last = {}, None
+    ins = re.compile(r'^\s*([0-9a-f]+):\s+(?:[0-9a-f]{2} )*\s*([a-z]\S*)\s*([^<]*)')
+    prev_mn, last, text, switch_bases = {}, None, {}, set()
     for line in open(g['asm'], errors='replace'):
         m = ins.match(line)
         if m:
             a = int(m.group(1), 16)
             prev_mn[a] = last
             last = m.group(2)
+            text[a] = f'{m.group(2)} {m.group(3).strip()}'
+            t = re.search(r'\[4\*[a-z]+ \+ 0x([0-9a-f]+)\]', m.group(3)) if m.group(2) == 'jmp' else None
+            if t:
+                switch_bases.add(int(t.group(1), 16))
     start_like = lambda v: v in prev_mn and prev_mn[v] in (None, 'ret', 'jmp', 'int3', 'nop')
     print(f'{o.game}: {len(known)} known functions, the C runtime from 0x{crt:08x}')
     created = sorted(int(x[:-2], 16) for x in os.listdir(g['decomp']) if x.startswith('0x') and x.endswith('.c'))
@@ -120,6 +125,12 @@ def main():
         print(f'  map 0x{m:08x} msg 0x{e[0]:x} code 0x{e[1]:x} id {e[2]}..{e[3]} sig 0x{e[4]:x} -> 0x{e[5]:08x}'
               f' (inside 0x{owner(e[5]) or 0:08x})')
     # every code address in data
+    switch_slots = set()
+    for b in switch_bases:
+        k = b
+        while k < b + 4 * 512 and (x := word(k)) is not None and in_code(x) and owner(x) == owner(word(b)):
+            switch_slots.add(k)
+            k += 4
     inside, unknown, mid = {}, {}, {}
     for s in secs:
         if s['name'] not in ('.rdata', '.data'):
@@ -130,19 +141,41 @@ def main():
                 continue
             f = owner(v)
             va = s['va'] + off
-            # a jump table: a neighbour pointing inside the same function
-            nb = [word(va - 4), word(va + 4)]
-            if f is not None and any(x is not None and owner(x) == f and x != f and in_code(x) for x in nb):
+            # a switch's table only where code jumps through it (jmp [4*reg + base]); a run of pointers into one
+            # function is not enough (a vtable's slots into a function Ghidra made too long: hidden functions)
+            if va in switch_slots:
                 inside.setdefault(f, []).append(va)
             elif start_like(v):
                 unknown.setdefault(v, []).append(va)
             else:
                 mid.setdefault(v, []).append(va)
+    # a body behind a listed thunk (no decomp of its own): reached only through the thunk
+    behind = {}
+    for a in sorted(known):
+        if a >= crt or (g['decomp'] / f'0x{a:x}.c').exists():
+            continue
+        t = thunk_target(text, a)
+        if t is not None and t not in known and t < crt and in_code(t):
+            behind[t] = a
+    print(f'behind a thunk, not listed ({len(behind)}): '
+          + ' '.join(f'0x{t:08x} (from 0x{a:08x})' for t, a in sorted(behind.items())))
     print(f'data: {sum(len(x) for x in inside.values())} jump-table entries in {len(inside)} functions; '
           f'{len(mid)} addresses inside an instruction run (no function start: not code pointers, or labels); '
           f'{len(unknown)} function starts not listed:')
     for v in sorted(unknown):
         print(f'  0x{v:08x} (after 0x{owner(v) or 0:08x}) from {" ".join(f"0x{x:08x}" for x in unknown[v][:4])}')
+
+
+def thunk_target(text, a):
+    """Where a thunk (jmp X, or a virtual-base adjustor: sub ecx, [ecx - 4] (sub ecx, n) jmp X) at `a` goes."""
+    t = sorted(x for x in text if a <= x < a + 16)
+    for x in t[:3]:
+        m = re.match(r'^jmp 0x([0-9a-f]+)$', text[x])
+        if m:
+            return int(m.group(1), 16)
+        if not re.match(r'^sub ecx, (dword ptr \[ecx - 0x4\]|0x[0-9a-f]+)$', text[x]):
+            return None
+    return None
 
 
 if __name__ == '__main__':

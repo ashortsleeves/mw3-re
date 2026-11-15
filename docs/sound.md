@@ -38,8 +38,21 @@ user data 0x56f430 and name 0x56f740.
 Two APIs are compiled in: [0x72c2cc] 0 DirectSound, 1 Aureal A3D
 (CoCreateInstance, its own error names 0x5746b0). Only 0x570625 writes the
 selector, and only to 0 when A3D fails to open, so A3D is never used; its
-branches are not ported. The syntax 1 reader of sounds.zrd (0x5706f0) is
-not ported either: the shipped file is SYNTAX 2.
+branches are not ported. The shipped sounds.zrd is SYNTAX 2; the load
+(0x5705e0) reads a file saying SYNTAX 1, or none, with the older reader
+0x5706f0 (ported 2026-11-14, `zsnd::read_syntax1`, so a modded file without
+the key loads as in the original): CD_TRACKS, SOUND_PATH, the default
+formats and SPEED_OF_SOUND as SYNTAX 2; then SETS, each a name and a list
+of sounds, each sound a list read by place: name, file, an optional float
+volume (not clamped), three words, each TRUE or not, for looped, 3D and
+purgeable, then the range's two floats only when they end the list (else 50
+and 400). No keywords, sub-sets, per-sound formats, demo sets or load
+callback; the queue time and A3D distance stay 0 (SYNTAX 2 sets 5 and 1);
+SOUND_GROUPS without the callback. The exe reads three words whatever the
+list holds and takes any item as a string; the port reads a missing or
+non-string word as not TRUE, and a set or sound that is no list (or SETS
+missing) as nothing (FIX (A), fixes.md). `test_sound.py` loads 25 made-up
+SYNTAX 1 files on both sides (4 of 4 breaks).
 
 ## 1. Start-up and sounds.zrd
 
@@ -260,7 +273,7 @@ kept 1 s longer, a group's status not asking its voices. Not caught: the
 
 ## 9. Left
 
-- The A3D path and the syntax 1 reader (dead in MW3).
+- The A3D path (dead in MW3).
 - CD volume through the aux / mixer API (0x572ee0, 0x573060..0x5731f0): the
   music output's own volume stands in (zsnd_cd).
 - Wiring: `mech3::Engine`'s sound hooks (sound_find, sound_play, ...) and

@@ -14,7 +14,8 @@ regularly a dump of the whole state (every set and sound, voices, groups and
 their entries, the playing groups, the voice queue, cue tracking, fades).
 
 Scenarios: start-up with each SoundLOD, archives on and off, the engine
-variables present or not, demo sets, callbacks; loading and unloading sets;
+variables present or not, demo sets, callbacks; made-up SYNTAX 1 files (the
+older reader 0x5706f0); loading and unloading sets;
 then thousands of random operations: play, play at a position, status, stop,
 frequency, voice volume, locks, frames (fades, queue, cues, groups), the
 listener and 3D updates with doppler, fades, pause snapshots, group stash,
@@ -24,6 +25,7 @@ import ctypes
 import random
 import struct
 import sys
+import tempfile
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
@@ -162,6 +164,7 @@ class Emu:
         self.sizes = {}
         self.log = []
         self.reader_data = reader_data
+        self.reader_path = READER
         imp = cpu.stub_import
         imp(0x5bb664, lambda c: self.alloc(c.arg(0)))                       # malloc
         imp(0x5bb60c, lambda c: self.alloc(c.arg(0) * c.arg(1), zero=True))  # calloc
@@ -598,7 +601,7 @@ class Emu:
     # --- a scenario
     def begin(self, lod, mute, volume, vars_, archives_on, caps, seed):
         cpu = self.cpu
-        self.reader_entries = list(archive_entries_cached(READER))
+        self.reader_entries = list(archive_entries_cached(self.reader_path))
         self.next = self.base
         self.sizes = {}
         self.strings = {}
@@ -1280,6 +1283,87 @@ def scenario_picks(emu, names, plays):
     return b.calls
 
 
+def ser(v):
+    """A reader tree to the file's bytes (zreader.md)."""
+    if isinstance(v, list):
+        return struct.pack('<iI', 4, len(v) + 1) + b''.join(ser(x) for x in v)
+    if isinstance(v, str):
+        e = v.encode('latin-1')
+        return struct.pack('<iI', 3, len(e)) + e
+    if isinstance(v, float):
+        return struct.pack('<if', 2, v)
+    return struct.pack('<ii', 1, v)
+
+
+def syntax1_zrd(r, names):
+    """A SYNTAX 1 sounds.zrd (0x5706f0): sets of sounds as lists, no keywords; the SYNTAX key 1 or none. Only
+    what the exe reads without faulting: three words after the volume, all strings."""
+    _, sounds, _ = names
+    word = lambda: r.choice(['TRUE', 'TRUE', 'FALSE', 'true', 'YES'])  # noqa: E731
+    sets = []
+    for k in range(r.randint(1, 6)):
+        entries = []
+        for _ in range(r.choice([0, 1, 3, r.randint(1, 12)])):
+            e = [r.choice(sounds), f'{r.choice(sounds)}.wav']
+            if r.random() < 0.6:
+                e.append(r.choice([0.5, 1.0, 1.7, -0.25, r.random()]))
+            if r.random() < 0.15:
+                e.append('x')  # not a float: read as the first word
+            e += [word() for _ in range(3)]  # the exe reads three words whatever the list holds
+            if r.random() < 0.5:
+                e += [r.uniform(1, 100), r.uniform(100, 900)]
+            if r.random() < 0.1:
+                e.append(r.uniform(1, 5))
+            entries.append(e)
+        sets += [f'set{k}', entries]
+    top = [] if r.random() < 0.5 else ['SYNTAX', [1]]
+    top += ['CD_TRACKS', [1, 2], 'SOUND_PATH', ['..\\data\\common\\sounds;zbd']]
+    for key in ('HIGH_DEFAULT', 'MEDIUM_DEFAULT', 'LOW_DEFAULT'):
+        if r.random() < 0.5:
+            top += [key, [r.choice([11025, 22050, 44100]), r.choice([8, 16]), r.choice([1, 2])]]
+    if r.random() < 0.5:
+        top += ['SPEED_OF_SOUND', [r.uniform(200, 400)]]
+    top += ['SETS', sets]
+    return ser([top])
+
+
+def archive(files):
+    """A version-1 archive of {name: bytes} (zreader.md)."""
+    body, table = bytearray(), bytearray()
+    for name, data in files.items():
+        table += struct.pack('<II', len(body), len(data)) + name.encode().ljust(64, b'\0') + bytes(0x94 - 72)
+        body += data
+    return bytes(body + table + struct.pack('<II', 1, len(files)))
+
+
+def scenario_syntax1(emu, names, seed):
+    """Loads of SYNTAX 1 files made up from the shipped names, read by both sides from the same archive."""
+    r = random.Random(seed)
+    calls = 0
+    with tempfile.TemporaryDirectory() as tmp:
+        (Path(tmp) / 'zbd').mkdir()
+        path = Path(tmp) / 'zbd' / 'reader.zbd'
+        for k in range(25):
+            data = archive({'sounds.zrd': syntax1_zrd(r, names)})
+            path.write_bytes(data)
+            _entries_cache.pop(path, None)
+            emu.reader_data, emu.reader_path = data, path
+            if not probe.probe_snd_setup(tmp.encode()):
+                raise SystemExit('probe could not open the made-up reader.zbd')
+            b = Both(emu, lod=k % 3, archives_on=0)
+            b.init()
+            b.load(cb=k % 2, demo=0)
+            b.compare(f'syntax 1 file {k}: after load')
+            b.close(1)
+            b.shutdown()
+            b.compare(f'syntax 1 file {k}: after shutdown')
+            calls += b.calls
+    emu.reader_data, emu.reader_path = READER.read_bytes(), READER
+    if not probe.probe_snd_setup(str(GAME).encode()):
+        raise SystemExit('probe could not reopen reader.zbd')
+    return calls
+
+
 def main():
     quick = '--quick' in sys.argv
     seed0 = int(sys.argv[sys.argv.index('--seed') + 1]) if '--seed' in sys.argv else 1
@@ -1302,6 +1386,8 @@ def main():
         calls += scenario_load(emu, names, 2, 1, 1, 1, 0, sets[:10], caps=0)
         runs += 1
         calls += scenario_picks(emu, names, 40 if quick else 200)
+        runs += 1
+        calls += scenario_syntax1(emu, names, seed0)
         runs += 1
         play_sets = ['MENU', 'mech', 'common', 'dom', 'c1', 'c1m4', 't1', 'brief_c11', 'brief_t11', 'choppers']
         for k in range(3 if quick else 12):

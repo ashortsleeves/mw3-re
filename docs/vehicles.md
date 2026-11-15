@@ -1512,7 +1512,22 @@ the two sines; NaN passes), then by kind: Fixed 0x4a4330, its heading's
 across part squared under 1e-5 of the flat length squared (along the one
 heading, forward or back); Narrow 0x4a45b0, on the inner side of both edges;
 Wide 0x4a4830, of either; Full 0x4a4180, the pitch alone. Unordered edge
-tests fail. Nothing in the turret asks their clamp (vt+0x04).
+tests fail. Nothing in the release asks their clamp (vt+0x04).
+
+**The turn limits' clamp** (vt+0x04; ported for preservation 2026-11-14, `TurnLimits::clamp`, not wired in):
+within, the direction itself and true; else a direction put back and false. Unordered compares count as past.
+- Fixed 0x4a43c0: past the pitch, the one heading (lo_edge's (z, -x)) scaled to the passed limit's cosine with
+  its sine as y. Within the pitch and along the heading, itself; across it, the heading with the direction's own
+  pitch (0x4a3fe0: the cosine sqrt(1 - y y) from its sine).
+- Narrow 0x4a4660 and Wide 0x4a4830's 0x4a48e0: a direction within the pitch comes back as it is, true only when
+  its heading is inside too (quirk: a heading outside is not put back). One past the pitch keeps its heading when
+  inside, else takes an edge's heading (Narrow: the low edge when it is the further out, Wide the reverse), and
+  comes back level: the sine and cosine stay 0x4a3fb0's 0 and 1 (quirk: nothing sets them from the limit).
+- Full: the vehicles' 0x4a41b0 (The gun's aim).
+Each scales by cos / hypot(x, y) where the heading's length is hypot(x, z), reading `out`'s y before it is
+written; FIX (bug), behind `small_fixes` as 0x4a41b0's. `test_turn_clamp.py` against the exe: 20,000 clamps over
+the four kinds (records as 0x4a4b30 makes them and random ones, NaNs, directions on the limits and edges), within
+4 ulps; with the fix on, a Fixed clamp past the pitch lands on the limit at the heading; 6 of 6 breaks.
 
 **The lead's three questions** (2026-10-24):
 
@@ -1731,7 +1746,12 @@ inverted) names c1m1's four vehicles.
 **Part 1, ported for preservation (2026-11-14; not wired in).** `mech3/veh_basic_controls` holds the class
 over `VehicleControls` (`BasicControls`, 0xa70 bytes): its constructor 0x4ae270 (the base's, the net's
 number at +0xa04, then init), init 0x4ae3c0, setup 0x4ae6b0 and the answers vt+0x04 0x4ae340 (the mode
-+0xa14), vt+0x08 0x4ae350 (the net node's +0x2c) and vt+0x1c 0x4ae6a0 (state 4). Init, with the vehicle's
++0xa14), vt+0x08 0x4ae350 (the net node's +0x2c) and vt+0x1c 0x4ae6a0 (state 4), with IControls'
+vt+0x70 0x4ae690 (on a path: state 2, so the vehicle frame 0x4a1040 moves it only while it follows a record) and
+vt+0x64 0x4ae650 (a record let go: following that one, state 4 and no record) and vt+0x04 0x4ae5e0 (a net handed
+over: stopped, with an owner and its node, and a net that serves (its vt+0x38), its number (vt+0x18) kept and the
+base's init 0x4ac8a0 run again), each behind a virtual-base adjustor (0x4aeaf0, 0x4aeae0, 0x4aea00; found by the S20
+sweep). Init, with the vehicle's
 node, runs the base's init. A positive net number that names a record (0x4022c0 over [0x5f4c4c]: the
 version-105 nets' records, a stand-in `Net105Record` until that group is ported) sets state 2. The mode comes
 from the record's kind (0, 2 or 3). The node is the record's net's element nearest the vehicle (0x4d51d0, then

@@ -254,6 +254,7 @@ void stop_queue(int32_t stop_playing);               // 0x00570410
 void drop_queued(Sound* sound);                      // 0x00570490
 int32_t shutdown();                                  // 0x00570510
 int32_t load(uint32_t window, const char* name, LoadFn fn, int32_t demo);  // 0x005705e0
+int32_t read_syntax1(zrdr::Node* root);                            // 0x005706f0
 int32_t read_syntax2(zrdr::Node* root, LoadFn fn, int32_t demo);  // 0x00570af0
 int32_t open_device();                               // 0x00571460
 
