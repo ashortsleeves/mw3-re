@@ -522,6 +522,7 @@ come from the asm, Ghidra drops the fastcall registers.
 | [0x72f3d0] / [0x72f3d4] / [0x72f3d8] | 0x57eeb0 / 0x57f2a0 / 0x57f860 | textured with projected shadows (multi-pass) | count, texture / flags, count, texture |
 | [0x72f3bc] | 0x57caa0 | textured, white vertices: puffers without colours (0x567720), weather (0x5a5a03); ported | count, texture record, priority (unused), opacity, overlay |
 | [0x72f3cc] / [0x72f3dc] | 0x57ea20 / 0x57fe20 | one projected-light triangle from 0x547740 (correction: not puffers; render-shadows.md) | light, flags, count, texture, priority, opacity, overlay / light, flags, count, texture |
+| [0x72f3b4] | 0x57c2f0 | untextured, a packed colour per vertex; nothing reads the slot (The unused vertex-colour draw) | points, colours, alpha, count, priority (unused), overlay |
 
 `alpha` = `ftol(material alpha * opacity [0x74a26c])`; `opacity` = the
 pushed node opacity as a float; `overlay` = [0x74a268] (node flag
@@ -988,6 +989,18 @@ the planes among them), every bit equal at 24 bits but a NaN's sign (a 0/0 cut a
 x87's 0xffc00000, the port's 0x7fc00000); 10 of 10 breaks. At 53 bits the floats agree within 1e-4, and one polygon
 in 3,000, with a corner exactly on a plane, takes another branch: the exe compares a cut's z still in the register
 (unrounded at 53) with its stored copy. Nothing runs these, so the port keeps the 24-bit result.
+
+### The unused vertex-colour draw (S20, 2026-11-14)
+
+0x579f50 fills [0x72f3b4] with 0x57c2f0, but nothing in the release reads the slot (the sweep found it; so are the
+render-state setters [0x72f3a0] 0x57bbc0, [0x72f3a4] 0x57bc00, [0x72f3a8] 0x57bc40 and [0x72f380] 0x5779d0, which are
+Direct3D calls and labelled replaced). 0x57c2f0 is 0x57bf80 with a colour per vertex: ECX the points (x, y, depth;
+rhw = depth), EDX one display-packed colour each, unpacked with the alpha the same way; then alpha, count, an unused
+priority and the overlay flag. With alpha under 255 the polygon goes to the transparent queue (or the overlay list as type
+0); otherwise it is built in the opaque buffer and drawn flat, or copied to the overlay list as type 2 (the only
+user of that type), the buffer filled even when the list is full. Quirk, kept: points and colours are read last to
+first, so the polygon's winding is reversed. Ported (`zvid::draw_vertex_colors`), unwired; `test_drawtable.py` runs it
+among the live draws against the exe (3 of 3 breaks).
 
 ### (c) Open: a parked vehicle's edges flicker on c1m2 (playtest #22)
 

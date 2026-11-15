@@ -269,7 +269,8 @@ def write_doc(o, g, rows):
            'Every game function of the original (below the C runtime) that has no port of its own, labelled from its decomp,',
            'its callers and callees, the port\'s comments and the docs (tools/analysis/port_audit.py; labels with their',
            'reasons in tools/analysis/port_audit_labels.tsv). Addresses and plain words only. Besides Ghidra\'s functions,',
-           'the ones it never made that were found by hand (message maps, vtables) are counted: tools/analysis/port_audit_extra.tsv.', '',
+           'the ones it never made that were found by hand (message maps, vtables) or by the sweep of every code pointer in the data '
+           '(tools/analysis/sweep_tables.py) are counted: tools/analysis/port_audit_extra.tsv.', '',
            'Classes: **folded** (into its callers or a ported class: getters, setters, constructors, destructors, thunks,',
            'container code, or covered where the port names it); **replaced** (SDL or the platform layer); **PORT (preserve)**',
            '(debug and dev tools, unused code: to be ported for preservation, not called by the game); **MISSING LOGIC**',
