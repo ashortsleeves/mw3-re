@@ -65,6 +65,8 @@ struct Frames {
   int32_t frozen = 0;              // 0x0060b94c
 };
 Frames& frames();
+// The frame counter reset to 1 and the stamps unfrozen; 0. Nothing calls it (ported for preservation).
+int32_t frames_reset();            // 0x004f8f20
 
 Node* node_alloc();                // 0x004eacd0
 int node_pool_grow();              // 0x004f8c80, 0 ok, 1 out of memory

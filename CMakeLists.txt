@@ -122,6 +122,7 @@ add_library(mw3core STATIC
   src/gamez/zinterp/zinterp_parse.cpp
   src/gamez/zinterp/zinterp_console.cpp
   src/gamez/zimage/zimg_texture.cpp
+  src/gamez/zimage/zimg_fonts.cpp
   src/gamez/zmath/zmth_matrix.cpp
   src/gamez/zmath/zmth_vector.cpp
   src/gamez/zmath/zmth_unused.cpp
@@ -492,6 +493,8 @@ add_library(mw3probe SHARED
   tests/probe_drawtable.cpp
   tests/probe_matrix.cpp
   tests/probe_zmath_unused.cpp
+  tests/probe_zimg_fonts.cpp
+  tests/probe_s14_misc.cpp
   tests/probe_screen.cpp
   tests/probe_strips.cpp
   tests/probe_ripple.cpp
@@ -643,6 +646,7 @@ add_executable(mw3tests
   tests/test_znet.cpp
   tests/test_cue.cpp
   tests/test_mipmaps.cpp
+  tests/test_zimg_fonts.cpp
   tests/test_mech.cpp
   tests/test_mech_reader.cpp
   tests/test_msvc_rand.cpp
