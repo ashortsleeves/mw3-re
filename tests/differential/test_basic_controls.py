@@ -4,7 +4,9 @@ by its number through the real 0x4022c0 over [0x5f4c4c]; the mode from its kind;
 nearest the vehicle, 0x4d51d0 and the element's vt+0x80, stubbed; the vehicle's "healthy" node 0x4f9d60 and its
 flags 0x4eb750 / 0x4eb620; the ranges from the record, each 0 its default; the vehicle's +0xe0), their setup
 0x4ae6b0 (the base's 0x4acbc0 stubbed; the definition's activation, pursuit_range, not_pursuit_dwell and
-return_range for the record's zeros, the pursuit pair put in order) and the answers 0x4ae340, 0x4ae350, 0x4ae6a0.
+return_range for the record's zeros, the pursuit pair put in order) and the answers 0x4ae340, 0x4ae350, 0x4ae6a0,
+IControls' 0x4ae690 (on a path), 0x4ae650 (a record let go: its own, or another) and 0x4ae5e0 (a net handed over,
+taken when stopped and it serves).
 Ported for preservation, not wired in.
 
     cmake --build build --target mw3probe && .venv/bin/python -P tests/differential/test_basic_controls.py [cases]
@@ -25,8 +27,10 @@ from calltrace import Emu, Replay, Trace, compare, load_probe  # noqa: E402
 
 U, I = ctypes.c_uint32, ctypes.c_int32
 INIT, SETUP, MODE, GOAL, DEAD = 0x4ae3c0, 0x4ae6b0, 0x4ae340, 0x4ae350, 0x4ae6a0
+ON_PATH, LET_GO, TAKE_NET = 0x4ae690, 0x4ae650, 0x4ae5e0  # IControls vt+0x70 / +0x64 / +0x04 past their adjustors
+# (this = +0xa5c)
 HEAD = 0x5f4c4c
-COVER = {k: 0 for k in ('no node', 'no number', 'no record', 'record', 'no element', 'no healthy', 'setup',
+COVER = {k: 0 for k in ('no node', 'let go', 'took a net', 'no number', 'no record', 'record', 'no element', 'no healthy', 'setup',
                         )}
 
 
@@ -66,6 +70,9 @@ def make(seed, t):
     netnode = e.world_alloc(0x40)
     e.w32(netnode + 0x2c, r.randrange(-1, 30))
     element = e.object('element', slots={0x80: ('c', 0)})
+    netobj = e.object('net', slots={0x38: ('c', 0), 0x18: ('c', 0)})  # IControls vt+0x04's net
+    t.script['net.vt+0x38'] = r.choice([0, 1, 1])
+    t.script['net.vt+0x18'] = r.randrange(-1, 6)
     t.script['element.vt+0x80'] = netnode
     t.script['0x005a85e0'] = pos
     t.script['0x004d51d0'] = element if r.random() < 0.85 else 0
@@ -97,12 +104,13 @@ def make(seed, t):
     e.stub(0x5569e0, spec='c,zd', fn=find)
     case = dict(node=node != 0, net=net, records=len(recs), setup=setup, element=t.script['0x004d51d0'] != 0,
                 healthy=healthy != 0)
-    return e, case, ctl, owner, node, net, state0, rec0, defn if setup else 0, r.randrange(0, 9), r.choice([net, 1, 2, 3])
+    return (e, case, ctl, owner, node, net, state0, rec0, defn if setup else 0, r.randrange(0, 9), r.choice([net, 1, 2, 3]),
+            netobj)
 
 
 def run(probe, seed):
     t = Trace()
-    e, case, ctl, owner, node, net, state0, rec0, defn, arg2, net2 = make(seed, t)
+    e, case, ctl, owner, node, net, state0, rec0, defn, arg2, net2, netobj = make(seed, t)
     snap = e.snapshot()
     rep = Replay(t, e, snap)
     probe.probe_app_set_callback(rep.callback())
@@ -114,24 +122,35 @@ def run(probe, seed):
     nn = e.r32(ctl + 0xa0c)
     goal = e.call(GOAL, ecx=ctl) if nn else 0
     dead = e.call(DEAD, ecx=ctl) & 0xff
+    path = e.call(ON_PATH, ecx=ctl + 0xa5c) & 0xff  # the IControls part: the adjustor's this
+    rec, state, net_was = e.r32(ctl + 0xa08), e.r32(ctl + 0x38), e.r32(ctl + 0xa04)
+    let = rec if rec and seed % 3 else (e.r32(0x5f4c4c) or 0x1234)
+    let_r = e.call(LET_GO, ecx=ctl + 0xa5c, stack=(let,)) & 0xff
+    took = e.call(TAKE_NET, ecx=ctl + 0xa5c, stack=(netobj,)) & 0xff
     out = (U * 24)()
-    k = probe.probe_basic_controls(ctl, owner, node, net, e.r32(0x5f4c4c), state0, rec0, defn, arg2, net2, out)
+    k = probe.probe_basic_controls(ctl, owner, node, net, e.r32(0x5f4c4c), state0, rec0, defn, arg2, net2, let, netobj,
+                                   out)
     name = f'seed {seed} {case}'
     if not compare(name, t.log, rep.log):
         return False
-    a = [e.r32(ctl + 0x38), e.r32(ctl + 0xa04), e.r32(ctl + 0xa08), nn, e.r32(ctl + 0xa14), e.r32(ctl + 0xa18)]
+    a = [state, net_was, rec, nn, e.r32(ctl + 0xa14), e.r32(ctl + 0xa18)]
     a += [e.r32(ctl + o) for o in (0xa1c, 0xa20, 0xa24, 0xa28, 0xa2c, 0xa30, 0xa44)]
     a += [e.r32(owner + 0xe0), mode & 0xffffffff, goal & 0xffffffff, 1 if dead else 0]
+    a += [1 if path else 0, 1 if let_r else 0, e.r32(ctl + 0x38), e.r32(ctl + 0xa08), 1 if took else 0,
+          e.r32(ctl + 0xa04)]
     b = list(out[:k])
     if a != b:
         names = ['state', 'net', 'record', 'node', 'mode', 'xa18', 'xa1c', 'dwell', 'xa24', 'far', 'near', 'return',
-                 'activation', 'owner+0xe0', 'path_mode', 'path_goal', 'destroyed']
+                 'activation', 'owner+0xe0', 'path_mode', 'path_goal', 'destroyed', 'on_path', 'let_go',
+                 'state after', 'record after', 'took the net', 'net number after']
         diff = [f'{n}: {x:#x} / {y:#x}' for n, x, y in zip(names, a, b) if x != y]
         print(f'{name}: {diff}')
         return False
     COVER['no node' if not case['node'] else 'no number' if net <= 0 else
-          'record' if e.r32(ctl + 0x38) == 2 else 'no record'] += 1
-    if case['node'] and e.r32(ctl + 0x38) == 2:
+          'record' if state == 2 else 'no record'] += 1
+    COVER['let go'] += bool(let_r)
+    COVER['took a net'] += bool(took)
+    if case['node'] and state == 2:
         COVER['no element'] += not case['element']
         COVER['no healthy'] += not case['healthy']
         COVER['setup'] += bool(defn)
@@ -140,7 +159,7 @@ def run(probe, seed):
 
 def main():
     probe = load_probe()
-    probe.probe_basic_controls.argtypes = [U, U, U, I, U, I, U, U, U, I, ctypes.POINTER(U)]
+    probe.probe_basic_controls.argtypes = [U, U, U, I, U, I, U, U, U, I, U, U, ctypes.POINTER(U)]
     probe.probe_basic_controls.restype = I
     n = int(sys.argv[1]) if len(sys.argv) > 1 else 600
     bad = sum(0 if run(probe, s) else 1 for s in range(n))

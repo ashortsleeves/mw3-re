@@ -28,7 +28,7 @@ using zgame::Handle;
 // points at it): the gun's pitch as sines and cosines (0x004a4000), and by
 // the yaw's range one of four kinds. The kind is the exe's vtable. A new
 // kind is built over the old one: fields it does not set keep their bytes.
-// The aim asks within (vt+0x08); nothing in the turret asks clamp (vt+0x04).
+// The aim asks within (vt+0x08); nothing in the release asks clamp (vt+0x04).
 enum class LimitKind : uint32_t {
   Fixed = 0x005c8310,   // 0x004a42f0: a range of 0.001 or less (or NaN): the low yaw alone
   Narrow = 0x005c8320,  // 0x004a4580 over 0x004a4270: under pi
@@ -51,6 +51,14 @@ struct TurnLimits {
   // either way), Narrow 0x004a45b0 (inside both edges), Wide 0x004a4830
   // (inside either).
   bool within(const float d[3]) const;
+  // vt+0x04, which nothing in the release calls (docs/vehicles.md, The turn
+  // limits' clamp; preserved, unwired): within, the direction itself and
+  // true; else a direction put back, and false. Fixed 0x004a43c0, Narrow
+  // 0x004a4660, Wide 0x004a48e0 (over 0x004a3fb0 / 0x004a3fe0); Full is the
+  // vehicles' 0x004a41b0. FIX (bug), behind zfix small_fixes as there: the
+  // heading's length is hypot(x, z), the exe's hypot(x, y) reads `out`'s y
+  // before it is written.
+  bool clamp(const float d[3], float out[3]) const;
 };
 
 // The pick's turn by game time (FIX (B), behind per_second): one turn in `n`

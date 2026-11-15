@@ -188,8 +188,7 @@ int32_t shutdown() {
 
 // Mech3.exe 1.2 @ 0x005705e0 (ECX window, EDX file, the load callback, the
 // demo flag). Opens DirectSound, reads the file, then its SYNTAX: 2 is the
-// shipped one. The older syntax 1 reader (0x005706f0) is not ported; no data
-// uses it (docs/sound.md).
+// shipped one; 1, or none, the older reader (0x005706f0; docs/sound.md).
 int32_t load(uint32_t window, const char* name, LoadFn fn, int32_t demo) {
   State& st = g_state;
   if (st.open || !st.initialized) return 0;
@@ -205,7 +204,86 @@ int32_t load(uint32_t window, const char* name, LoadFn fn, int32_t demo) {
   }
   int32_t syntax = 0;
   if (!zrdr::get_int(st.root, "SYNTAX", &syntax)) syntax = 1;
-  if (syntax == 2) read_syntax2(st.root, fn, demo);  // syntax 1 reads nothing here
+  if (syntax == 1) read_syntax1(st.root);
+  else if (syntax == 2) read_syntax2(st.root, fn, demo);
+  return 1;
+}
+
+namespace {
+// An item the syntax 1 reader compares with "TRUE" (case and all).
+bool is_true(const zrdr::Node* l, int32_t k) {
+  // FIX (A): the exe reads the item as a string whatever it is, past the list's end too; a missing or other
+  // item is not TRUE here.
+  return k < l[0].i && l[k].type == zrdr::String && l[k].s && std::strcmp(l[k].s, "TRUE") == 0;
+}
+}  // namespace
+
+// Mech3.exe 1.2 @ 0x005706f0 (ECX the root): the older sounds.zrd, SYNTAX 1 or none. CD_TRACKS, SOUND_PATH, the
+// default formats and SPEED_OF_SOUND as SYNTAX 2; then SETS, each a name and a list of sounds, each sound a list:
+// name, file, an optional volume (a float, not clamped), three TRUE / other words for looped, 3D and purgeable,
+// then optionally the range's two floats (only when they end the list). No keywords, sub-sets, formats per sound,
+// demo sets or load callback; then SOUND_GROUPS, without the callback.
+int32_t read_syntax1(zrdr::Node* root) {
+  State& st = g_state;
+  Format defaults[3];
+  defaults[0].rate = 44100, defaults[0].bits = 16, defaults[0].channels = 2;
+  defaults[1].rate = 22050, defaults[1].bits = 16, defaults[1].channels = 1;
+  defaults[2].rate = 11025, defaults[2].bits = 8, defaults[2].channels = 1;
+  if (g_hooks.cd_open) g_hooks.cd_open(zrdr::find(root, "CD_TRACKS"));  // 0x00572450
+  if (const char* sp = zrdr::get_string(root, "SOUND_PATH")) {
+    if (!st.has_search) st.search = sp, st.has_search = true;  // 0x00576100
+    else st.search = st.search + ";" + sp;                      // 0x00576140
+  }
+  static const char* const kDefaults[3] = {"HIGH_DEFAULT", "MEDIUM_DEFAULT", "LOW_DEFAULT"};
+  for (int i = 0; i < 3; ++i)
+    if (zrdr::Node* n = zrdr::find(root, kDefaults[i]))
+      read_triple(n, &defaults[i].rate, &defaults[i].bits, &defaults[i].channels);
+  float sos = 0.0f;
+  if (zrdr::get_float(root, "SPEED_OF_SOUND", &sos)) set_speed_of_sound(sos);
+  zrdr::Node* sets = zrdr::find(root, "SETS");
+  if (sets && sets->type == zrdr::List) {  // FIX (A): the exe reads SETS' list whether it is there or not
+    zrdr::Node* items = sets->list;
+    const int32_t pairs = (items[0].i - 1) / 2;
+    for (int32_t k = 0; k < pairs; ++k) {
+      zrdr::Node& name_node = items[1 + 2 * k];
+      zrdr::Node& set_node = items[2 + 2 * k];
+      const int32_t n = set_node.type == zrdr::List ? set_node.list[0].i - 1 : 0;  // FIX (A): as SETS
+      auto* set = new Set;  // 0x0056f760
+      set->name = name_node.type == zrdr::String && name_node.s ? name_node.s : "";
+      if (n > 0) set->sounds.resize(n);
+      st.sets.push_back(set);
+      for (int32_t i = 0; i < n; ++i) {
+        const zrdr::Node& entry = set_node.list[1 + i];
+        Sound& s = set->sounds[i];
+        s.kind = 0;
+        s.queue_life = 0.0f, s.a3d_dist = 0.0f;  // the set's zeroed records: SYNTAX 1 sets neither
+        if (entry.type != zrdr::List || entry.list[0].i < 3) continue;  // FIX (A): read as a list regardless
+        const zrdr::Node* l = entry.list;
+        s.name = l[1].s;
+        s.file = l[2].s;
+        int32_t at = 3;
+        if (l[0].i > 3 && l[3].type == zrdr::Float) {
+          s.volume = raw_float(l[3]);
+          at = 4;
+        } else {
+          s.volume = 1.0f;
+        }
+        s.flags = (s.flags & ~(kLooped | k3D | kPurgeable)) | (is_true(l, at) ? kLooped : 0) |
+                  (is_true(l, at + 1) ? k3D : 0) | (is_true(l, at + 2) ? kPurgeable : 0);
+        if (l[0].i == at + 5) {
+          s.range_min = raw_float(l[at + 3]);
+          s.range_max = raw_float(l[at + 4]);
+        } else {
+          s.range_min = 50.0f, s.range_max = 400.0f;
+        }
+        s.freq_max = 90000.0f;
+        s.freq_min = 20000.0f;
+        s.user = nullptr;
+        for (int f = 0; f < 3; ++f) s.formats[f] = defaults[f];
+      }
+    }
+  }
+  if (zrdr::Node* g = zrdr::find(root, "SOUND_GROUPS")) read_groups(g, nullptr, nullptr);
   return 1;
 }
 

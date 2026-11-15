@@ -75,6 +75,24 @@ void BasicControls::init() {
   v->xe0 = v;
 }
 
+// Mech3.exe 1.2 @ 0x004ae5e0
+bool BasicControls::take_net(Handle n) {
+  BasicControlsHooks& h = hk();
+  auto* v = static_cast<BasicVehicle*>(owner);
+  if (state != 4 || !v || !v->node || !h.net_usable(n)) return false;
+  net = h.net_number(n);
+  h.base_init(*this);  // 0x004ac8a0, called directly
+  return true;
+}
+
+// Mech3.exe 1.2 @ 0x004ae650
+bool BasicControls::let_go(const Net105Record* r) {
+  if (state != 2 || r != record) return false;
+  state = 4;
+  record = nullptr;
+  return true;
+}
+
 // Mech3.exe 1.2 @ 0x004ae6b0: the net's number kept, the base's setup; with a record, each of its ranges left 0
 // taken from the definition ("activation", "pursuit_range"'s two, "not_pursuit_dwell", "return_range"), the
 // pursuit pair put in order.

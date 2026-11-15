@@ -57,9 +57,10 @@ extern "C" {
 // the record list's head `head` (read from the original's memory: +0x18, +0x30, +0x38..+0x50, +0x58), +0x38 and
 // +0xa08 before; then init, and with `def` the setup (def, arg2, net2). out: +0x38, +0xa04, +0xa08, +0xa0c,
 // +0xa14, +0xa18, +0xa1c..+0xa30 (bits), +0xa44 (bits), the vehicle's +0xe0, then path_mode, path_goal (with a
-// node), destroyed.
+// node), destroyed; on_path, let_go(the record at `let_go`) and +0x38, +0xa08 after it; take_net(`net_obj`) and +0xa04.
 int probe_basic_controls(uint32_t ctl, uint32_t owner, uint32_t node, int32_t net, uint32_t head, int32_t state0,
-                         uint32_t rec0, uint32_t def, uint32_t arg2, int32_t net2, uint32_t* out) {
+                         uint32_t rec0, uint32_t def, uint32_t arg2, int32_t net2, uint32_t let_go, uint32_t net_obj,
+                         uint32_t* out) {
   m3::set_basic_controls_hooks(&g_hooks);
   g_rec_addr.clear();
   m3::ai::nets105_free();
@@ -102,6 +103,12 @@ int probe_basic_controls(uint32_t ctl, uint32_t owner, uint32_t node, int32_t ne
   out[n++] = static_cast<uint32_t>(c.path_mode());
   out[n++] = c.net_node ? static_cast<uint32_t>(c.path_goal()) : 0;
   out[n++] = c.destroyed() ? 1 : 0;
+  out[n++] = c.on_path() ? 1 : 0;
+  const auto it = by_addr.find(let_go);
+  out[n++] = c.let_go(it != by_addr.end() ? it->second : reinterpret_cast<m3::Net105Record*>(uintptr_t{1})) ? 1 : 0;
+  out[n++] = static_cast<uint32_t>(c.state), out[n++] = c.record ? g_rec_addr[c.record] : 0;
+  out[n++] = c.take_net(hd(net_obj)) ? 1 : 0;
+  out[n++] = static_cast<uint32_t>(c.net);
   m3::ai::nets105_free();
   g_c = nullptr, g_v = nullptr;
   m3::set_basic_controls_hooks(nullptr);

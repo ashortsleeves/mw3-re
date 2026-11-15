@@ -144,6 +144,84 @@ bool TurnLimits::within(const float d[3]) const {
   return true;
 }
 
+namespace {
+// The x87's fcom against 0 then "je": equal or unordered.
+bool zero_or_nan(double x) { return !(x < 0.0 || x > 0.0); }
+
+// The tail the three clamps share: `out`'s x and z set to a heading, scaled
+// to the cosine `co` with the sine `s` as y; a zero (or NaN) length leaves
+// (0, s, -co).
+void put_on_heading(float out[3], float s, float co) {
+  const double len = zfix::options().small_fixes ? std::hypot(double{out[0]}, double{out[2]})
+                                                 : std::hypot(double{out[0]}, double{out[1]});
+  if (zero_or_nan(len)) {
+    out[0] = 0.0f, out[1] = s, out[2] = -co;
+    return;
+  }
+  const float f = static_cast<float>(co / len);
+  out[0] = f * out[0];
+  out[1] = s;
+  out[2] = f * out[2];
+}
+}  // namespace
+
+// Mech3.exe 1.2 @ 0x004a43c0 (Fixed), 0x004a4660 (Narrow), 0x004a48e0 (Wide), with 0x004a3fb0 (a sine and cosine
+// of (0, 1)) and 0x004a3fe0 (from a sine: (s, sqrt(1 - s s))). Unordered compares count as past the limits.
+bool TurnLimits::clamp(const float d[3], float out[3]) const {
+  if (kind == LimitKind::Full) {  // 0x004a4aa0 -> 0x004a41b0
+    TurretLimits t(0.0f, 0.0f);
+    t.lo_sin = lo_sin, t.lo_cos = lo_cos, t.hi_sin = hi_sin, t.hi_cos = hi_cos;
+    return t.clamp(d, out);
+  }
+  if (kind == LimitKind::Fixed) {
+    const float* limit = nullptr;  // the sine and cosine passed
+    if (!(d[1] >= lo_sin)) {
+      limit = &lo_sin;
+    } else if (!(hi_sin >= d[1])) {
+      limit = &hi_sin;
+    }
+    if (limit) {
+      out[0] = lo_edge[2];
+      out[2] = -lo_edge[0];
+      put_on_heading(out, limit[0], limit[1]);
+      return false;
+    }
+    const float across = d[2] * d[2] + d[0] * d[0];
+    const float off = d[0] * lo_edge[0] + d[2] * lo_edge[2];
+    if (across * zgame::from_bits(0x3727c5acu) > off * off) {  // [0x005c82d0] 1e-5
+      out[0] = d[0], out[1] = d[1], out[2] = d[2];
+      return true;
+    }
+    // The pitch kept: its cosine overwrites `across` on the exe's stack.
+    out[0] = lo_edge[2];
+    out[2] = -lo_edge[0];
+    put_on_heading(out, d[1], std::sqrt(1.0f - d[1] * d[1]));
+    return false;
+  }
+  const bool pitch_ok = d[1] >= lo_sin && hi_sin >= d[1];
+  const float a = d[0] * lo_edge[0] + d[2] * lo_edge[2];
+  const float b = d[0] * hi_edge[0] + d[2] * hi_edge[2];
+  const bool in_a = a >= 0.0f, in_b = b >= 0.0f;
+  const bool heading_ok = kind == LimitKind::Narrow ? in_a && in_b : in_a || in_b;
+  const bool ok = pitch_ok && heading_ok;
+  // Quirk: a direction within the pitch comes back as it is (false when its
+  // heading is not); one past it comes back level (the sine and cosine stay
+  // 0 and 1: nothing sets them from the limit).
+  if (pitch_ok) {
+    out[0] = d[0], out[1] = d[1], out[2] = d[2];
+    return ok;
+  }
+  if (heading_ok) {
+    out[0] = d[0], out[2] = d[2];
+  } else if ((a < b || std::isnan(a) || std::isnan(b)) == (kind == LimitKind::Narrow)) {
+    out[0] = lo_edge[2], out[2] = -lo_edge[0];
+  } else {
+    out[0] = -hi_edge[2], out[2] = hi_edge[0];
+  }
+  put_on_heading(out, 0.0f, 1.0f);
+  return ok;
+}
+
 // --- The turret ----------------------------------------------------------------------
 
 // Mech3.exe 1.2 @ 0x004a5c60, over AiTarget 0x004d56e0(0, 0) (zEntity3d
