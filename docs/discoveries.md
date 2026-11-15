@@ -1553,6 +1553,18 @@ From the world files (gamez.md).
 - **Deleted objects are still in the files.** Free node slots keep the names of
   objects the level designers deleted without clearing; mission 1's world holds
   1,393 of them.
+- **Modders: adding objects to a world with mech3ax can crash the game.**
+  The free slots form a chain the file stores (in mech3ax, an Empty node's
+  `parent_indices` is its next free slot; the last Empty points at the end of
+  the list). New nodes appended to `nodes.json` sit right where that chain
+  goes next, and the game never checks: when it needs a fresh object (every
+  mission load needs 2,000 to 3,700 of them) it takes the new node, wipes it,
+  and follows its data offset as if it were the next free slot, which crashes
+  or corrupts memory. Every shipped world reaches it while the mission loads;
+  c2 and c4b have only 4 spare slots before it. The fix: set the last Empty's
+  `parent_indices` to the new length of the list (training's t1 has no Empty:
+  set `node_last_free` in metadata.json instead). Reusing an Empty slot for a
+  new object has the same problem. (gamez.md, Adding nodes)
 - **The engine's error messages go nowhere.** The GameZ error reporter
   (0x49bfd0) is an empty stub in the shipped game, so every engine error is
   silent; a broken node is just marked dead and loading carries on.
