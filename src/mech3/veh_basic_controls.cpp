@@ -75,13 +75,15 @@ void BasicControls::init() {
   v->xe0 = v;
 }
 
-// Mech3.exe 1.2 @ 0x004ae5e0
-bool BasicControls::take_net(Handle n) {
-  BasicControlsHooks& h = hk();
+// Mech3.exe 1.2 @ 0x004ae5e0 (the name and body as pm's, which ported it first)
+bool BasicControls::set_net(ai::AiNet* n) {
   auto* v = static_cast<BasicVehicle*>(owner);
-  if (state != 4 || !v || !v->node || !h.net_usable(n)) return false;
-  net = h.net_number(n);
-  h.base_init(*this);  // 0x004ac8a0, called directly
+  if (state != 4 || !v || !v->node) return false;
+  // FIX (A) (docs/fixes.md): no net is none; the exe asks a null net its vt+0x38.
+  auto* v105 = dynamic_cast<ai::Net105*>(n);  // vt+0x38: the version-105 net's own
+  if (!v105) return false;
+  net = v105->x18;  // vt+0x18 (0x0040a890)
+  hk().base_init(*this);  // 0x004ac8a0, called directly
   return true;
 }
 

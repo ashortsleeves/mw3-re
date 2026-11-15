@@ -1748,9 +1748,9 @@ over `VehicleControls` (`BasicControls`, 0xa70 bytes): its constructor 0x4ae270 
 number at +0xa04, then init), init 0x4ae3c0, setup 0x4ae6b0 and the answers vt+0x04 0x4ae340 (the mode
 +0xa14), vt+0x08 0x4ae350 (the net node's +0x2c) and vt+0x1c 0x4ae6a0 (state 4), with IControls'
 vt+0x70 0x4ae690 (on a path: state 2, so the vehicle frame 0x4a1040 moves it only while it follows a record) and
-vt+0x64 0x4ae650 (a record let go: following that one, state 4 and no record) and vt+0x04 0x4ae5e0 (a net handed
-over: stopped, with an owner and its node, and a net that serves (its vt+0x38), its number (vt+0x18) kept and the
-base's init 0x4ac8a0 run again), each behind a virtual-base adjustor (0x4aeaf0, 0x4aeae0, 0x4aea00; found by the S20
+vt+0x64 0x4ae650 (a record let go: following that one, state 4 and no record) and vt+0x04 0x4ae5e0 (set_net, as pm's: a net
+handed over; stopped, with an owner and its node, and a version-105 net (its vt+0x38), its number (vt+0x18) kept and
+the base's init 0x4ac8a0 run again; no net at all is 0, FIX (A)), each behind a virtual-base adjustor (0x4aeaf0, 0x4aeae0, 0x4aea00; found by the S20
 sweep). Init, with the vehicle's
 node, runs the base's init. A positive net number that names a record (0x4022c0 over [0x5f4c4c]: the
 version-105 nets' records, a stand-in `Net105Record` until that group is ported) sets state 2. The mode comes

@@ -33,9 +33,6 @@ class BasicControlsHooks : public zgame::Unported {
   // The record's net's element nearest a place (0x004d51d0) and its node (the element's vt+0x80).
   virtual Handle nearest_element(Net105Record* r, const float* pos) { return h(unported("0x004d51d0", {ref(r), ref(pos)})); }
   virtual Handle element_node(Handle e) { return h(unported("element.vt+0x80", {ref(e)})); }
-  // A net handed over (IControls vt+0x04): whether it serves (its vt+0x38) and its number (its vt+0x18).
-  virtual bool net_usable(Handle net) { return unported("net.vt+0x38", {ref(net)}) != 0; }
-  virtual int32_t net_number(Handle net) { return static_cast<int32_t>(unported("net.vt+0x18", {ref(net)})); }
   // The net's node's +0x2c (its goal's number; the v105 node class 0x005c8cb8, set -1 by 0x004ae8e0).
   virtual int32_t node_goal(Handle n) { return static_cast<int32_t>(unported("node+0x2c", {ref(n)})); }
   virtual Handle node_find(Handle root, const char* name) { return h(unported("0x004f9d60", {ref(root), name})); }
@@ -90,9 +87,10 @@ struct BasicControls : VehicleControls {
   void follow(Handle target);                                    // 0x00401050
   int32_t path_goal() override;                                  // vt+0x08 0x004ae350: the node's +0x2c
   bool destroyed() override { return state == 4; }               // vt+0x1c 0x004ae6a0
-  // IControls vt+0x04 0x004ae5e0 (the adjustor 0x004aea00): a net handed over. Stopped (4), with an owner and its
-  // node, and a net that serves: its number kept and the base's init run again (not this class's). True if taken.
-  bool take_net(Handle net);
+  // IControls vt+0x04, set-net (0x004ae5e0 through 0x004aea00; on pm also Pirate's Moon's 0x004b1ec0): with the
+  // controls stopped (+0x38 4), an owner with its +4 and a version-105 net (its vt+0x38), the net's number (vt+0x18,
+  // its +0x18) as the controls' and the base's init (0x004ac8a0) again. 1, else 0 (nothing changed).
+  bool set_net(ai::AiNet* n);
   // IControls vt+0x70 0x004ae690 (the adjustor 0x004aeaf0): on a path while following a record.
   bool on_path() override { return state == 2; }
   // IControls vt+0x64 0x004ae650 (the adjustor 0x004aeae0): the record `r` let go; following it, the
