@@ -4,7 +4,9 @@
 # is in the folder (a player may not have it); and no game file is in it.
 # Needs dumpbin (vcvars64). Usage: check_dist.ps1 <folder>
 # -Pm: the combined package, mw3pm.exe required too (its DLLs checked as every program's).
-param([Parameter(Mandatory = $true)][string]$Dist, [switch]$Pm)
+# -Mw1: MechWarrior 1: Critical Hit in it too, mw1.exe required; its own mw1data\ (MW1's .zrd screens and the
+# image archive packed from its repo's art) is ours, not a game file.
+param([Parameter(Mandatory = $true)][string]$Dist, [switch]$Pm, [switch]$Mw1)
 $ErrorActionPreference = 'Stop'
 $here = Get-ChildItem -LiteralPath $Dist -File | ForEach-Object { $_.Name.ToLowerInvariant() }
 $sys = Join-Path $env:SystemRoot 'System32'
@@ -22,11 +24,13 @@ foreach ($bin in Get-ChildItem -LiteralPath $Dist -File | Where-Object { $_.Exte
 }
 # Our free fonts are the only .ttf a package may hold (assets\launcher, assets\fonts); the game's are not.
 $ours = 'font.ttf', 'LiberationSans-Regular.ttf', 'LiberationMono-Regular.ttf', 'Anton-Regular.ttf'
+$mw1data = (Join-Path $Dist 'mw1data') + [IO.Path]::DirectorySeparatorChar
 $game = Get-ChildItem -LiteralPath $Dist -Recurse -File |
+  Where-Object { -not ($Mw1 -and $_.FullName.StartsWith($mw1data, [StringComparison]::OrdinalIgnoreCase)) } |
   Where-Object { $_.Extension -in '.zbd', '.avi', '.fmv', '.m1v', '.zrd', '.wav', '.ogg', '.flac' -or $_.Name -ieq 'mech3.exe' -or
                  ($_.Extension -ieq '.ttf' -and $_.Name -cnotin $ours) }
 # The launcher (the main shortcut) and the game it starts.
-$programs = @('mw3launcher.exe', 'mw3.exe') + $(if ($Pm) { @('mw3pm.exe') } else { @() })
+$programs = @('mw3launcher.exe', 'mw3.exe') + $(if ($Pm) { @('mw3pm.exe') } else { @() }) + $(if ($Mw1) { @('mw1.exe') } else { @() })
 foreach ($exe in $programs) {
   if (-not (Test-Path -LiteralPath (Join-Path $Dist $exe))) { $missing += "$exe (the program itself)" }
 }
