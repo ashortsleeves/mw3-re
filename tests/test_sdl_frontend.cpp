@@ -6800,6 +6800,55 @@ TEST(sdl_program_mouse_waits_for_the_focus) {
 }
 
 #if !defined(_WIN32)
+// The MechWarrior (1989) entry (lead's launcher list, item 3;
+// docs/launcher.md): shown when Elthial's port is found (here a stand-in
+// script by MW3_MW1_PORT), started as its own script starts it
+// (`mechwarrior <game dir> <capture dir>`, the saves in
+// MECHWARRIOR_SAVE_DIRECTORY, both under the write dir's mw1) with the
+// folder mw3.cfg's mw1_game= keeps; the launcher waits for it. Without
+// MW1: Critical Hit's `mw1` beside the launcher (MW3_MW1_BIN empty here, as a
+// plain mw3-re package), the entry is the port's, as it always was.
+TEST(sdl_program_launcher_starts_mechwarrior_1989) {
+  const std::string dir = std::string(MW3_TEST_TMP) + "/launcher_mw1";
+  std::error_code ec;
+  std::filesystem::remove_all(dir, ec);
+  std::filesystem::create_directories(dir + "/wd", ec);
+  std::filesystem::create_directories(dir + "/game", ec);
+  std::ofstream(dir + "/game/BTECH.EXE") << "x";
+  {
+    std::ofstream cfg(dir + "/wd/mw3.cfg");
+    cfg << "mw1_game=" << dir << "/game\n";
+  }
+  const std::string port = dir + "/mechwarrior";
+  {
+    std::ofstream sh(port);
+    sh << "#!/bin/sh\necho \"$1|$2|$MECHWARRIOR_SAVE_DIRECTORY\" > \"$2/args.txt\"\nexit 0\n";
+  }
+  std::filesystem::permissions(port, std::filesystem::perms::owner_all, ec);
+  setenv("MW3_MW1_PORT", port.c_str(), 1);
+  setenv("MW3_MW1_BIN", "", 1);  // no mw1 beside us, whatever this build put there
+  const std::string log = dir + "/mw1.log";
+  const pid_t pid = spawn_launcher({"--write-dir", dir + "/wd", "--launcher-mw1", "--window", "640x480", "--nosound", "--hidden"}, log);
+  unsetenv("MW3_MW1_PORT");
+  unsetenv("MW3_MW1_BIN");
+  int status = 0;
+  EXPECT(pid > 0 && waitpid(pid, &status, 0) == pid && WIFEXITED(status) && WEXITSTATUS(status) == 0);
+  std::ifstream f(log);
+  const std::string text((std::istreambuf_iterator<char>(f)), std::istreambuf_iterator<char>());
+  std::ifstream af(dir + "/wd/mw1/captures/args.txt");
+  std::string args;
+  std::getline(af, args);
+  std::printf("launcher mw1: found %d, started %d, exited %d; it was given \"%s\"\n",
+              text.find("MechWarrior (1989) port at") != std::string::npos, text.find("MechWarrior (1989) started") != std::string::npos,
+              text.find("MechWarrior (1989) exited (0)") != std::string::npos, args.c_str());
+  EXPECT(text.find("MechWarrior (1989) port at " + port) != std::string::npos);
+  EXPECT(text.find("MechWarrior 1 at") == std::string::npos && text.find("entry MECHWARRIOR 1") == std::string::npos);
+  EXPECT(text.find("MechWarrior (1989) exited (0)") != std::string::npos);
+  EXPECT(args == dir + "/game|" + dir + "/wd/mw1/captures|" + dir + "/wd/mw1/saves");
+}
+#endif
+
+#if !defined(_WIN32)
 // MW1 (for MechWarrior 1: Critical Hit, 2026-11-16): the launcher's MechWarrior 1 entry starts `mw1` in place of
 // Elthial's port (docs/launcher.md, MechWarrior 1): found beside ours (here a stand-in script by MW3_MW1_BIN),
 // given the three installs (Pirate's Moon's, MW3's, the MW1 folder mw3.cfg's mw1_game= keeps); the launcher waits

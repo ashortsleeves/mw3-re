@@ -535,6 +535,7 @@ class Launcher {
   double status_read_ms_ = -1e9;  // no first frame within ready_wait_ms(): the status line says so
   std::string ready_file_;
   bool mw1_logged_ = false;  // MW1: its entry's line said once
+  bool mw1_remake_ = false;  // MW1: MechWarrior 1: Critical Hit's mw1 beside ours; without it, Elthial's port as before
   std::string mw1_exe_, mw1_game_;  // MechWarrior (1989): Elthial's port beside ours, the player's folder
   std::string status_;
   bool status_good_ = true;
@@ -680,12 +681,15 @@ bool mw1_game_valid(const std::string& dir) {
 // beside ours or in a MechWarrior1989 folder beside it (MW3_MW1_PORT for
 // checks); the entry shows only when it is there.
 void Launcher::find_mw1() {
-  // MW1: MechWarrior 1: Critical Hit (mw1/VISION.md) replaces Elthial's port on this entry: `mw1` beside
-  // ours, with the player's MW1 folder as before. The port's search below is unreachable until upstream drops it.
-  if (mw1_game_valid(o_.cfg_mw1_game)) mw1_game_ = o_.cfg_mw1_game;
-  mw1_exe_ = o_.mw1_bin;
-  if (!mw1_exe_.empty()) std::printf("mw3: launcher: MechWarrior 1 at %s\n", mw1_exe_.c_str());
-  return;
+  // MW1: with `mw1` beside ours (MW1: Critical Hit's VISION.md), this entry is the
+  // remake's, with the player's MW1 folder as before; without it, the port's search below as it always was.
+  mw1_remake_ = !o_.mw1_bin.empty();
+  if (mw1_remake_) {
+    if (mw1_game_valid(o_.cfg_mw1_game)) mw1_game_ = o_.cfg_mw1_game;
+    mw1_exe_ = o_.mw1_bin;
+    std::printf("mw3: launcher: MechWarrior 1 at %s\n", mw1_exe_.c_str());
+    return;
+  }
 #if defined(_WIN32)
   const char* name = "mechwarrior.exe";
 #else
@@ -736,8 +740,8 @@ void Launcher::find_pm() {
 
 void Launcher::run_mw1() {
   // MW1: the remake gets the three installs and this start's choices, as Pirate's Moon does; its settings and
-  // saves are its own folder's. The port's start below is unreachable until upstream drops it.
-  return run_mw1_remake();
+  // saves are its own folder's. Without it, the port's start below.
+  if (mw1_remake_) return run_mw1_remake();
   const fs::path base = o_.write_dir.empty() ? fs::path("mw1") : fs::path(o_.write_dir) / "mw1";
   std::error_code ec;
   fs::create_directories(base / "captures", ec);
@@ -1046,7 +1050,7 @@ void Launcher::layout() {
       }
       if (!entries_logged_) std::printf("mw3: launcher: footer %s\n", package_words().c_str());
       entries_logged_ = true;  // once a run: the lines as first shown
-      if (!mw1_exe_.empty()) {  // MW1: the remake; its line names what it still needs, else its MW1 folder
+      if (mw1_remake_) {  // MW1: the remake; its line names what it still needs, else its MW1 folder
         const std::string needs = mw1_needs();
         const std::string line = mw1_game_.empty() ? "Click to pick your MechWarrior (1989) folder"
                                  : !needs.empty()  ? "Not ready: " + needs
@@ -1055,7 +1059,7 @@ void Launcher::layout() {
         game(kMw1, 2, 2, "MECHWARRIOR 1", line, needs.empty());
         if (needs.empty() && !mw1_game_.empty()) buttons_.back().sub_keep = 7;  // "Ready: " kept, the folder shortened
         if (!mw1_logged_) std::printf("mw3: launcher: entry MECHWARRIOR 1: %s\n", line.c_str()), mw1_logged_ = true;
-      } else if (false) {  // MW1: Elthial's port, credited on its line (MIT; THIRD-PARTY.txt); unreachable, replaced above
+      } else if (!mw1_exe_.empty()) {  // Elthial's port, credited on its line (MIT; THIRD-PARTY.txt)
         const std::string by = "Elthial's SDL port: ";
         game(kMw1, 2, 2, "MECHWARRIOR (1989)", by + (mw1_game_.empty() ? "click to pick your MechWarrior folder" : mw1_game_), true);
         buttons_.back().sub_keep = by.size();
@@ -1415,7 +1419,7 @@ void Launcher::picked(int what, const std::string& path) {
     mw1_game_ = dir;
     save_config_value(o_.write_dir, "mw1_game", dir);
     layout();
-    if (!mw1_needs().empty()) {  // MW1: the other two games first, said
+    if (mw1_remake_ && !mw1_needs().empty()) {  // MW1: the other two games first, said
       status_ = "MechWarrior 1 " + mw1_needs() + ".", status_good_ = false;
       return layout();
     }
@@ -2042,7 +2046,7 @@ void Launcher::activate(int id) {
       }
       break;
     case kMw1:
-      if (!mw1_game_.empty() && !mw1_needs().empty()) {  // MW1: the other two games first, said
+      if (mw1_remake_ && !mw1_game_.empty() && !mw1_needs().empty()) {  // MW1: the other two games first, said
         status_ = "MechWarrior 1 " + mw1_needs() + ".", status_good_ = false;
         layout();
       } else if (mw1_game_.empty()) {
