@@ -105,7 +105,7 @@ A reader file: `KEY value` pairs and `( ... )` lists. Keys match exactly, case i
 | `LOCK_ON_LEAD` | a weapon | list: min max | none | min <= max | Leads a locked target between these ranges. |
 | `MINE` | a weapon | flag 0/1 | 0 | - | Lies where it lands. |
 | `MULTI_TARGET` | a weapon | flag 0/1 | 0 | - | Can take several targets. |
-| `QUICKSAND` | a weapon | a block | none | - | A crater that sinks mechs (the CRATER keys). |
+| `QUICKSAND` | a weapon | a block | none | - | A quicksand pit (the CRATER keys): only a picture, it neither slows nor sinks a mech (craters.md 3). |
 | `RANGE` | a weapon | float (m) | 500 | - | How far it reaches. |
 | `RANGE_MINIMUM` | a weapon | list: two floats | none | - | The closest it can hit, and a second distance. |
 | `RELATIVE_SPEED` | a weapon | flag 0/1 | 0 | - | Shots add the firer's speed. |
