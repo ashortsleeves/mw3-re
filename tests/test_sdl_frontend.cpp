@@ -81,6 +81,7 @@
 #include "mech3/mission.h"
 #include "mech3/options.h"
 #include "mech3/pilot.h"
+#include "platform/pointer_hands_off.h"
 #include "platform/platform.h"
 #include "platform/render3d.h"
 #include "platform/silent_sound.h"
@@ -2559,6 +2560,26 @@ TEST(sdl_keypad_types_an_address) {
 #else
   EXPECT(typed == "1234567890." || (SDL_GetModState() & SDL_KMOD_NUM) == 0);
 #endif
+}
+
+// A run no player is at (pointer_hands_off.h) types the same whatever the real keyboard is doing. With the host's
+// Caps Lock on (faked: SDL_SetModState), zInput's 'b' is 'b' hands-off (the tests, hidden and scripted runs), and 'B'
+// in a player's run, as before. (The lobby tests typed their pilots "BEST" and "TEST" with the Mac's Caps Lock on.)
+TEST(sdl_hands_off_runs_ignore_the_host_caps_lock) {
+  sdlfe::SdlZinHost host(nullptr);
+  zin::set_host(&host);
+  const SDL_Keymod was = SDL_GetModState();
+  const bool hands_off = platform::pointer_hands_off();
+  SDL_SetModState(SDL_KMOD_CAPS);
+  platform::set_pointer_hands_off(true);
+  const uint32_t off = zin::key_char(0x30);  // DIK_B
+  platform::set_pointer_hands_off(false);
+  const uint32_t player = zin::key_char(0x30);
+  platform::set_pointer_hands_off(hands_off);
+  SDL_SetModState(was);  // the state it found: the next tests type as before
+  zin::set_host(nullptr);
+  std::printf("  Caps Lock on: hands-off '%c', a player's '%c'\n", static_cast<char>(off), static_cast<char>(player));
+  EXPECT(off == 'b' && player == 'B' && SDL_GetModState() == was);
 }
 
 TEST(sdl_window_shape_maps_the_mouse_through_the_frame) {

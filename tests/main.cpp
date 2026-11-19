@@ -20,6 +20,7 @@
 #include <cstring>
 
 #include "check.h"
+#include "platform/pointer_hands_off.h"
 
 namespace check {
 std::vector<Test>& registry() {
@@ -80,6 +81,14 @@ void on_crash(int sig) {
 #endif
 
 int main() {
+  // Ours (MW1's FIXES 30): no test touches the system's pointer, nor do the programs a test starts (they inherit
+  // the variable): pointer_hands_off.h.
+  platform::set_pointer_hands_off(true);
+#if defined(_WIN32)
+  _putenv_s("MW3_POINTER_HANDS_OFF", "1");
+#else
+  setenv("MW3_POINTER_HANDS_OFF", "1", 1);
+#endif
 #if defined(_WIN32)
   // No crash dialogs: a test that crashes exits (the run is often headless, over ssh).
   SetErrorMode(SEM_FAILCRITICALERRORS | SEM_NOGPFAULTERRORBOX);

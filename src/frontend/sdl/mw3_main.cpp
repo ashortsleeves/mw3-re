@@ -144,6 +144,7 @@ extern "C" const char mw3_version_tag[] = "MW3-PROGRAM-VERSION:" MW3_VERSION;
 #include "mech3/mission.h"
 #include "mech3/app_sensors.h"
 #include "mech3/turret.h"
+#include "platform/pointer_hands_off.h"
 #include "platform/reg_file.h"
 #include "platform/silent_sound.h"
 
@@ -747,6 +748,8 @@ int program(int argc, char** argv) {
     return refused ? 1 : 0;
   }
   if (!a.shot.empty()) a.hidden = true;
+  // Ours (MW1's FIXES 30): a run no player is at never holds or moves the system's pointer (pointer_hands_off.h).
+  if (a.hidden || a.frames > 0 || !a.chain.empty() || !a.modes.empty()) platform::set_pointer_hands_off(true);
   mech3::mods_program_version() = MW3_VERSION;  // game_version= in mod.txt (upgrades/mods/mod_needs.h)
   if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_JOYSTICK)) {
     sdlfe::fatal_box(std::string("MechWarrior 3 cannot start: ") + SDL_GetError(), a.hidden);
