@@ -81,6 +81,7 @@
 #include "mech3/mission.h"
 #include "mech3/options.h"
 #include "mech3/pilot.h"
+#include "frontend/sdl/system_pickers.h"
 #include "platform/pointer_hands_off.h"
 #include "platform/platform.h"
 #include "platform/render3d.h"
@@ -2580,6 +2581,41 @@ TEST(sdl_hands_off_runs_ignore_the_host_caps_lock) {
   zin::set_host(nullptr);
   std::printf("  Caps Lock on: hands-off '%c', a player's '%c'\n", static_cast<char>(off), static_cast<char>(player));
   EXPECT(off == 'b' && player == 'B' && SDL_GetModState() == was);
+}
+
+// No system picker opens in a run no player is at (system_pickers.h): every ask answered at once as cancelled
+// (SDL's: a list whose first is null), the opener never reached; in a player's run the opener is. SDL's own opener is
+// swapped for a stand-in first, so this test can never put a picker on the screen, whatever the guard does.
+TEST(sdl_no_picker_opens_in_a_hands_off_run) {
+  auto& opener = sdlfe::picker_opener();
+  const auto real = opener;
+  int opened = 0;
+  opener = [&](const sdlfe::PickerAsk&) { ++opened; };
+  struct Got {
+    int calls = 0;
+    bool cancelled = false;
+  };
+  auto done = [](void* user, const char* const* list, int) {
+    auto* g = static_cast<Got*>(user);
+    ++g->calls;
+    g->cancelled = list && !list[0];
+  };
+  const bool hands_off = platform::pointer_hands_off();
+  platform::set_pointer_hands_off(true);
+  Got g;
+  int refused = 0;
+  for (sdlfe::PickerKind k : {sdlfe::PickerKind::kOpenFile, sdlfe::PickerKind::kOpenFolder, sdlfe::PickerKind::kSaveFile})
+    refused += !sdlfe::open_picker({k, done, &g});
+  const int opened_off = opened;
+  platform::set_pointer_hands_off(false);
+  Got p;
+  const bool asked = sdlfe::open_picker({sdlfe::PickerKind::kOpenFile, done, &p});
+  platform::set_pointer_hands_off(hands_off);
+  opener = real;
+  std::printf("  hands-off: %d of 3 refused, %d answered cancelled, %d opened; a player's: opened %d\n", refused, g.calls,
+              opened_off, opened - opened_off);
+  EXPECT(refused == 3 && g.calls == 3 && g.cancelled && opened_off == 0);
+  EXPECT(asked && opened == 1 && p.calls == 0);
 }
 
 TEST(sdl_window_shape_maps_the_mouse_through_the_frame) {

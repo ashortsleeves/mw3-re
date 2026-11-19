@@ -1,3 +1,4 @@
+#include "frontend/sdl/system_pickers.h"
 #include "frontend/sdl/vulkan_check.h"
 #include "frontend/sdl/launcher.h"
 #include "frontend/sdl/log_start.h"
@@ -1384,8 +1385,9 @@ void Launcher::open_picker() {
   std::printf("mw3: launcher: the %s picker asked for\n", ask_is_folder_ ? "folder" : "file");
   const char* check = SDL_getenv("MW3_LAUNCHER_PICKER");
   if (check && std::strcmp(check, "cancel") == 0) Pick::done(&pick_, nullptr, 0);
-  else if (ask_is_folder_) SDL_ShowOpenFolderDialog(Pick::done, &pick_, win_, nullptr, false);
-  else SDL_ShowOpenFileDialog(Pick::done, &pick_, win_, ask_filters_, ask_filter_count_, nullptr, false);
+  else if (!sdlfe::open_picker({ask_is_folder_ ? sdlfe::PickerKind::kOpenFolder : sdlfe::PickerKind::kOpenFile, Pick::done,
+                                &pick_, win_, ask_filters_, ask_filter_count_, nullptr}))
+    std::printf("mw3: launcher: no picker in a run no player is at: cancelled\n");
   std::printf("mw3: launcher: the picker's call took %.0f ms\n", static_cast<double>(SDL_GetTicksNS() - ask_at_) / 1e6);
 }
 
