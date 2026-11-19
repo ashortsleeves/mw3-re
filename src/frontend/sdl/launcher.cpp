@@ -982,7 +982,10 @@ void Launcher::watch_game() {
       if (code < 0) {
         const std::string text = "MechWarrior 3 crashed (signal " + std::to_string(-code) + ").\n\nThe log is " +
                                  o_.write_dir + "/mw3.log\nPlease include it if you report this.";
-        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "MechWarrior 3", text.c_str(), nullptr);
+        // Said in the log always; the box only for a player (never a hidden run's: pointer_hands_off.h).
+        std::printf("mw3launcher: %s\n", text.c_str());
+        if (!o_.hidden && !platform::pointer_hands_off())
+          SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "MechWarrior 3", text.c_str(), nullptr);
       }
     }
     SDL_DestroyProcess(game_);  // let go: the game runs on, where it has not ended above
