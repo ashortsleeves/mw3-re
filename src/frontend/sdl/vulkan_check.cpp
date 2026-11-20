@@ -22,7 +22,22 @@ Vulkan vulkan_check() {
   if (!lib) return Vulkan::kNoLoader;
   SDL_UnloadObject(lib);
   // SDL's own test for its Vulkan backend: an instance and a device with what SDL_GPU needs.
+#ifdef __ANDROID__
+  // ours (docs/android.md): asked as SdlWindow::init creates it (no clip distances: Mali has none,
+  // the shaders write none); a refusal's reason goes to the log, the driver being the device's own
+  SDL_SetLogPriority(SDL_LOG_CATEGORY_GPU, SDL_LOG_PRIORITY_VERBOSE);
+  SDL_ClearError();
+  SDL_PropertiesID p = SDL_CreateProperties();
+  SDL_SetBooleanProperty(p, SDL_PROP_GPU_DEVICE_CREATE_SHADERS_SPIRV_BOOLEAN, true);
+  SDL_SetStringProperty(p, SDL_PROP_GPU_DEVICE_CREATE_NAME_STRING, "vulkan");
+  SDL_SetBooleanProperty(p, SDL_PROP_GPU_DEVICE_CREATE_FEATURE_CLIP_DISTANCE_BOOLEAN, false);
+  const bool ok = SDL_GPUSupportsProperties(p);
+  SDL_DestroyProperties(p);
+  if (!ok) SDL_Log("mw3: vulkan: SDL_GPU refused the device: %s", SDL_GetError());
+  return ok ? Vulkan::kOk : Vulkan::kNoDriver;
+#else
   return SDL_GPUSupportsShaderFormats(SDL_GPU_SHADERFORMAT_SPIRV, "vulkan") ? Vulkan::kOk : Vulkan::kNoDriver;
+#endif
 #else
   return Vulkan::kOk;
 #endif

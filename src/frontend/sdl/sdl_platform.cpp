@@ -19,7 +19,19 @@ bool SdlWindow::init(bool hidden_for_good, SDL_Window* adopt) {
 #if defined(MW3_HAVE_SPIRV)
   formats |= SDL_GPU_SHADERFORMAT_SPIRV;
 #endif
+#ifdef __ANDROID__
+  // ours (docs/android.md): no clip distances (Mali-G77 has none; the shaders write none), as
+  // vulkan_check asks
+  {
+    SDL_PropertiesID p = SDL_CreateProperties();
+    SDL_SetBooleanProperty(p, SDL_PROP_GPU_DEVICE_CREATE_SHADERS_SPIRV_BOOLEAN, true);
+    SDL_SetBooleanProperty(p, SDL_PROP_GPU_DEVICE_CREATE_FEATURE_CLIP_DISTANCE_BOOLEAN, false);
+    device_ = SDL_CreateGPUDeviceWithProperties(p);
+    SDL_DestroyProperties(p);
+  }
+#else
   device_ = SDL_CreateGPUDevice(formats, false, nullptr);
+#endif
   if (!device_) return std::fprintf(stderr, "mw3: SDL_CreateGPUDevice: %s\n", SDL_GetError()), false;
   window_ = adopt ? adopt : SDL_CreateWindow("MechWarrior 3", 1280, 960, SDL_WINDOW_HIDDEN | SDL_WINDOW_RESIZABLE);
   if (adopt) std::printf("mw3: the game took the launcher's window\n");
