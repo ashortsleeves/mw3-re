@@ -65,6 +65,7 @@ TEST(sdl_music_a_loop_track_loops_and_a_disc_plays_on) {
   SDL_SetHint(SDL_HINT_AUDIO_FREQUENCY, "48000");  // not the files' rate: the stream resamples
   if (!SDL_InitSubSystem(SDL_INIT_AUDIO | SDL_INIT_EVENTS)) {
     std::printf("  no SDL audio (dummy): %s\n", SDL_GetError());
+    SDL_ResetHint(SDL_HINT_AUDIO_DRIVER), SDL_ResetHint(SDL_HINT_AUDIO_FREQUENCY);
     return;
   }
   const std::string dir = std::string(MW3_TEST_TMP) + "/music_flush";
@@ -105,5 +106,5 @@ TEST(sdl_music_a_loop_track_loops_and_a_disc_plays_on) {
   zsnd_cd::close();
   zsnd_cd::set_backend(nullptr, nullptr, "music");
   SDL_QuitSubSystem(SDL_INIT_AUDIO);
-  SDL_ResetHint(SDL_HINT_AUDIO_FREQUENCY);
+  SDL_ResetHint(SDL_HINT_AUDIO_FREQUENCY), SDL_ResetHint(SDL_HINT_AUDIO_DRIVER);  // the next test's audio as ever
 }
