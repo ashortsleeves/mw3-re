@@ -10,7 +10,11 @@ extern "C" __declspec(dllimport) unsigned short __stdcall RtlCaptureStackBackTra
 extern "C" const char __ImageBase;  // the linker's, the image's start
 #else
 #include <dlfcn.h>
+#if defined(__ANDROID__)
+#include <unwind.h>  // ours (docs/android.md): bionic has execinfo from API 33 only
+#else
 #include <execinfo.h>
+#endif
 #endif
 
 #include "gamez/zrender/zrndr_fog.h"
@@ -75,6 +79,21 @@ void report(const char* what, int at) {
 #if defined(_WIN32)
   const int n = RtlCaptureStackBackTrace(1, 6, frames, nullptr);
   for (int i = 0; i < n; ++i) print_address(frames[i]);
+#elif defined(__ANDROID__)
+  struct Walk {
+    void** at;
+    int n, max;
+  } walk{frames, 0, 6};
+  _Unwind_Backtrace(
+      [](_Unwind_Context* c, void* arg) {
+        auto* w = static_cast<Walk*>(arg);
+        if (w->n >= w->max) return _URC_END_OF_STACK;
+        w->at[w->n++] = reinterpret_cast<void*>(_Unwind_GetIP(c));
+        return _URC_NO_REASON;
+      },
+      &walk);
+  const int n = walk.n;
+  for (int i = 1; i < n; ++i) print_address(frames[i]);
 #else
   const int n = backtrace(frames, 6);
   for (int i = 1; i < n; ++i) print_address(frames[i]);

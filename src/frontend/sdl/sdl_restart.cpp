@@ -214,7 +214,7 @@ std::string restart_own_path() {
 
 std::vector<int> restart_open_handles() {
   std::vector<int> out;
-  const int top = getdtablesize();
+  const int top = static_cast<int>(sysconf(_SC_OPEN_MAX));  // ours (docs/android.md): bionic has no getdtablesize
   for (int fd = 3; fd < top; ++fd)
     if (fcntl(fd, F_GETFD) != -1) out.push_back(fd);
   return out;

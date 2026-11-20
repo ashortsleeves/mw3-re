@@ -11,7 +11,7 @@
 #include "mech3/mods.h"
 #include "mech3/force_feedback.h"
 
-#if !defined(_WIN32)
+#if !defined(_WIN32) && !defined(__ANDROID__)  // ours (docs/android.md): bionic has execinfo from API 33
 #include <execinfo.h>
 #endif
 #include "gamez/zfmv/fmv_script.h"
@@ -358,7 +358,7 @@ uint32_t GameEngine::unported(const char* key, std::initializer_list<Arg> args) 
   }
   // Ours, for finding a hook's caller: MW3_TRACE_UNPORTED=<key> prints where
   // each of its first eight reaches comes from.
-#if !defined(_WIN32)  // execinfo is POSIX
+#if !defined(_WIN32) && !defined(__ANDROID__)  // execinfo is POSIX (bionic: API 33+)
   static const char* trace = std::getenv("MW3_TRACE_UNPORTED");
   if (trace && std::strcmp(trace, key) == 0 && n <= 8) {
     void* frames[16];
