@@ -434,8 +434,15 @@ the mw1 files just like mw3 and pm do"), in `frontend/sdl/mw1_files` (ours):
   the status line ("That download has no BTECH.EXE: it is not MechWarrior
   (1989).") and nothing changes. Without `MW_MAIN.EXE` beside it the game is
   still taken (its Bar keeps ORDER DRINK and NEWS greyed), logged.
+- **GAME FILES** after MW1's line was clicked (as it acts on the game last
+  clicked for MW3 and Pirate's Moon) opens the same picker: the new folder is
+  kept, nothing started; a cancel keeps the one in use. A kept folder that no
+  longer holds the game is dropped at the next start and searched for again.
+- Its line says what it needs (MW3, Pirate's Moon) before asking for its
+  folder, and a press then opens no picker.
 - `MW3_LAUNCHER_PICK` with `--launcher-mw1` (checks) stands for the picker's
-  answer. `test_mw1_files.cpp`; the zip pick in
+  answer; `MW3_LAUNCHER_PICKER=path:<file>` answers any ask with that file;
+  `MW3_LAUNCHER_FILES=mw1` opens GAME FILES as after MW1's line. `test_mw1_files.cpp`; the zip pick in
   `sdl_program_launcher_starts_mechwarrior_1`.
 
 ## MechWarrior (1989)

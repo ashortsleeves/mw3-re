@@ -23,6 +23,7 @@
 #include <cstring>
 #include <memory>
 #include <mutex>
+#include <utility>
 #include <thread>
 
 #include "frontend/sdl/mw1_files.h"
@@ -519,6 +520,8 @@ class Launcher {
   Install install_;
   std::string pm_dir_;  // Pirate's Moon's folder, kept as pm_install= in mw3.cfg
   bool pm_last_ = false;  // the game last clicked: GAME FILES acts on it
+  bool mw1_repick_ = false;  // the MW1 pick came from GAME FILES: kept, not played
+  bool mw1_last_ = false;  // MW1's line last clicked: GAME FILES re-picks its folder
   bool files_pm_ = false;  // GAME FILES' screens are Pirate's Moon's (pm_last_ when they opened)
   bool pm_lacks_music_ = false, pm_lacks_sounds_ = false;  // pm_refresh
   std::shared_ptr<upgrades::update::Verdict> update_;  // the last CHECK FOR UPDATES' verdict
@@ -1065,8 +1068,8 @@ void Launcher::layout() {
       entries_logged_ = true;  // once a run: the lines as first shown
       if (mw1_remake_) {  // MW1: the remake; its line names what it still needs, else its MW1 folder
         const std::string needs = mw1_needs();
-        const std::string line = mw1_game_.empty() ? "Not found yet: click to find your MechWarrior (1989)"
-                                 : !needs.empty()  ? "Not ready: " + needs
+        const std::string line = !needs.empty()        ? "Not ready: " + needs  // the other two games first, said before the folder
+                                 : mw1_game_.empty() ? "Not found yet: click to find your MechWarrior (1989)"
                                  : mw1_program_.empty() ? "Ready: " + mw1_game_
                                                         : "Ready, " + mw1_program_ + ": " + mw1_game_;
         // Greyed until MW3 and PM are both there (Owen, 2026-11-16); then a click picks the MW1 folder or plays.
@@ -1390,7 +1393,8 @@ void Launcher::ask_folder(int what) {
   asking_ = ask_pending_ = ask_is_folder_ = true, ask_shown_ = false;
 }
 // The system's picker, once the frame with its notice is on screen (run).
-// MW3_LAUNCHER_PICKER=cancel (checks): no window, the ask answered as cancelled;
+// MW3_LAUNCHER_PICKER=cancel (checks): no window, the ask answered as cancelled
+// (=path:<file>, answered with that file);
 // MW3_LAUNCHER_PICKER_SHOT: the frame on screen at the ask, saved.
 void Launcher::open_picker() {
   if (const char* shot = SDL_getenv("MW3_LAUNCHER_PICKER_SHOT")) SDL_SaveBMP(canvas_, shot);
@@ -1398,6 +1402,10 @@ void Launcher::open_picker() {
   std::printf("mw3: launcher: the %s picker asked for\n", ask_is_folder_ ? "folder" : "file");
   const char* check = SDL_getenv("MW3_LAUNCHER_PICKER");
   if (check && std::strcmp(check, "cancel") == 0) Pick::done(&pick_, nullptr, 0);
+  else if (check && std::strncmp(check, "path:", 5) == 0) {  // checks: the picker's answer as given
+    const char* list[] = {check + 5, nullptr};
+    Pick::done(&pick_, list, 0);
+  }
   else if (!sdlfe::open_picker({ask_is_folder_ ? sdlfe::PickerKind::kOpenFolder : sdlfe::PickerKind::kOpenFile, Pick::done,
                                 &pick_, win_, ask_filters_, ask_filter_count_, nullptr}))
     std::printf("mw3: launcher: no picker in a run no player is at: cancelled\n");
@@ -1437,6 +1445,10 @@ void Launcher::picked(int what, const std::string& path) {
                 sdlfe::mw1::has_main(dir) ? "" : " (no MW_MAIN.EXE: the Bar's drinks and news stay greyed)");
     mw1_game_ = dir;
     save_config_value(o_.write_dir, "mw1_game", dir);
+    if (std::exchange(mw1_repick_, false)) {  // GAME FILES: the new folder kept, PLAY left to the player
+      status_ = "MechWarrior (1989) is now " + dir + ".", status_good_ = true;
+      return layout();
+    }
     layout();
     if (mw1_remake_ && !mw1_needs().empty()) {  // MW1: the other two games first, said
       status_ = "MechWarrior 1 " + mw1_needs() + ".", status_good_ = false;
@@ -1959,7 +1971,7 @@ void Launcher::activate(int id) {
   static const SDL_DialogFileFilter kZip[] = {{"The 1.2 patch (.zip, .exe)", "zip;exe"}, {"All files", "*"}};
   switch (id) {
     case kMw3:
-      pm_last_ = files_pm_ = false;
+      pm_last_ = files_pm_ = mw1_last_ = false;
       if (install_.ok) play();
       else from_files_ = false, screen_ = kSetupScreen, status_.clear(), layout();  // its files to find first
       break;
@@ -2049,6 +2061,15 @@ void Launcher::activate(int id) {
       break;
     }
     case kFiles:  // the find screen at any time (Owen): repick or refresh the game's files
+      if (mw1_last_ && !mw1_exe_.empty()) {  // MW1's: its folder picked again (a cancel keeps the one in use)
+        status_ = (mw1_game_.empty() ? std::string("Pick your MechWarrior (1989)")
+                                     : "MechWarrior (1989) is at " + mw1_game_ + ". Pick another") +
+                  ": its BTECH.EXE, or the download it came in (.zip).";
+        status_good_ = true;
+        mw1_repick_ = true;
+        ask_file(kMw1, kMw1Files, 2);
+        break;
+      }
       files_pm_ = pm_last_ && !o_.pm_bin.empty();  // the game last clicked
       if (files_pm_) pm_refresh();
       from_files_ = true, status_.clear();
@@ -2056,7 +2077,7 @@ void Launcher::activate(int id) {
       break;
     case kPm:
       if (o_.pm_bin.empty()) break;
-      pm_last_ = true;
+      pm_last_ = true, mw1_last_ = false;
       if (pm_dir_.empty()) {  // its files to find first, as MechWarrior 3's
         files_pm_ = true, from_files_ = false, status_.clear();
         screen_ = kSetupScreen, layout();
@@ -2065,7 +2086,8 @@ void Launcher::activate(int id) {
       }
       break;
     case kMw1:
-      if (mw1_remake_ && !mw1_game_.empty() && !mw1_needs().empty()) {  // MW1: the other two games first, said
+      mw1_last_ = true, pm_last_ = false;
+      if (mw1_remake_ && !mw1_needs().empty()) {  // MW1: the other two games first, said (before its own folder too)
         status_ = "MechWarrior 1 " + mw1_needs() + ".", status_good_ = false;
         layout();
       } else if (mw1_game_.empty()) {
@@ -2268,6 +2290,7 @@ LauncherChoice Launcher::run() {
   }
   // Checks: GAME FILES opened on Pirate's Moon, as after a click on it.
   if (const char* g = SDL_getenv("MW3_LAUNCHER_FILES"); g && std::strcmp(g, "pm") == 0) pm_last_ = true, activate(kFiles);
+  else if (g && std::strcmp(g, "mw1") == 0) mw1_last_ = true, activate(kFiles);  // checks: GAME FILES after MW1's line
   // Checks: a pick as if made in the find screen's dialog (after any NAV
   // steps: GAME FILES), INSTALL and the notes' OK pressed.
   if (const char* to = SDL_getenv("MW3_LAUNCHER_MOVE_TO")) {  // checks: the data folder's move, its MOVE pressed
@@ -2354,6 +2377,7 @@ LauncherChoice Launcher::run() {
         std::printf("mw3: launcher: the picker answered (%s) %.0f ms after it was asked for\n", cancelled ? "cancelled" : "a pick",
                     static_cast<double>(SDL_GetTicksNS() - ask_at_) / 1e6);
         if (!cancelled) picked(what, path);
+        else if (what == kMw1 && std::exchange(mw1_repick_, false)) status_.clear(), layout();  // the folder in use kept
       } else {
         // While the panel is up the launcher stops drawing and waits in the
         // run loop: on the Mac the panel is another process answering through
