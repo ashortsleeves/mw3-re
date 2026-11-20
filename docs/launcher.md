@@ -397,7 +397,7 @@ MECHWARRIOR 3 uses). Its line is "Ready: <MW1
 folder>" ("Ready, mw1-v1.0.0: <MW1 folder>" when its file holds a version, read
 as mw3pm's is, from a `mw1-vX.Y.Z` tag on branch mw1; also on the log's
 programs line), "Not found yet: click to find your MechWarrior (1989)", or "Not ready:
-needs MechWarrior 3 and/or Pirate's Moon: find them in GAME FILES", greyed
+needs MechWarrior 3 and/or Pirate's Moon: find them (or it) in GAME FILES", greyed
 until both games are there (Owen, 2026-11-16: an icon follows what is loaded);
 then a click picks the MW1 folder or starts it. Started as `mw1 --install <PM>
 --mw3-install <MW3> --mw1-game <MW1> --no-launcher` plus this start's choices

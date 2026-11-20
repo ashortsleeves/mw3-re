@@ -815,8 +815,8 @@ void Launcher::run_mw1_remake() {
 std::string Launcher::mw1_needs() const {
   const bool mw3 = install_.ok && !install_.dir.empty(), pm = !pm_dir_.empty();
   if (mw3 && pm) return "";
-  return std::string("needs ") + (!mw3 && !pm ? "MechWarrior 3 and Pirate's Moon" : !mw3 ? "MechWarrior 3" : "Pirate's Moon") +
-         ": find them in GAME FILES";
+  return std::string("needs ") + (!mw3 && !pm ? "MechWarrior 3 and Pirate's Moon: find them" : !mw3 ? "MechWarrior 3: find it" : "Pirate's Moon: find it") +
+         " in GAME FILES";
 }
 
 // Pirate's Moon checked before it starts (setup::check_install, docs/launcher.md,
