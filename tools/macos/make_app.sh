@@ -18,6 +18,8 @@
 #
 # For the combined package (tools/package/combined.sh, docs/release.md):
 #   MW3_PKG_PM_BIN=<mw3pm built on pm>  adds Pirate's Moon beside mw3 (bundled, signed and checked as mw3)
+#   MW3_PKG_MW1_DIR=<mw1's build tree>  adds MechWarrior 1: Critical Hit: mw1 beside the launcher, its mw1data/ in
+#                                       Resources (where SDL_GetBasePath points mw1)
 #   MW3_PKG_STEM=<stem>                 the DMG's name: <stem>-<version>-mac.dmg (default MW3-Rebuild; MW3 alone is
 #                                       MW3-alone, which the launcher's updater never takes)
 #   MW3_PKG_KEEP_BUILD=1                reuse build-mac-pkg (a second package from the same build)
@@ -44,6 +46,10 @@ APP="$OUT/$NAME.app"
 
 PM_BIN="${MW3_PKG_PM_BIN:-}"
 if [ -n "$PM_BIN" ] && [ ! -x "$PM_BIN" ]; then echo "MW3_PKG_PM_BIN: no program at $PM_BIN" >&2; exit 1; fi
+MW1_DIR="${MW3_PKG_MW1_DIR:-}"
+if [ -n "$MW1_DIR" ] && { [ ! -x "$MW1_DIR/mw1" ] || [ ! -f "$MW1_DIR/mw1data/zbd/mw1image.zbd" ]; }; then
+  echo "MW3_PKG_MW1_DIR: no mw1 and mw1data/zbd/mw1image.zbd in $MW1_DIR" >&2; exit 1
+fi
 
 # The build, from scratch, as package.cmd does on Windows.
 [ -n "${MW3_PKG_KEEP_BUILD:-}" ] || rm -rf build-mac-pkg
@@ -68,6 +74,11 @@ cp build-mac-pkg/mw3 "$APP/Contents/MacOS/mw3"
 if [ -n "$DEPS" ]; then cp build-mac-pkg/mw3import "$APP/Contents/MacOS/mw3import"; fi
 # The combined package: Pirate's Moon beside it (the launcher finds it there, launcher.md).
 if [ -n "$PM_BIN" ]; then cp "$PM_BIN" "$APP/Contents/MacOS/mw3pm"; fi
+# MechWarrior 1: Critical Hit beside the launcher (it starts the launcher from its own folder), its data in Resources.
+if [ -n "$MW1_DIR" ]; then
+  cp "$MW1_DIR/mw1" "$APP/Contents/MacOS/mw1"
+  cp -R "$MW1_DIR/mw1data" "$APP/Contents/Resources/mw1data"
+fi
 # The launcher's art (ours, assets/launcher), where SDL's base path is: Resources.
 mkdir -p "$APP/Contents/Resources/assets/launcher"
 cp assets/launcher/*.png assets/launcher/font.ttf "$APP/Contents/Resources/assets/launcher/"
@@ -79,7 +90,7 @@ python3 - "$APP" "$DEPS" <<'EOF'
 import glob, os, shutil, subprocess, sys
 app = sys.argv[1]
 prefix = sys.argv[2] if len(sys.argv) > 2 else ''
-exes = [os.path.join(app, 'Contents/MacOS', n) for n in ('mw3launcher', 'mw3', 'mw3pm', 'mw3import')]
+exes = [os.path.join(app, 'Contents/MacOS', n) for n in ('mw3launcher', 'mw3', 'mw3pm', 'mw1', 'mw3import')]
 exes = [e for e in exes if os.path.exists(e)]
 fw = os.path.join(app, 'Contents/Frameworks')
 def deps(f):
@@ -226,7 +237,7 @@ for f in "$APP"/Contents/Frameworks/*.dylib; do
 done
 # The game and the importer, second programs in Contents/MacOS, before the app that seals them.
 codesign "${SIGN[@]}" --entitlements tools/macos/mw3.entitlements "$APP/Contents/MacOS/mw3"
-for p in mw3import mw3pm; do
+for p in mw3import mw3pm mw1; do
   if [ -f "$APP/Contents/MacOS/$p" ]; then codesign "${SIGN[@]}" --entitlements tools/macos/mw3.entitlements "$APP/Contents/MacOS/$p"; fi
 done
 codesign "${SIGN[@]}" --entitlements tools/macos/mw3.entitlements "$APP"
@@ -234,6 +245,10 @@ codesign --verify --deep --strict --verbose=2 "$APP"
 # The package carries both programs, the launcher as the app's executable.
 PROGRAMS="mw3launcher mw3"
 if [ -n "$PM_BIN" ]; then PROGRAMS="$PROGRAMS mw3pm"; fi
+if [ -n "$MW1_DIR" ]; then
+  PROGRAMS="$PROGRAMS mw1"
+  [ -f "$APP/Contents/Resources/mw1data/zbd/mw1image.zbd" ] || { echo "no mw1data in the app" >&2; exit 1; }
+fi
 for p in $PROGRAMS; do [ -x "$APP/Contents/MacOS/$p" ] || { echo "no $p in the app" >&2; exit 1; }; done
 [ "$(/usr/libexec/PlistBuddy -c 'Print :CFBundleExecutable' "$APP/Contents/Info.plist")" = mw3launcher ] || { echo "the app does not start the launcher" >&2; exit 1; }
 

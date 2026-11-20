@@ -13,6 +13,7 @@
 #           appimagetool-x86_64.AppImage are (default ../deps).
 # For the combined package (tools/package/combined.sh, docs/release.md):
 #   MW3_PKG_PM_BIN=<mw3pm built on pm>  adds Pirate's Moon beside mw3 (its libraries gathered as mw3's)
+#   MW3_PKG_MW1_DIR=<mw1's build tree>  adds MechWarrior 1: Critical Hit: mw1 and its mw1data/ beside the launcher
 #   MW3_PKG_STEM=<stem>                 the AppImage's name: <stem>-<version>-x86_64.AppImage (default MW3-Rebuild;
 #                                       MW3 alone is MW3-alone, which the launcher's updater never takes)
 #   MW3_PKG_KEEP_BUILD=1                reuse build-linux-pkg's build (a second package from it)
@@ -26,6 +27,9 @@ export APPIMAGE_EXTRACT_AND_RUN=1  # no FUSE needed (WSL, containers)
 export PKG_CONFIG_PATH="$PREFIX/lib/pkgconfig${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}"
 
 if [ -n "${MW3_PKG_PM_BIN:-}" ] && [ ! -x "$MW3_PKG_PM_BIN" ]; then echo "MW3_PKG_PM_BIN: no program at $MW3_PKG_PM_BIN" >&2; exit 1; fi
+if [ -n "${MW3_PKG_MW1_DIR:-}" ] && { [ ! -x "$MW3_PKG_MW1_DIR/mw1" ] || [ ! -f "$MW3_PKG_MW1_DIR/mw1data/zbd/mw1image.zbd" ]; }; then
+  echo "MW3_PKG_MW1_DIR: no mw1 and mw1data/zbd/mw1image.zbd in $MW3_PKG_MW1_DIR" >&2; exit 1
+fi
 # A package without the movie importer is not one to release (v1.0.5's AppImage went out without it: the prefix
 # given had SDL and no FFmpeg, and this script went on). So FFmpeg must be in PREFIX, before anything is built;
 # MW3_PKG_NO_IMPORT=1 says a package without movies is meant (a quick check, never a release).
@@ -63,6 +67,12 @@ if [ -n "${MW3_PKG_PM_BIN:-}" ]; then
   cp "$MW3_PKG_PM_BIN" "$APPDIR/usr/bin/mw3pm"
   EXES="$EXES -e $APPDIR/usr/bin/mw3pm"
 fi
+# MechWarrior 1: Critical Hit, its data beside it (SDL_GetBasePath()/mw1data).
+if [ -n "${MW3_PKG_MW1_DIR:-}" ]; then
+  cp "$MW3_PKG_MW1_DIR/mw1" "$APPDIR/usr/bin/mw1"
+  cp -R "$MW3_PKG_MW1_DIR/mw1data" "$APPDIR/usr/bin/mw1data"
+  EXES="$EXES -e $APPDIR/usr/bin/mw1"
+fi
 # The launcher's art (ours): beside the program, where SDL_GetBasePath finds it.
 cp assets/launcher/*.png assets/launcher/font.ttf "$APPDIR/usr/bin/assets/launcher/"
 mkdir -p "$APPDIR/usr/bin/assets/fonts" "$APPDIR/usr/share/doc/mw3/licenses/liberation" "$APPDIR/usr/share/doc/mw3/licenses/anton"
@@ -97,6 +107,10 @@ LD_LIBRARY_PATH="$PREFIX/lib:$LD_LIBRARY_PATH" "$TOOLS/linuxdeploy-x86_64.AppIma
 # Both programs, the launcher as the entry (AppRun follows the desktop file's Exec).
 PROGRAMS="mw3launcher mw3"
 [ -n "${MW3_PKG_PM_BIN:-}" ] && PROGRAMS="$PROGRAMS mw3pm"
+if [ -n "${MW3_PKG_MW1_DIR:-}" ]; then
+  PROGRAMS="$PROGRAMS mw1"
+  [ -f "$APPDIR/usr/bin/mw1data/zbd/mw1image.zbd" ] || { echo "no mw1data in the AppDir" >&2; exit 1; }
+fi
 for p in $PROGRAMS; do [ -x "$APPDIR/usr/bin/$p" ] || { echo "no $p in the AppDir" >&2; exit 1; }; done
 grep -qx 'Exec=mw3launcher' "$APPDIR"/*.desktop || { echo "the AppImage does not start the launcher" >&2; exit 1; }
 # No local path or user name in anything shipped (release.md, Privacy).
