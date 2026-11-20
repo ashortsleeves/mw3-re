@@ -135,6 +135,8 @@ if [ "$PLATFORM" = mac ]; then
     extra=(--arch="$arch" --cc="clang -arch $arch" --extra-cflags="-mmacosx-version-min=12.0"
            --extra-ldflags="-arch $arch -mmacosx-version-min=12.0" --install-name-dir=@rpath)
     [ "$arch" = "$(uname -m)" ] || extra+=(--enable-cross-compile --target-os=darwin --disable-x86asm)
+    # an Intel Mac builds x86_64 natively, where FFmpeg wants nasm: without it, no hand-written asm
+    [ "$arch" != x86_64 ] || command -v nasm >/dev/null || extra+=(--disable-x86asm)
     ff_build "$WORK/ffmpeg-$arch" "${extra[@]}"
   done
   # One tree (headers, pkg-config) with each dylib joined.
