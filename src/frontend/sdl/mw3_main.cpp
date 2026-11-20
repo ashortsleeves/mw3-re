@@ -67,6 +67,10 @@
 #include <vector>
 
 #include "frontend/sdl/system_pickers.h"
+#include "frontend/sdl/android_support.h"
+#ifdef __ANDROID__
+#include <SDL3/SDL_main.h>  // ours (android_support.h): main becomes SDL_main, which SDLActivity calls
+#endif
 #include "frontend/sdl/vulkan_check.h"
 #include "frontend/sdl/campaign_chain.h"
 #include "frontend/sdl/editor_imgui.h"
@@ -705,6 +709,11 @@ int main(int argc, char** argv) {
   const int result = program(argc, argv);
   sdlfe::RestartTo to;
   if (!sdlfe::restart_asked(&to)) return result;
+#ifdef __ANDROID__
+  // Ours (android_support.h): an app cannot exec itself again; the player starts it again.
+  std::fprintf(stderr, "mw3: android: a restart was asked (MODS); start the app again\n");
+  return result;
+#endif
   // What the run left open (a library's own; ours are closed): said, and closed at the exec.
   for (int fd : sdlfe::restart_open_handles())
     std::fprintf(stderr, "mw3: starting again: handle %d still open: %s\n", fd, sdlfe::restart_handle_name(fd).c_str());
@@ -752,6 +761,13 @@ int program(int argc, char** argv) {
   // Ours (MW1's FIXES 30): a run no player is at never holds or moves the system's pointer (pointer_hands_off.h).
   if (a.hidden || a.frames > 0 || !a.chain.empty() || !a.modes.empty()) platform::set_pointer_hands_off(true);
   mech3::mods_program_version() = MW3_VERSION;  // game_version= in mod.txt (upgrades/mods/mod_needs.h)
+#ifdef __ANDROID__
+  // Ours (android_support.h): the back button a key (Escape, sdl_input.cpp), not the app's exit;
+  // landscape only; a tap moves the menus' cursor as a mouse would.
+  SDL_SetHint(SDL_HINT_ANDROID_TRAP_BACK_BUTTON, "1");
+  SDL_SetHint(SDL_HINT_ORIENTATIONS, "LandscapeLeft LandscapeRight");
+  SDL_SetHint(SDL_HINT_TOUCH_MOUSE_EVENTS, "1");
+#endif
   if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_JOYSTICK)) {
     sdlfe::fatal_box(std::string("MechWarrior 3 cannot start: ") + SDL_GetError(), a.hidden);
     return 1;
@@ -780,7 +796,12 @@ int program(int argc, char** argv) {
   else if (!a.write_dir.empty() && run_log.open(a.write_dir))
     std::printf("mw3 (MechWarrior 3 rebuild) %s, log %s\n", MW3_VERSION, run_log.path().c_str());
   zutl::repair_old_names(a.write_dir);
+#ifdef __ANDROID__
+  // Ours (android_support.h): no crash box (it forks and execs a second copy); the APK's assets into the files folder.
+  sdlfe::android_copy_assets();
+#else
   if (!a.hidden && !a.write_dir.empty()) sdlfe::crash_report_install("mw3", a.write_dir + "/mw3.log", true);
+#endif
   if (!a.write_dir.empty()) read_config(a.write_dir, a);
   // Ours (docs/mods-campaigns-plan.md): a plain start mounts no mods, the main menu plays the original;
   // mw3.cfg's mod= lines are only moved to the campaign entries (entries_migrate), mods mount for --entry

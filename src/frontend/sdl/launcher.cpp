@@ -10,6 +10,8 @@
 #include "frontend/sdl/text_fit.h"
 
 #include <SDL3/SDL.h>
+
+#include "frontend/sdl/android_support.h"
 #include <SDL3_ttf/SDL_ttf.h>
 
 #include <algorithm>
@@ -56,7 +58,7 @@ constexpr int kBadge = 76;  // a game's badge across, on the 640x480 canvas
 
 std::string assets_dir() {
   std::error_code ec;
-  if (const char* base = SDL_GetBasePath()) {
+  if (const char* base = program_base()) {
     const fs::path p = fs::path(base) / "assets" / "launcher";
     if (fs::is_directory(p, ec)) return p.string();
   }

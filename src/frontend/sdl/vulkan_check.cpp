@@ -13,8 +13,12 @@ Vulkan vulkan_check() {
     if (std::strcmp(forced, "nodriver") == 0) return Vulkan::kNoDriver;
     return Vulkan::kOk;
   }
-#if defined(__linux__)
+#if defined(__linux__)  // Android too (it defines __linux__)
+#ifdef __ANDROID__
+  SDL_SharedObject* lib = SDL_LoadObject("libvulkan.so");  // ours: Android's loader has no .1
+#else
   SDL_SharedObject* lib = SDL_LoadObject("libvulkan.so.1");
+#endif
   if (!lib) return Vulkan::kNoLoader;
   SDL_UnloadObject(lib);
   // SDL's own test for its Vulkan backend: an instance and a device with what SDL_GPU needs.
@@ -26,6 +30,11 @@ Vulkan vulkan_check() {
 
 std::string vulkan_help(Vulkan v) {
   if (v == Vulkan::kOk) return {};
+#ifdef __ANDROID__
+  return std::string("MechWarrior 3 needs Vulkan graphics, and this device has ") +
+         (v == Vulkan::kNoLoader ? "no Vulkan library" : "no Vulkan driver with what the game needs") +
+         ". The log (mw3.log in the app's files folder) has SDL's own reason.";
+#endif
   const std::string what = v == Vulkan::kNoLoader ? "no Vulkan library (libvulkan)"
                                                   : "no Vulkan driver for its graphics card";
   return "MechWarrior 3 needs Vulkan graphics, and this computer has " + what +

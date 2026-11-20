@@ -7,6 +7,7 @@
 #include <cstdlib>
 #include <string>
 
+#include "frontend/sdl/android_support.h"
 #include "gamez/zutil/zutl_path.h"
 #include "mech3/data_folder.h"
 
@@ -16,7 +17,13 @@ namespace sdlfe {
 inline std::string usual_folder(const char* game = "MechWarrior 3") {
   if (const char* env = std::getenv("MW3_USUAL_FOLDER")) return env;
   std::string dir;
+#ifdef __ANDROID__
+  // Ours (android_support.h): the app's external files folder, which a computer reaches over USB.
+  (void)game;
+  dir = android_files_dir();
+#else
   if (char* p = SDL_GetPrefPath("MicroProse", game)) dir = p, SDL_free(p);
+#endif
   while (dir.size() > 1 && dir.back() == '/') dir.pop_back();
   return dir;
 }

@@ -26,6 +26,10 @@ bool text_face(const std::string& name) {
 
 std::vector<std::string> font_folders() {
   std::vector<std::string> out;
+#ifdef __ANDROID__
+  out.push_back("/system/fonts");  // ours (android_support.h): Android's own; no HOME or XDG there
+  return out;
+#endif
   const char* home = std::getenv("HOME");
   if (const char* d = std::getenv("XDG_DATA_HOME"); d && *d) out.push_back(std::string(d) + "/fonts");
   if (home && *home) {

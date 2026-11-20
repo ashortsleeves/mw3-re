@@ -1,0 +1,71 @@
+plugins {
+    id 'com.android.application'
+}
+
+// docs/android.md. The native part is jni/CMakeLists.txt; SDL's Java glue
+// comes from android/deps/SDL (sh android/fetch_deps.sh).
+def sdlJava = file("${rootDir}/deps/SDL/android-project/app/src/main/java")
+def generatedAssets = layout.buildDirectory.dir("generated/mw3assets")
+
+// The repository's assets/ (fonts, launcher art) into the APK as assets/...,
+// with assets_manifest.txt listing them: android_support.cpp copies them to
+// the app's files folder at start, as the APK cannot be listed from C++.
+def mw3Assets = tasks.register('mw3Assets') {
+    def src = file("${rootDir}/../assets")
+    inputs.dir(src)
+    outputs.dir(generatedAssets)
+    doLast {
+        def out = generatedAssets.get().asFile
+        project.delete(out)
+        def names = []
+        src.eachFileRecurse(groovy.io.FileType.FILES) { f ->
+            def rel = 'assets/' + src.toPath().relativize(f.toPath()).toString().replace('\\', '/')
+            def to = new File(out, rel)
+            to.parentFile.mkdirs()
+            to.bytes = f.bytes
+            names << rel
+        }
+        names.sort()
+        new File(out, 'assets_manifest.txt').text = names.join('\n') + '\n'
+    }
+}
+
+android {
+    namespace = "com.mw3re.game"
+    compileSdkVersion 35
+    ndkVersion = "28.2.13676358"
+    defaultConfig {
+        applicationId "com.mw3re.game"
+        minSdkVersion 29          // Android 10: SDL's GPU API on Vulkan
+        targetSdkVersion 35
+        versionCode 1
+        versionName "0.1-android"
+        externalNativeBuild {
+            cmake {
+                arguments "-DANDROID_PLATFORM=android-29", "-DANDROID_STL=c++_static"
+                abiFilters 'arm64-v8a'
+            }
+        }
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            signingConfig signingConfigs.debug  // a sideloaded build: signed with the debug key
+        }
+    }
+    sourceSets.main {
+        java.srcDirs += sdlJava
+        assets.srcDirs += generatedAssets
+    }
+    externalNativeBuild {
+        cmake {
+            path 'jni/CMakeLists.txt'
+            version '3.22.1+'
+        }
+    }
+    lint {
+        abortOnError = false
+    }
+}
+
+preBuild.dependsOn mw3Assets

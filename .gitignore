@@ -35,3 +35,15 @@ docs/drafts/
 CLAUDE.md
 docs/worklogs/
 docs/for-owen.md
+
+# Android build (docs/android.md)
+/android/deps/
+/android/.gradle/
+/android/build/
+/android/app/build/
+/android/app/.cxx/
+/android/local.properties
+/android/gradlew
+/android/gradlew.bat
+/android/gradle/
+*.apk

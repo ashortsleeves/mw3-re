@@ -11,16 +11,21 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # The install the tests and the tools read (any MW3 data version; assets.md,
 # Data versions): -DMW3_GAME_DIR=... for another, e.g. game/mw3-1.0.
-set(MW3_GAME_DIR "${CMAKE_SOURCE_DIR}/game/mw3-1.2" CACHE PATH "The MechWarrior 3 install the tests and tools read")
+set(MW3_GAME_DIR "${CMAKE_CURRENT_SOURCE_DIR}/game/mw3-1.2" CACHE PATH "The MechWarrior 3 install the tests and tools read")
 
 # A build for other players (tools/windows/package.cmd): mw3 and mw3import
 # get no development copy to fall back on, only the player's own install.
 option(MW3_PACKAGE "Build mw3 and mw3import for players: no MW3_GAME_DIR in them" OFF)
+# Android (ours, docs/android.md): only the game, as libmain.so for SDL's
+# SDLActivity; no launcher, tests or tools. android/ builds it with Gradle.
+if(ANDROID)
+  set(MW3_PACKAGE ON CACHE BOOL "" FORCE)
+endif()
 # The version mw3 --version and the Windows version resource give: git's
 # describe (a tag, or the commit) and the commit count.
-execute_process(COMMAND git describe --tags --match "v[0-9]*" --always --dirty WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+execute_process(COMMAND git describe --tags --match "v[0-9]*" --always --dirty WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
                 OUTPUT_VARIABLE MW3_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE ERROR_QUIET)
-execute_process(COMMAND git rev-list --count HEAD WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+execute_process(COMMAND git rev-list --count HEAD WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
                 OUTPUT_VARIABLE MW3_BUILD_NUMBER OUTPUT_STRIP_TRAILING_WHITESPACE ERROR_QUIET)
 if(NOT MW3_VERSION)
   set(MW3_VERSION "unknown")
@@ -417,7 +422,7 @@ endif()
 # them, its miniupnpcstrings.h made from its template.
 set(_mw3_project_version "${PROJECT_VERSION}")
 set(PROJECT_VERSION 2.2.8)
-configure_file(third_party/miniupnpc/miniupnpcstrings.h.cmake ${CMAKE_BINARY_DIR}/miniupnpc/miniupnpcstrings.h)
+configure_file(third_party/miniupnpc/miniupnpcstrings.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/miniupnpc/miniupnpcstrings.h)
 set(PROJECT_VERSION "${_mw3_project_version}")
 add_library(miniupnpc STATIC
   third_party/miniupnpc/src/igd_desc_parse.c third_party/miniupnpc/src/miniupnpc.c
@@ -427,7 +432,7 @@ add_library(miniupnpc STATIC
   third_party/miniupnpc/src/connecthostport.c third_party/miniupnpc/src/portlistingparse.c
   third_party/miniupnpc/src/receivedata.c third_party/miniupnpc/src/addr_is_reserved.c)
 target_include_directories(miniupnpc PUBLIC third_party/miniupnpc/include
-                           PRIVATE third_party/miniupnpc/src ${CMAKE_BINARY_DIR}/miniupnpc)
+                           PRIVATE third_party/miniupnpc/src ${CMAKE_CURRENT_BINARY_DIR}/miniupnpc)
 target_compile_definitions(miniupnpc PUBLIC MINIUPNP_STATICLIB)
 target_compile_options(miniupnpc PRIVATE "$<IF:$<C_COMPILER_ID:MSVC>,/w,-w>")
 if(WIN32)
@@ -447,16 +452,16 @@ endif()
 # Mac may use Homebrew's (brew install libarchive). Without it the game
 # builds and SETUP takes folders, drives, .iso and .cue only.
 find_path(LIBARCHIVE_INCLUDE archive.h
-          HINTS "${CMAKE_SOURCE_DIR}/deps/archive/include" /opt/homebrew/opt/libarchive/include /usr/local/opt/libarchive/include)
+          HINTS "${CMAKE_CURRENT_SOURCE_DIR}/deps/archive/include" /opt/homebrew/opt/libarchive/include /usr/local/opt/libarchive/include)
 find_library(LIBARCHIVE_LIB NAMES archive archive_static
-             HINTS "${CMAKE_SOURCE_DIR}/deps/archive/lib" /opt/homebrew/opt/libarchive/lib /usr/local/opt/libarchive/lib)
+             HINTS "${CMAKE_CURRENT_SOURCE_DIR}/deps/archive/lib" /opt/homebrew/opt/libarchive/lib /usr/local/opt/libarchive/lib)
 if(LIBARCHIVE_INCLUDE AND LIBARCHIVE_LIB)
   target_include_directories(mw3core PUBLIC "${LIBARCHIVE_INCLUDE}")
   target_link_libraries(mw3core PUBLIC "${LIBARCHIVE_LIB}")
   if(LIBARCHIVE_LIB MATCHES "\\.(a|lib)$")  # static: its own libraries beside it
     target_compile_definitions(mw3core PUBLIC LIBARCHIVE_STATIC)  # the tests write archives with it too
-    find_library(MW3_LZMA_LIB NAMES lzma liblzma HINTS "${CMAKE_SOURCE_DIR}/deps/archive/lib")
-    find_library(MW3_Z_LIB NAMES z zlibstatic zlib zs HINTS "${CMAKE_SOURCE_DIR}/deps/archive/lib")
+    find_library(MW3_LZMA_LIB NAMES lzma liblzma HINTS "${CMAKE_CURRENT_SOURCE_DIR}/deps/archive/lib")
+    find_library(MW3_Z_LIB NAMES z zlibstatic zlib zs HINTS "${CMAKE_CURRENT_SOURCE_DIR}/deps/archive/lib")
     target_link_libraries(mw3core PUBLIC ${MW3_LZMA_LIB} ${MW3_Z_LIB})
     if(WIN32)
       target_link_libraries(mw3core PUBLIC bcrypt)
@@ -480,6 +485,7 @@ endif()
 # GCC on Linux needs it asked for, docs/linux.md).
 set_target_properties(mw3core PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
+if(NOT ANDROID)  # the tests and probes: desktop only (ours, docs/android.md)
 # A C interface over a few ported functions, for the differential tests that run
 # the original x86 code in an emulator and compare (tests/differential).
 add_library(mw3probe SHARED
@@ -708,12 +714,17 @@ endif()
 target_link_libraries(mw3tests PRIVATE mw3core)
 # Tests that read the player's install skip themselves when it is not there.
 target_compile_definitions(mw3tests PRIVATE MW3_GAME_DIR="${MW3_GAME_DIR}"
-                                          MW3_TEST_TMP_ROOT="${CMAKE_BINARY_DIR}"
-                                          MW3_SOURCE_DIR="${CMAKE_SOURCE_DIR}")
+                                          MW3_TEST_TMP_ROOT="${CMAKE_CURRENT_BINARY_DIR}"
+                                          MW3_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}")
 add_test(NAME mw3tests COMMAND mw3tests)
+endif()  # NOT ANDROID
 
 # The SDL3 front end and the programs on it.
-find_package(SDL3 CONFIG QUIET)
+if(TARGET SDL3::SDL3)  # built alongside (android/app/jni/CMakeLists.txt)
+  set(SDL3_FOUND TRUE)
+else()
+  find_package(SDL3 CONFIG QUIET)
+endif()
 if(SDL3_FOUND)
   # Platform implementations on SDL (docs/program.md): window and message
   # pump, input, render3d, sound, music; the debug world loader.
@@ -734,6 +745,7 @@ if(SDL3_FOUND)
     src/frontend/sdl/sdl_focus.cpp
     src/frontend/sdl/log_start.cpp
     src/frontend/sdl/editor_imgui.cpp
+    src/frontend/sdl/android_support.cpp
   )
   target_link_libraries(mw3sdl PUBLIC mw3core SDL3::SDL3 enet miniupnpc)
   # Dear ImGui (third_party/imgui, VERSION.txt): the game editor's dialogs only
@@ -754,8 +766,8 @@ if(SDL3_FOUND)
   # Windows SDK's dxc, as headers the renderer includes.
   if(WIN32)
     find_program(DXC dxc REQUIRED)
-    set(hlsl ${CMAKE_SOURCE_DIR}/src/frontend/sdl/sdl_render3d.hlsl)
-    set(dxil_dir ${CMAKE_BINARY_DIR}/dxil)
+    set(hlsl ${CMAKE_CURRENT_SOURCE_DIR}/src/frontend/sdl/sdl_render3d.hlsl)
+    set(dxil_dir ${CMAKE_CURRENT_BINARY_DIR}/dxil)
     set(dxil_headers)
     foreach(stage vs:vs_6_0 fs_tex:ps_6_0 fs_flat:ps_6_0)
       string(REPLACE ":" ";" pair ${stage})
@@ -781,8 +793,8 @@ if(SDL3_FOUND)
     find_program(GLSLANG glslangValidator)
   endif()
   if(GLSLANG)
-    set(glsl ${CMAKE_SOURCE_DIR}/src/frontend/sdl/sdl_render3d.glsl)
-    set(spv_dir ${CMAKE_BINARY_DIR}/spirv)
+    set(glsl ${CMAKE_CURRENT_SOURCE_DIR}/src/frontend/sdl/sdl_render3d.glsl)
+    set(spv_dir ${CMAKE_CURRENT_BINARY_DIR}/spirv)
     set(spv_headers)
     foreach(stage vs:vert:VS fs_tex:frag:FS_TEX fs_flat:frag:FS_FLAT)
       string(REPLACE ":" ";" parts ${stage})
@@ -801,7 +813,11 @@ if(SDL3_FOUND)
   endif()
   # Music files other than .wav decode with SDL3_sound (brew install sdl3_sound;
   # Windows: its -devel-VC.zip in deps\, found through SDL3_sound_ROOT).
-  find_package(SDL3_sound CONFIG QUIET)
+  if(TARGET SDL3_sound::SDL3_sound)
+    set(SDL3_sound_FOUND TRUE)
+  else()
+    find_package(SDL3_sound CONFIG QUIET)
+  endif()
   if(SDL3_sound_FOUND)
     target_link_libraries(mw3sdl PUBLIC SDL3_sound::SDL3_sound)
     target_compile_definitions(mw3sdl PRIVATE MW3_HAVE_SDL_SOUND=1)
@@ -809,7 +825,11 @@ if(SDL3_FOUND)
     message(STATUS "SDL3_sound not found: music plays .wav tracks only")
   endif()
   # The game, and its front end's tests: the 2D text needs SDL3_ttf.
-  find_package(SDL3_ttf CONFIG QUIET)
+  if(TARGET SDL3_ttf::SDL3_ttf)
+    set(SDL3_ttf_FOUND TRUE)
+  else()
+    find_package(SDL3_ttf CONFIG QUIET)
+  endif()
   if(SDL3_ttf_FOUND)
     add_library(mw3text STATIC src/frontend/sdl/sdl_twod_host.cpp src/frontend/sdl/font_search.cpp
                 src/frontend/sdl/gdi_font_size.cpp
@@ -817,9 +837,9 @@ if(SDL3_FOUND)
                 src/frontend/sdl/vulkan_check.cpp)
     target_link_libraries(mw3text PUBLIC mw3sdl SDL3_ttf::SDL3_ttf)
     if(NOT MW3_PACKAGE)
-      target_compile_definitions(mw3text PRIVATE MW3_ASSETS_DIR="${CMAKE_SOURCE_DIR}/assets")
+      target_compile_definitions(mw3text PRIVATE MW3_ASSETS_DIR="${CMAKE_CURRENT_SOURCE_DIR}/assets")
     endif()
-    add_executable(mw3
+    set(MW3_MAIN_SOURCES
       src/frontend/sdl/mw3_main.cpp
       src/frontend/sdl/sdl_restart.cpp
       src/frontend/sdl/win_cmdline.cpp
@@ -832,22 +852,30 @@ if(SDL3_FOUND)
       src/frontend/sdl/modes_chain.cpp
       src/frontend/sdl/first_run_import.cpp
     )
+    if(ANDROID)
+      # SDLActivity loads libSDL3.so, then libmain.so and calls its SDL_main (SDL_main.h in mw3_main.cpp).
+      add_library(mw3 SHARED ${MW3_MAIN_SOURCES})
+      set_target_properties(mw3 PROPERTIES OUTPUT_NAME main)
+      target_link_libraries(mw3 PRIVATE android log)
+    else()
+      add_executable(mw3 ${MW3_MAIN_SOURCES})
+    endif()
     target_link_libraries(mw3 PRIVATE mw3text mw3sdl mw3core SDL3::SDL3)
     target_compile_definitions(mw3 PRIVATE MW3_VERSION="${MW3_VERSION}")
     # The launcher's art (assets/launcher) in a development build; a package
     # carries it beside the exe (tools/windows/package.cmd) or in the app's
     # Resources (tools/macos/make_app.sh), and keeps no path of this machine.
     if(NOT MW3_PACKAGE)
-      target_compile_definitions(mw3 PRIVATE MW3_ASSETS_DIR="${CMAKE_SOURCE_DIR}/assets")
+      target_compile_definitions(mw3 PRIVATE MW3_ASSETS_DIR="${CMAKE_CURRENT_SOURCE_DIR}/assets")
       target_compile_definitions(mw3 PRIVATE MW3_GAME_DIR="${MW3_GAME_DIR}")
     endif()
     # Windows: the version resource and our placeholder icon (tools/windows).
     if(WIN32)
       set(MW3_RC_NAME "MechWarrior 3 rebuild")
       set(MW3_RC_FILE "mw3.exe")
-      set(MW3_RC_ICON "ICON_MAIN ICON \"${CMAKE_SOURCE_DIR}/tools/windows/mw3.ico\"")
-      configure_file(tools/windows/version.rc.in ${CMAKE_BINARY_DIR}/mw3.rc)
-      target_sources(mw3 PRIVATE ${CMAKE_BINARY_DIR}/mw3.rc)
+      set(MW3_RC_ICON "ICON_MAIN ICON \"${CMAKE_CURRENT_SOURCE_DIR}/tools/windows/mw3.ico\"")
+      configure_file(tools/windows/version.rc.in ${CMAKE_CURRENT_BINARY_DIR}/mw3.rc)
+      target_sources(mw3 PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/mw3.rc)
       target_sources(mw3 PRIVATE tools/windows/utf8.manifest)
     endif()
     # A package build is a Windows GUI program: no console window beside the
@@ -866,6 +894,7 @@ if(SDL3_FOUND)
                          COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_RUNTIME_DLLS:mw3> $<TARGET_FILE_DIR:mw3>
                          COMMAND_EXPAND_LISTS)
     endif()
+    if(NOT ANDROID)  # ours (docs/android.md): the launcher and the front end's tests, desktop only
     # The launcher (docs/launcher.md, The two programs; games-layout.md): the
     # main icon, its own program; MECHWARRIOR 3 starts mw3 beside it.
     add_executable(mw3launcher
@@ -878,16 +907,16 @@ if(SDL3_FOUND)
     target_link_libraries(mw3launcher PRIVATE mw3text mw3sdl mw3core SDL3::SDL3)
     target_compile_definitions(mw3launcher PRIVATE MW3_VERSION="${MW3_VERSION}")
     if(NOT MW3_PACKAGE)
-      target_compile_definitions(mw3launcher PRIVATE MW3_ASSETS_DIR="${CMAKE_SOURCE_DIR}/assets"
+      target_compile_definitions(mw3launcher PRIVATE MW3_ASSETS_DIR="${CMAKE_CURRENT_SOURCE_DIR}/assets"
                                                      MW3_GAME_DIR="${MW3_GAME_DIR}")
     endif()
     add_dependencies(mw3launcher mw3)
     if(WIN32)
       set(MW3_RC_NAME "MW3 Rebuild")
       set(MW3_RC_FILE "mw3launcher.exe")
-      set(MW3_RC_ICON "ICON_MAIN ICON \"${CMAKE_SOURCE_DIR}/tools/windows/mw3.ico\"")
-      configure_file(tools/windows/version.rc.in ${CMAKE_BINARY_DIR}/mw3launcher.rc)
-      target_sources(mw3launcher PRIVATE ${CMAKE_BINARY_DIR}/mw3launcher.rc)
+      set(MW3_RC_ICON "ICON_MAIN ICON \"${CMAKE_CURRENT_SOURCE_DIR}/tools/windows/mw3.ico\"")
+      configure_file(tools/windows/version.rc.in ${CMAKE_CURRENT_BINARY_DIR}/mw3launcher.rc)
+      target_sources(mw3launcher PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/mw3launcher.rc)
       target_sources(mw3launcher PRIVATE tools/windows/utf8.manifest)
       # No console, in every build: it is only ever a window (its log is
       # mw3launcher.log in the write dir).
@@ -921,19 +950,21 @@ if(SDL3_FOUND)
     )
     target_link_libraries(mw3sdltests PRIVATE mw3text mw3sdl mw3core SDL3::SDL3)
     target_compile_definitions(mw3sdltests PRIVATE MW3_GAME_DIR="${MW3_GAME_DIR}"
-                                                 MW3_TEST_TMP_ROOT="${CMAKE_BINARY_DIR}"
+                                                 MW3_TEST_TMP_ROOT="${CMAKE_CURRENT_BINARY_DIR}"
                                                  MW3_BIN="$<TARGET_FILE:mw3>"
                                                  MW3_LAUNCHER_BIN="$<TARGET_FILE:mw3launcher>"
-                                                 MW3_ASSETS_FOR_TESTS="${CMAKE_SOURCE_DIR}/assets"
+                                                 MW3_ASSETS_FOR_TESTS="${CMAKE_CURRENT_SOURCE_DIR}/assets"
                                                  MW3_FAKE_INDEO="$<TARGET_FILE:mw3indeo_fake>"
                                                  MW3_IMPORT_BIN="$<TARGET_FILE_DIR:mw3>/mw3import")
     add_dependencies(mw3sdltests mw3indeo_fake)
     add_dependencies(mw3sdltests mw3)
     add_dependencies(mw3sdltests mw3launcher)
     add_test(NAME mw3sdltests COMMAND mw3sdltests)
+    endif()  # NOT ANDROID
   else()
     message(STATUS "SDL3_ttf not found: mw3 is not built (brew install sdl3_ttf)")
   endif()
+  if(NOT ANDROID)  # ours (docs/android.md): the tools, desktop only
   # Development tools (not part of the port): the world viewer.
   add_executable(mw3view tools/viewer/viewer.cpp tools/viewer/scene.cpp)
   target_link_libraries(mw3view PRIVATE mw3core mw3sdl SDL3::SDL3)
@@ -952,7 +983,7 @@ if(SDL3_FOUND)
     set(MW3_FFMPEG PkgConfig::FFMPEG)
   else()
     if(NOT FFMPEG_DIR)
-      file(GLOB _ffmpeg_dirs "${CMAKE_SOURCE_DIR}/deps/ffmpeg-*shared*")
+      file(GLOB _ffmpeg_dirs "${CMAKE_CURRENT_SOURCE_DIR}/deps/ffmpeg-*shared*")
       if(_ffmpeg_dirs)
         list(GET _ffmpeg_dirs 0 FFMPEG_DIR)
       endif()
@@ -985,8 +1016,8 @@ if(SDL3_FOUND)
       set(MW3_RC_NAME "MechWarrior 3 rebuild: movie and music importer")
       set(MW3_RC_FILE "mw3import.exe")
       set(MW3_RC_ICON "")
-      configure_file(tools/windows/version.rc.in ${CMAKE_BINARY_DIR}/mw3import.rc)
-      target_sources(mw3import PRIVATE ${CMAKE_BINARY_DIR}/mw3import.rc)
+      configure_file(tools/windows/version.rc.in ${CMAKE_CURRENT_BINARY_DIR}/mw3import.rc)
+      target_sources(mw3import PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/mw3import.rc)
     endif()
     if(MW3_FFMPEG_DLLS)  # the DLLs beside mw3import.exe, as SDL3.dll is beside mw3.exe
       add_custom_command(TARGET mw3import POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different ${MW3_FFMPEG_DLLS}
@@ -999,4 +1030,5 @@ if(SDL3_FOUND)
   add_executable(mw3soundcheck tools/soundcheck/soundcheck.cpp)
   target_link_libraries(mw3soundcheck PRIVATE mw3core mw3sdl SDL3::SDL3)
   target_compile_definitions(mw3soundcheck PRIVATE MW3_GAME_DIR="${MW3_GAME_DIR}")
+  endif()  # NOT ANDROID
 endif()

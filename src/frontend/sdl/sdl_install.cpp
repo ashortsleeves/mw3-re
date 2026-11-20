@@ -5,6 +5,8 @@
 #include <sstream>
 #include <SDL3/SDL.h>
 
+#include "frontend/sdl/android_support.h"
+
 #include <algorithm>
 #include <atomic>
 #include <cctype>
@@ -166,7 +168,7 @@ std::vector<std::string> install_candidates(bool pirates_moon) {
 #endif
   // This program's folder and the one above (mw3 beside or inside the
   // install); on the Mac, beside the .app.
-  if (const char* base = SDL_GetBasePath()) {
+  if (const char* base = program_base()) {
     const std::string b = trimmed(base);
     add(b);
     add(parent(b));

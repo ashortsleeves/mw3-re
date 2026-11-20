@@ -14,6 +14,7 @@
 #include <filesystem>
 #include <set>
 
+#include "frontend/sdl/android_support.h"
 #include "frontend/sdl/gdi_font_size.h"
 #include "frontend/sdl/sdl_input.h"
 #include "gamez/zutil/zfix.h"
@@ -127,7 +128,7 @@ std::string SdlTwodHost::shipped_font(const std::string& file) {
                      : file == "lucon.ttf" ? "LiberationMono-Regular.ttf"
                                            : "LiberationSans-Regular.ttf";
   std::error_code ec;
-  if (const char* base = SDL_GetBasePath()) {
+  if (const char* base = program_base()) {
     const std::filesystem::path p = std::filesystem::path(base) / "assets" / "fonts" / name;
     if (std::filesystem::exists(p, ec)) return p.string();
   }

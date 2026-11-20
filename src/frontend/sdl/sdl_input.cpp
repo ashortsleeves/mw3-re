@@ -23,6 +23,9 @@ uint8_t dik_from_scancode(SDL_Scancode s) {
   if (s >= SDL_SCANCODE_F1 && s <= SDL_SCANCODE_F10) return static_cast<uint8_t>(0x3b + (s - SDL_SCANCODE_F1));
   switch (s) {
     case SDL_SCANCODE_ESCAPE: return 0x01;           // DIK_ESCAPE
+#ifdef __ANDROID__
+    case SDL_SCANCODE_AC_BACK: return 0x01;          // ours (android_support.h): Android's back is Escape
+#endif
     case SDL_SCANCODE_MINUS: return 0x0c;
     case SDL_SCANCODE_EQUALS: return 0x0d;
     case SDL_SCANCODE_BACKSPACE: return 0x0e;        // DIK_BACK
