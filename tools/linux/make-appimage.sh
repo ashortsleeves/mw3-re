@@ -71,6 +71,12 @@ fi
 if [ -n "${MW3_PKG_MW1_DIR:-}" ]; then
   cp "$MW3_PKG_MW1_DIR/mw1" "$APPDIR/usr/bin/mw1"
   cp -R "$MW3_PKG_MW1_DIR/mw1data" "$APPDIR/usr/bin/mw1data"
+  # Its read-me and notices (mw1/dist on its branch), with mw3-re's in usr/share/doc/mw3.
+  mkdir -p "$APPDIR/usr/share/doc/mw3"
+  for f in README-MW1.txt THIRD-PARTY-MW1.txt; do
+    if [ -f "$MW3_PKG_MW1_DIR/../mw1/dist/$f" ]; then cp "$MW3_PKG_MW1_DIR/../mw1/dist/$f" "$APPDIR/usr/share/doc/mw3/$f"
+    else echo "warning: no $f in mw1/dist (an mw1 before its notices): not for release" >&2; fi
+  done
   EXES="$EXES -e $APPDIR/usr/bin/mw1"
 fi
 # The launcher's art (ours): beside the program, where SDL_GetBasePath finds it.

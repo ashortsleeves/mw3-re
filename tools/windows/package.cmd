@@ -60,6 +60,10 @@ if defined MW3_PKG_PM_BIN copy /y "%MW3_PKG_PM_BIN%" "%DIST%\mw3pm.exe" >nul || 
 rem MechWarrior 1: Critical Hit beside them (the launcher's MECHWARRIOR 1 entry starts it from there, launcher.md).
 if defined MW3_PKG_MW1_DIR copy /y "%MW3_PKG_MW1_DIR%\mw1.exe" "%DIST%\" >nul || exit /b 1
 if defined MW3_PKG_MW1_DIR xcopy /e /i /q /y "%MW3_PKG_MW1_DIR%\mw1data" "%DIST%\mw1data" >nul || exit /b 1
+rem Its read-me and notices (mw1\dist on its branch, beside the build tree), beside mw1.exe.
+if defined MW3_PKG_MW1_DIR for %%f in (README-MW1.txt THIRD-PARTY-MW1.txt) do (
+  if exist "%MW3_PKG_MW1_DIR%\..\mw1\dist\%%f" (copy /y "%MW3_PKG_MW1_DIR%\..\mw1\dist\%%f" "%DIST%\" >nul || exit /b 1) else (echo warning: no %%f in mw1\dist: not for release)
+)
 copy /y build-win-pkg\*.dll "%DIST%\" >nul || exit /b 1
 rem The Visual C++ runtime, app-local (a player may not have the redistributable).
 for /d %%d in ("%VCToolsRedistDir%x64\Microsoft.VC*.CRT") do (

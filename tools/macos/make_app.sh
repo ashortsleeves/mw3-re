@@ -78,6 +78,11 @@ if [ -n "$PM_BIN" ]; then cp "$PM_BIN" "$APP/Contents/MacOS/mw3pm"; fi
 if [ -n "$MW1_DIR" ]; then
   cp "$MW1_DIR/mw1" "$APP/Contents/MacOS/mw1"
   cp -R "$MW1_DIR/mw1data" "$APP/Contents/Resources/mw1data"
+  # Its read-me and notices (mw1/dist on its branch, beside the build tree), beside mw3-re's own.
+  for f in README-MW1.txt THIRD-PARTY-MW1.txt; do
+    if [ -f "$MW1_DIR/../mw1/dist/$f" ]; then cp "$MW1_DIR/../mw1/dist/$f" "$APP/Contents/Resources/$f"
+    else echo "warning: no $f in mw1/dist (an mw1 before its notices): not for release" >&2; fi
+  done
 fi
 # The launcher's art (ours, assets/launcher), where SDL's base path is: Resources.
 mkdir -p "$APP/Contents/Resources/assets/launcher"

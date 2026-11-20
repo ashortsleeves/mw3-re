@@ -64,6 +64,8 @@ Type: files; Name: "{app}\mw3pm.exe"
 ; and MechWarrior 1: Critical Hit's (its settings and saves, %APPDATA%\MicroProse\MechWarrior 1 Critical Hit, stay).
 Type: files; Name: "{app}\mw1.exe"
 Type: filesandordirs; Name: "{app}\mw1data"
+Type: files; Name: "{app}\README-MW1.txt"
+Type: files; Name: "{app}\THIRD-PARTY-MW1.txt"
 #endif
 
 [Icons]
