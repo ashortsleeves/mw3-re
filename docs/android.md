@@ -66,15 +66,21 @@ adb pull /storage/emulated/0/Android/data/com.mw3re.game/files/mw3.log
 | android_support.cpp | `program_base()` stands for SDL_GetBasePath (launcher.cpp, sdl_twod_host.cpp, sdl_install.cpp); the APK's assets copied out by `assets_manifest.txt` | no folder beside the program on Android |
 | font_search.cpp | `/system/fonts` | no HOME or XDG folders |
 | vulkan_check.cpp | `libvulkan.so` (no `.1`) and a message for a device | Android's loader's name; Android defines `__linux__` |
+| app_engine.cpp | no `MW3_TRACE_UNPORTED` backtrace | bionic has `execinfo.h` from API 33 only (minSdk is 29) |
+| zmth_matrix.cpp | the matrix-stack fault's callers walked with `_Unwind_Backtrace` | the same |
+| sdl_restart.cpp | `sysconf(_SC_OPEN_MAX)` in place of `getdtablesize()` (on the desktop too, the same value) | bionic has no `getdtablesize` |
+| sdl_platform.cpp, vulkan_check.cpp | the GPU device made, and the check asked, without clip distances (`SDL_PROP_GPU_DEVICE_CREATE_FEATURE_CLIP_DISTANCE_BOOLEAN` false); the check logs SDL's reason for a refusal | the Retroid Pocket 4 Pro's Mali-G77 has no `shaderClipDistance` (the other three opt-outs it has), and SDL_GPU asks for it by default; the shaders write none |
+| sdl_input.cpp | outside a mission the mouse is not held: zInput's mouse goes where the finger is, as the menus in a window | a tap has a place and no motion, which a held (relative) mouse never sees |
+| sdl_input.cpp | outside a mission the gamepad works the menus: the left stick and the d-pad move the cursor, A clicks, B is Escape, Start is Enter (a movie's skip); each as the event a mouse or key would send | a handheld has no mouse or keyboard; a movie skips only on Space, Escape or Enter |
 
 ## Open questions (to settle on a device)
 
-- **Mali's Vulkan driver.** SDL_GPU's Vulkan backend needs features a
-  phone's driver may lack; SdlWindow::init's error says which. The depth
-  buffer is D32_FLOAT (sdl_render3d.cpp), which Mali supports. Wireframe
-  (`FILLMODE_LINE`, the editor's) needs `fillModeNonSolid`.
-- **Menus with a pad.** The original's menus follow the mouse: on a handheld
-  they are tapped for now. A stick-driven cursor is the next piece.
+- **Mali's Vulkan driver.** Settled on the Retroid Pocket 4 Pro (2026-11-20):
+  with clip distances off, SDL_GPU's Vulkan device is made and the launcher,
+  the menus and the movies draw. Wireframe (`FILLMODE_LINE`, the editor's)
+  needs `fillModeNonSolid`, not yet checked.
+- **Menus with a pad.** Done (above); the cursor's speed is to be tuned by
+  hand.
 - **Screen.** 4:3 frames on a 16:9 screen; the menus' 16:9 (widemenus=) is on.
 - **Movies.** Imported on a computer (mw3import, FFmpeg); the importer is not
   part of the APK, so the first start's import is skipped.

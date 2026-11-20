@@ -456,10 +456,18 @@ void SdlInput::refresh() {
       }
   }
   const bool free = mission_ && pointer_free && pointer_free();
-  const bool absolute = (win_ && !mission_) || free;
+#ifdef __ANDROID__
+  // ours (docs/android.md): the menus by touch, as in a window: a tap has a place and no motion, which
+  // a held (relative) mouse never sees; zInput's mouse goes where the finger is
+  const bool touch_menus = !mission_;
+#else
+  const bool touch_menus = false;
+#endif
+  const bool absolute = (win_ && !mission_) || free || touch_menus;
   if (absolute && !absolute_) cursor_moved_ = false;
   absolute_ = absolute;
-  const bool want = acquired_[kMouse] && (coop_[kMouse] & 1) && focused_ && !free && !(win_ && (!mission_ || released_));
+  const bool want = acquired_[kMouse] && (coop_[kMouse] & 1) && focused_ && !free && !touch_menus &&
+                    !(win_ && (!mission_ || released_));
   // Playtest W19: SDL's own state, not only ours; a relative mode refused or
   // dropped (a fullscreen switch, the focus) is asked for again, else the
   // system's cursor showed at the centre the game puts it each frame.
@@ -531,6 +539,9 @@ void SdlInput::set_cooperative_level(Device d, uint32_t flags) { coop_[d] = flag
 
 int32_t SdlInput::mouse_state(platform::MouseState* out) {
   refresh();
+#ifdef __ANDROID__
+  menu_pad_cursor();
+#endif
   if (!opened_[kMouse] || !acquired_[kMouse]) return lost_[kMouse] ? kInputLost : kNotAcquired;
   if (muted()) {  // let go in a mission: no motion, no buttons
     *out = platform::MouseState{};
@@ -707,8 +718,71 @@ void SdlInput::focus_lost() {
   refresh();
 }
 
+// Ours (docs/android.md, sdl_input.h): the gamepad's buttons as the events a mouse and keyboard
+// would send, so they go the one way the touch, the mouse and the keys go.
+void SdlInput::menu_pad_button(const SDL_GamepadButtonEvent& b) {
+  if (b.down) std::printf("mw3: pad: button %d in %s%s\n", b.button, mission_ ? "a mission" : "the menus",
+                          !pad_ || b.which != id_ ? " (not the game's gamepad)" : "");
+  if (mission_ || !pad_ || b.which != id_) return;
+  SDL_Event e{};
+  const Uint32 win = window ? SDL_GetWindowID(window) : 0;
+  auto key = [&](SDL_Scancode sc) {
+    e.type = b.down ? SDL_EVENT_KEY_DOWN : SDL_EVENT_KEY_UP;
+    e.key.timestamp = SDL_GetTicksNS(), e.key.windowID = win;
+    e.key.scancode = sc, e.key.key = SDL_GetKeyFromScancode(sc, SDL_KMOD_NONE, false);
+    e.key.mod = SDL_KMOD_NONE, e.key.down = b.down, e.key.repeat = false;
+    SDL_PushEvent(&e);
+  };
+  switch (b.button) {
+    case SDL_GAMEPAD_BUTTON_START: key(SDL_SCANCODE_RETURN); break;
+    case SDL_GAMEPAD_BUTTON_EAST: key(SDL_SCANCODE_ESCAPE); break;
+    case SDL_GAMEPAD_BUTTON_SOUTH:
+      e.type = b.down ? SDL_EVENT_MOUSE_BUTTON_DOWN : SDL_EVENT_MOUSE_BUTTON_UP;
+      e.button.timestamp = SDL_GetTicksNS(), e.button.windowID = win;
+      e.button.button = SDL_BUTTON_LEFT, e.button.down = b.down, e.button.clicks = 1;
+      e.button.x = mouse_x, e.button.y = mouse_y;
+      SDL_PushEvent(&e);
+      break;
+    default: break;
+  }
+}
+
+// Each read of the mouse: the stick (a dead zone, then squared for fine aim) and the d-pad move the
+// cursor, a screen's height in about a second at full tilt; warped, so SDL's mouse and ours agree.
+void SdlInput::menu_pad_cursor() {
+  const uint64_t now = SDL_GetTicksNS();
+  const float dt = pad_ns_ ? std::min(static_cast<float>(now - pad_ns_) / 1e9f, 0.1f) : 0.0f;
+  pad_ns_ = now;
+  if (mission_ || !pad_ || !window || dt <= 0) return;
+  auto stick = [this](SDL_GamepadAxis a) {
+    const float v = SDL_GetGamepadAxis(pad_, a) / 32767.0f, m = std::fabs(v);
+    if (m < 0.2f) return 0.0f;
+    const float t = std::min((m - 0.2f) / 0.8f, 1.0f);
+    return v < 0 ? -t * t : t * t;
+  };
+  auto held = [this](SDL_GamepadButton b) { return SDL_GetGamepadButton(pad_, b) ? 1.0f : 0.0f; };
+  float vx = stick(SDL_GAMEPAD_AXIS_LEFTX) + held(SDL_GAMEPAD_BUTTON_DPAD_RIGHT) - held(SDL_GAMEPAD_BUTTON_DPAD_LEFT);
+  float vy = stick(SDL_GAMEPAD_AXIS_LEFTY) + held(SDL_GAMEPAD_BUTTON_DPAD_DOWN) - held(SDL_GAMEPAD_BUTTON_DPAD_UP);
+  if (vx == 0 && vy == 0) return;
+  vx = std::clamp(vx, -1.0f, 1.0f), vy = std::clamp(vy, -1.0f, 1.0f);
+  int w = 0, h = 0;
+  SDL_GetWindowSize(window, &w, &h);
+  if (w <= 0 || h <= 0) return;
+  const float speed = static_cast<float>(h);
+  const float x = std::clamp(mouse_x + vx * speed * dt, 0.0f, static_cast<float>(w - 1));
+  const float y = std::clamp(mouse_y + vy * speed * dt, 0.0f, static_cast<float>(h - 1));
+  SDL_WarpMouseInWindow(window, x, y);
+  mouse_x = x, mouse_y = y, cursor_moved_ = true;
+}
+
 void SdlInput::on_event(const SDL_Event& e) {
   switch (e.type) {
+#ifdef __ANDROID__
+    case SDL_EVENT_GAMEPAD_BUTTON_DOWN:
+    case SDL_EVENT_GAMEPAD_BUTTON_UP:
+      menu_pad_button(e.gbutton);
+      break;
+#endif
     case SDL_EVENT_JOYSTICK_REMOVED:  // ours (W54): centred until it is back
       if (joy_ && e.jdevice.which == id_) {
         std::printf("mw3: joystick taken out: it reads centred until it is back\n");

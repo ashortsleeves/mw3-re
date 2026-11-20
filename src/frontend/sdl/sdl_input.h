@@ -133,6 +133,10 @@ class SdlInput : public platform::Input {
 
   // From the message pump: every SDL input event passes through here.
   void on_event(const SDL_Event& e);
+  // Ours (docs/android.md): outside a mission the gamepad works the menus: the left stick and
+  // the d-pad move the cursor, A clicks, B is Escape, Start is Enter (a movie's skip)
+  void menu_pad_button(const SDL_GamepadButtonEvent& b);
+  void menu_pad_cursor();
 
   // The keys held now, by DIK code (kept from the events, for tools).
   bool key_down(uint8_t dik) const { return held_[dik]; }
@@ -190,6 +194,7 @@ class SdlInput : public platform::Input {
   uint32_t sequence_ = 0;
   bool held_[256] = {};
   float dx_ = 0, dy_ = 0, dz_ = 0;
+  uint64_t pad_ns_ = 0;  // menu_pad_cursor's last step
   float raw_dx_ = 0, raw_dy_ = 0;
   uint8_t buttons_[4] = {};
   uint8_t latched_[4] = {};  // a press not yet read (FIX (A): a click inside one frame)
