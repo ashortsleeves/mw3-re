@@ -8,7 +8,7 @@ Each one holds MechWarrior 3, Pirate's Moon, MW1: Critical Hit and the launcher.
 
 ## Before you install
 
-- **You need your own games.** No game files are included: the launcher sets each game up from your install, disc or disc image. MW1: Critical Hit also needs your MechWarrior (1989) folder.
+- **You need your own games.** No game files are included: the launcher sets each game up from your install, disc or disc image. MW1: Critical Hit also needs your MechWarrior (1989): its folder or the .zip it came in.
 - **Upgrading from 1.1.2, 1.1.1, 1.1.0 or 1.0.x:** install over it. Your pilots, saves, settings and mods are kept.
 - **Mac:** the first time, macOS stops the app because it isn't signed. Open System Settings > Privacy & Security and click Open Anyway.
 - **Linux:** make the AppImage executable, then run it.
