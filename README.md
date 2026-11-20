@@ -28,7 +28,7 @@ Nothing yet.
 **1.1.3 (2026-11-20)** (the full notes are in
 [docs/release-notes-1.1.3.md](docs/release-notes-1.1.3.md)):
 
-- **Three games on one launcher**: MW1: Critical Hit 1.0.0, a fan remake of
+- **Three games on one launcher**: MW1: Critical Hit 1.0.1, a fan remake of
   MechWarrior (1989) on the rebuild's engine, joins the combined package. The
   launcher finds your MechWarrior (1989), or takes its folder or the .zip it
   came in.
