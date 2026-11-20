@@ -63,6 +63,7 @@ const std::vector<const char*>& small_fixes_list() {
       "TAG's strike lands where the target is, not was.",
       "A held beam stays on a moving mech after release.",
       "A destroyed weapon's selection moves to a working one.",
+      "A weapon's loop sound stops when firing stops.",
       "A mech re-placed where it stands keeps to its ground.",
       "A mission's last animation can be waited for.",
       "An animation whose object is missing waits its turn.",
