@@ -720,26 +720,43 @@ void SdlInput::focus_lost() {
 
 // Ours (docs/android.md, sdl_input.h): the gamepad's buttons as the events a mouse and keyboard
 // would send, so they go the one way the touch, the mouse and the keys go.
-void SdlInput::menu_pad_button(const SDL_GamepadButtonEvent& b) {
-  if (b.down) std::printf("mw3: pad: button %d in %s%s\n", b.button, mission_ ? "a mission" : "the menus",
-                          !pad_ || b.which != id_ ? " (not the game's gamepad)" : "");
-  if (mission_ || !pad_ || b.which != id_) return;
+// SDL is started with joysticks only (mw3_main.cpp), so no gamepad events come: a joystick button
+// is the gamepad button its map binds it to (SDL_GetGamepadBindings).
+void SdlInput::menu_pad_joy_button(const SDL_JoyButtonEvent& j) {
+  if (!pad_ || j.which != id_) return;
+  int n = 0;
+  SDL_GamepadBinding** binds = SDL_GetGamepadBindings(pad_, &n);
+  if (!binds) return;
+  for (int i = 0; i < n; ++i) {
+    const SDL_GamepadBinding* g = binds[i];
+    if (g->input_type == SDL_GAMEPAD_BINDTYPE_BUTTON && g->input.button == j.button &&
+        g->output_type == SDL_GAMEPAD_BINDTYPE_BUTTON) {
+      menu_pad_button(g->output.button, j.down);
+      break;
+    }
+  }
+  SDL_free(binds);
+}
+
+void SdlInput::menu_pad_button(SDL_GamepadButton button, bool down) {
+  if (down) std::printf("mw3: pad: %s in %s\n", SDL_GetGamepadStringForButton(button), mission_ ? "a mission" : "the menus");
+  if (mission_) return;
   SDL_Event e{};
   const Uint32 win = window ? SDL_GetWindowID(window) : 0;
   auto key = [&](SDL_Scancode sc) {
-    e.type = b.down ? SDL_EVENT_KEY_DOWN : SDL_EVENT_KEY_UP;
+    e.type = down ? SDL_EVENT_KEY_DOWN : SDL_EVENT_KEY_UP;
     e.key.timestamp = SDL_GetTicksNS(), e.key.windowID = win;
     e.key.scancode = sc, e.key.key = SDL_GetKeyFromScancode(sc, SDL_KMOD_NONE, false);
-    e.key.mod = SDL_KMOD_NONE, e.key.down = b.down, e.key.repeat = false;
+    e.key.mod = SDL_KMOD_NONE, e.key.down = down, e.key.repeat = false;
     SDL_PushEvent(&e);
   };
-  switch (b.button) {
+  switch (button) {
     case SDL_GAMEPAD_BUTTON_START: key(SDL_SCANCODE_RETURN); break;
     case SDL_GAMEPAD_BUTTON_EAST: key(SDL_SCANCODE_ESCAPE); break;
     case SDL_GAMEPAD_BUTTON_SOUTH:
-      e.type = b.down ? SDL_EVENT_MOUSE_BUTTON_DOWN : SDL_EVENT_MOUSE_BUTTON_UP;
+      e.type = down ? SDL_EVENT_MOUSE_BUTTON_DOWN : SDL_EVENT_MOUSE_BUTTON_UP;
       e.button.timestamp = SDL_GetTicksNS(), e.button.windowID = win;
-      e.button.button = SDL_BUTTON_LEFT, e.button.down = b.down, e.button.clicks = 1;
+      e.button.button = SDL_BUTTON_LEFT, e.button.down = down, e.button.clicks = 1;
       e.button.x = mouse_x, e.button.y = mouse_y;
       SDL_PushEvent(&e);
       break;
@@ -778,9 +795,9 @@ void SdlInput::menu_pad_cursor() {
 void SdlInput::on_event(const SDL_Event& e) {
   switch (e.type) {
 #ifdef __ANDROID__
-    case SDL_EVENT_GAMEPAD_BUTTON_DOWN:
-    case SDL_EVENT_GAMEPAD_BUTTON_UP:
-      menu_pad_button(e.gbutton);
+    case SDL_EVENT_JOYSTICK_BUTTON_DOWN:
+    case SDL_EVENT_JOYSTICK_BUTTON_UP:
+      menu_pad_joy_button(e.jbutton);
       break;
 #endif
     case SDL_EVENT_JOYSTICK_REMOVED:  // ours (W54): centred until it is back

@@ -135,7 +135,8 @@ class SdlInput : public platform::Input {
   void on_event(const SDL_Event& e);
   // Ours (docs/android.md): outside a mission the gamepad works the menus: the left stick and
   // the d-pad move the cursor, A clicks, B is Escape, Start is Enter (a movie's skip)
-  void menu_pad_button(const SDL_GamepadButtonEvent& b);
+  void menu_pad_button(SDL_GamepadButton button, bool down);
+  void menu_pad_joy_button(const SDL_JoyButtonEvent& j);  // a raw button through the pad's map
   void menu_pad_cursor();
 
   // The keys held now, by DIK code (kept from the events, for tools).

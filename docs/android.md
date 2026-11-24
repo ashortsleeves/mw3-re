@@ -71,7 +71,7 @@ adb pull /storage/emulated/0/Android/data/com.mw3re.game/files/mw3.log
 | sdl_restart.cpp | `sysconf(_SC_OPEN_MAX)` in place of `getdtablesize()` (on the desktop too, the same value) | bionic has no `getdtablesize` |
 | sdl_platform.cpp, vulkan_check.cpp | the GPU device made, and the check asked, without clip distances (`SDL_PROP_GPU_DEVICE_CREATE_FEATURE_CLIP_DISTANCE_BOOLEAN` false); the check logs SDL's reason for a refusal | the Retroid Pocket 4 Pro's Mali-G77 has no `shaderClipDistance` (the other three opt-outs it has), and SDL_GPU asks for it by default; the shaders write none |
 | sdl_input.cpp | outside a mission the mouse is not held: zInput's mouse goes where the finger is, as the menus in a window | a tap has a place and no motion, which a held (relative) mouse never sees |
-| sdl_input.cpp | outside a mission the gamepad works the menus: the left stick and the d-pad move the cursor, A clicks, B is Escape, Start is Enter (a movie's skip); each as the event a mouse or key would send | a handheld has no mouse or keyboard; a movie skips only on Space, Escape or Enter |
+| sdl_input.cpp | outside a mission the gamepad works the menus: the left stick and the d-pad move the cursor, A clicks, B is Escape, Start is Enter (a movie's skip); each as the event a mouse or key would send. The buttons come as joystick events through the pad's map (SDL_GetGamepadBindings): SDL is started with joysticks only, so no gamepad events come | a handheld has no mouse or keyboard; a movie skips only on Space, Escape or Enter |
 
 ## Open questions (to settle on a device)
 
