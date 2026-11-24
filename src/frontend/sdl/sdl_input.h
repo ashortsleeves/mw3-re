@@ -139,7 +139,7 @@ class SdlInput : public platform::Input {
   void menu_pad_button(SDL_GamepadButton button, bool down);
   void menu_pad_joy_button(const SDL_JoyButtonEvent& j);  // a raw button through the pad's map
   void menu_pad_cursor();
-  // Ours (docs/android.md): in a mission RT, LT, RB and LB fire weapon groups 1..4, R3 centres the legs
+  // Ours (docs/android.md): in a mission RT fires, LT zooms, RB the next group, LB the fire mode, R3 the legs
   void mission_pad();
   void push_key(SDL_Scancode sc, bool down);  // a key event as the keyboard would send it
 
@@ -200,7 +200,7 @@ class SdlInput : public platform::Input {
   bool held_[256] = {};
   float dx_ = 0, dy_ = 0, dz_ = 0;
   uint64_t pad_ns_ = 0;  // menu_pad_cursor's last step
-  bool group_held_[4] = {}, fire_held_ = false, legs_held_ = false;  // mission_pad's keys down
+  bool pad_held_[5] = {};  // mission_pad's keys down: RT, RB, LT, LB, R3
   float raw_dx_ = 0, raw_dy_ = 0;
   uint8_t buttons_[4] = {};
   uint8_t latched_[4] = {};  // a press not yet read (FIX (A): a click inside one frame)

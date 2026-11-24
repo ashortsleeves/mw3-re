@@ -779,32 +779,27 @@ void SdlInput::push_key(SDL_Scancode sc, bool down) {
   SDL_PushEvent(&e);
 }
 
-// Each read of the stick in a mission: RT, LT, RB and LB each fire a weapon group (1, 2, 3, 4): at
-// the press the group's key (F1..F4, WEPGRP_1..4), then the fire key (Space, TRIGGER1) held while
-// any of them is; R3 is the legs' centring (/, CENTER_LEGS). Keys, so the group is taken before the
-// shot, in the order sent; the game's own bindings stay as they are. Out of a mission, let go.
+// Each read of the stick in a mission, the triggers and shoulders as the keys of the game's own
+// bindings: RT fire (Space, TRIGGER1, held), LT zoom (Z, RETICULE_ZOOM, held), RB the next weapon
+// group (], WEPGRP_NEXT), LB the fire mode (backslash, FIREMODE); R3 the legs' centring (/, CENTER_LEGS).
+// Out of a mission, each held key let go.
 void SdlInput::mission_pad() {
-  bool now[4] = {}, r3 = false;
+  bool now[5] = {};
   if (mission_ && pad_) {
     auto trigger = [this](SDL_GamepadAxis a, bool was) {
       const float v = SDL_GetGamepadAxis(pad_, a) / 32767.0f;
       return was ? v > 0.3f : v > 0.5f;
     };
-    now[0] = trigger(SDL_GAMEPAD_AXIS_RIGHT_TRIGGER, group_held_[0]);
-    now[1] = trigger(SDL_GAMEPAD_AXIS_LEFT_TRIGGER, group_held_[1]);
-    now[2] = SDL_GetGamepadButton(pad_, SDL_GAMEPAD_BUTTON_RIGHT_SHOULDER);
+    now[0] = trigger(SDL_GAMEPAD_AXIS_RIGHT_TRIGGER, pad_held_[0]);
+    now[1] = SDL_GetGamepadButton(pad_, SDL_GAMEPAD_BUTTON_RIGHT_SHOULDER);
+    now[2] = trigger(SDL_GAMEPAD_AXIS_LEFT_TRIGGER, pad_held_[2]);
     now[3] = SDL_GetGamepadButton(pad_, SDL_GAMEPAD_BUTTON_LEFT_SHOULDER);
-    r3 = SDL_GetGamepadButton(pad_, SDL_GAMEPAD_BUTTON_RIGHT_STICK);
+    now[4] = SDL_GetGamepadButton(pad_, SDL_GAMEPAD_BUTTON_RIGHT_STICK);
   }
-  static constexpr SDL_Scancode kGroup[4] = {SDL_SCANCODE_F1, SDL_SCANCODE_F2, SDL_SCANCODE_F3, SDL_SCANCODE_F4};
-  bool any = false;
-  for (int i = 0; i < 4; ++i) {
-    if (now[i] && !group_held_[i]) push_key(kGroup[i], true), push_key(kGroup[i], false);
-    group_held_[i] = now[i];
-    any = any || now[i];
-  }
-  if (any != fire_held_) push_key(SDL_SCANCODE_SPACE, any), fire_held_ = any;
-  if (r3 != legs_held_) push_key(SDL_SCANCODE_SLASH, r3), legs_held_ = r3;
+  static constexpr SDL_Scancode kKeys[5] = {SDL_SCANCODE_SPACE, SDL_SCANCODE_RIGHTBRACKET, SDL_SCANCODE_Z,
+                                            SDL_SCANCODE_BACKSLASH, SDL_SCANCODE_SLASH};
+  for (int i = 0; i < 5; ++i)
+    if (now[i] != pad_held_[i]) push_key(kKeys[i], now[i]), pad_held_[i] = now[i];
 }
 
 // Each read of the mouse: the stick (a dead zone, then squared for fine aim) and the d-pad move the
