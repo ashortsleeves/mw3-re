@@ -47,3 +47,8 @@ docs/for-owen.md
 /android/gradlew.bat
 /android/gradle/
 *.apk
+
+# Android Studio / IntelliJ, and local session notes
+.idea/
+*.iml
+/HANDOFF-android.md
