@@ -14,8 +14,24 @@
 
 namespace mech3 {
 
+#ifdef __ANDROID__
 namespace {
-AxisTable g_axes;
+const AxisBinding kPadAxes[4] = {{2, -1.0f, 0.0f, 0.05f}, {4, -1.0f, 0.0f, 0.0f}, {5, -1.0f, 0.0f, 0.0f},
+                                 {1, -1.0f, 0.0f, 0.0f}};  // throttle, twist, pitch, turn
+}  // namespace
+void pad_axes(AxisTable& t) {
+  for (int i = 0; i < 4; ++i) t.axes[i] = kPadAxes[i];
+}
+#else
+void pad_axes(AxisTable&) {}
+#endif
+
+namespace {
+AxisTable g_axes = [] {
+  AxisTable t;
+  pad_axes(t);
+  return t;
+}();
 ControlsSetup g_setup;
 ControlsSetupCalls g_calls;
 
@@ -177,6 +193,10 @@ const char* const kAxisNames[4] = {"Throttle", "Twist", "Pitch", "LR"};  // 0x00
 
 // The joystick's defaults, which 0x004120a0 recognises in a file.
 bool stock_axis(int i, int32_t src, float slope, float intercept, float deadzone) {
+#ifdef __ANDROID__
+  const AxisBinding& k = kPadAxes[i];  // ours (docs/android.md): the pad's defaults
+  return src == k.source && slope == k.scale && intercept == k.offset && (i != 0 || deadzone == k.deadzone);
+#endif
   switch (i) {
     case 0: return src == 3 && slope == -0.5f && intercept == 0.5f && deadzone == 0.05f;
     case 1: return src == 6 && slope == -1.0f && intercept == 0.0f;

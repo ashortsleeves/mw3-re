@@ -31,6 +31,11 @@ struct AxisTable {
   void set(int i, int32_t source, float scale, float offset, float deadzone);  // 0x0040db30, not ready
 };
 AxisTable& axis_table();
+// Ours (docs/android.md): on Android the stick's defaults are a handheld's pad's: the left stick
+// walks (Y the throttle, ahead and back, centred stopped) and turns (X), the right one twists (Rx)
+// and pitches (Ry, up aims up). Written over the table where the game puts the stick's defaults
+// (0x00410950, 0x00426650, 0x0040d070, the controls screen's resets); elsewhere it does nothing.
+void pad_axes(AxisTable& t);
 
 // A command's entry at 0x00604128 (0x14 bytes, 0xa7 of them).
 struct CommandEntry {

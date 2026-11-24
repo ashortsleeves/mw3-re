@@ -198,6 +198,7 @@ void ControlsButton::on_left_up() {
           t.axes[2].deadzone = 0.0f;
           t.ready = 0;
           t.set(3, 1, -1.0f, 0.0f, 0.0f);
+          pad_axes(t);  // ours (docs/android.md)
         } else {
           t.set3(2, 10, 1.0f, 0.0f);
           t.axes[2].deadzone = 0.0f;
@@ -232,6 +233,7 @@ void ControlsButton::on_left_up() {
       t.axes[1] = {6, -1.0f, 0.0f, 0.0f};
       t.axes[2] = {2, 1.0f, 0.0f, 0.0f};
       t.axes[3] = {1, -1.0f, 0.0f, 0.0f};
+      pad_axes(t);  // ours (docs/android.md)
       t.ready = 1;
       s->load_save(e_.message(0xfc0), true);
       e_.set_use_joystick(1);

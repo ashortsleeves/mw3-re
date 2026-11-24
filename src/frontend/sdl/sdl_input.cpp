@@ -541,6 +541,7 @@ int32_t SdlInput::mouse_state(platform::MouseState* out) {
   refresh();
 #ifdef __ANDROID__
   menu_pad_cursor();
+  mission_pad();
 #endif
   if (!opened_[kMouse] || !acquired_[kMouse]) return lost_[kMouse] ? kInputLost : kNotAcquired;
   if (muted()) {  // let go in a mission: no motion, no buttons
@@ -584,6 +585,9 @@ int32_t SdlInput::joystick_state(platform::JoyState* out) {
     return acquired_[kJoystick] ? 0 : kNotAcquired;
   }
   SDL_UpdateJoysticks();  // Poll (IDirectInputDevice2 +0x64)
+#ifdef __ANDROID__
+  mission_pad();
+#endif
   *out = platform::JoyState{};
   int32_t* axes[8] = {&out->x, &out->y, &out->z, &out->rx, &out->ry, &out->rz, &out->slider[0], &out->slider[1]};
   for (int i = 0; i < 8; ++i) {
@@ -608,6 +612,11 @@ int32_t SdlInput::joystick_state(platform::JoyState* out) {
         SDL_GAMEPAD_BUTTON_LEFT_SHOULDER, SDL_GAMEPAD_BUTTON_RIGHT_SHOULDER, SDL_GAMEPAD_BUTTON_BACK,
         SDL_GAMEPAD_BUTTON_START, SDL_GAMEPAD_BUTTON_LEFT_STICK, SDL_GAMEPAD_BUTTON_RIGHT_STICK};
     for (int i = 0; i < 10; ++i) out->buttons[i] = SDL_GetGamepadButton(pad_, kButtons[i]) ? 0x80 : 0;
+#ifdef __ANDROID__
+    // ours (docs/android.md): Start is the pause (menu_pad_button), LB, RB and R3 mission_pad's,
+    // not the game's buttons 8, 5, 6 and 10 (CENTER_LEGS, FIREMODE, ALPHASTRIKE, THROTTLE_REV)
+    out->buttons[7] = out->buttons[4] = out->buttons[5] = out->buttons[9] = 0;
+#endif
     const int hat = (SDL_GetGamepadButton(pad_, SDL_GAMEPAD_BUTTON_DPAD_UP) ? 1 : 0) |
                     (SDL_GetGamepadButton(pad_, SDL_GAMEPAD_BUTTON_DPAD_RIGHT) ? 2 : 0) |
                     (SDL_GetGamepadButton(pad_, SDL_GAMEPAD_BUTTON_DPAD_DOWN) ? 4 : 0) |
@@ -739,19 +748,16 @@ void SdlInput::menu_pad_joy_button(const SDL_JoyButtonEvent& j) {
 }
 
 void SdlInput::menu_pad_button(SDL_GamepadButton button, bool down) {
-  if (down) std::printf("mw3: pad: %s in %s\n", SDL_GetGamepadStringForButton(button), mission_ ? "a mission" : "the menus");
-  if (mission_) return;
+  const bool pause = in_pause && in_pause();
+  if (down) std::printf("mw3: pad: %s in %s\n", SDL_GetGamepadStringForButton(button),
+                        mission_ ? "a mission" : pause ? "the pause" : "the menus");
+  if (mission_ && button != SDL_GAMEPAD_BUTTON_START) return;  // the mission reads the pad itself
   SDL_Event e{};
   const Uint32 win = window ? SDL_GetWindowID(window) : 0;
-  auto key = [&](SDL_Scancode sc) {
-    e.type = down ? SDL_EVENT_KEY_DOWN : SDL_EVENT_KEY_UP;
-    e.key.timestamp = SDL_GetTicksNS(), e.key.windowID = win;
-    e.key.scancode = sc, e.key.key = SDL_GetKeyFromScancode(sc, SDL_KMOD_NONE, false);
-    e.key.mod = SDL_KMOD_NONE, e.key.down = down, e.key.repeat = false;
-    SDL_PushEvent(&e);
-  };
+  auto key = [&](SDL_Scancode sc) { push_key(sc, down); };
   switch (button) {
-    case SDL_GAMEPAD_BUTTON_START: key(SDL_SCANCODE_RETURN); break;
+    // Start: in a mission and in its pause Escape (the pause, and back), elsewhere Enter (a movie's skip)
+    case SDL_GAMEPAD_BUTTON_START: key(mission_ || pause ? SDL_SCANCODE_ESCAPE : SDL_SCANCODE_RETURN); break;
     case SDL_GAMEPAD_BUTTON_EAST: key(SDL_SCANCODE_ESCAPE); break;
     case SDL_GAMEPAD_BUTTON_SOUTH:
       e.type = down ? SDL_EVENT_MOUSE_BUTTON_DOWN : SDL_EVENT_MOUSE_BUTTON_UP;
@@ -762,6 +768,43 @@ void SdlInput::menu_pad_button(SDL_GamepadButton button, bool down) {
       break;
     default: break;
   }
+}
+
+void SdlInput::push_key(SDL_Scancode sc, bool down) {
+  SDL_Event e{};
+  e.type = down ? SDL_EVENT_KEY_DOWN : SDL_EVENT_KEY_UP;
+  e.key.timestamp = SDL_GetTicksNS(), e.key.windowID = window ? SDL_GetWindowID(window) : 0;
+  e.key.scancode = sc, e.key.key = SDL_GetKeyFromScancode(sc, SDL_KMOD_NONE, false);
+  e.key.mod = SDL_KMOD_NONE, e.key.down = down, e.key.repeat = false;
+  SDL_PushEvent(&e);
+}
+
+// Each read of the stick in a mission: RT, LT, RB and LB each fire a weapon group (1, 2, 3, 4): at
+// the press the group's key (F1..F4, WEPGRP_1..4), then the fire key (Space, TRIGGER1) held while
+// any of them is; R3 is the legs' centring (/, CENTER_LEGS). Keys, so the group is taken before the
+// shot, in the order sent; the game's own bindings stay as they are. Out of a mission, let go.
+void SdlInput::mission_pad() {
+  bool now[4] = {}, r3 = false;
+  if (mission_ && pad_) {
+    auto trigger = [this](SDL_GamepadAxis a, bool was) {
+      const float v = SDL_GetGamepadAxis(pad_, a) / 32767.0f;
+      return was ? v > 0.3f : v > 0.5f;
+    };
+    now[0] = trigger(SDL_GAMEPAD_AXIS_RIGHT_TRIGGER, group_held_[0]);
+    now[1] = trigger(SDL_GAMEPAD_AXIS_LEFT_TRIGGER, group_held_[1]);
+    now[2] = SDL_GetGamepadButton(pad_, SDL_GAMEPAD_BUTTON_RIGHT_SHOULDER);
+    now[3] = SDL_GetGamepadButton(pad_, SDL_GAMEPAD_BUTTON_LEFT_SHOULDER);
+    r3 = SDL_GetGamepadButton(pad_, SDL_GAMEPAD_BUTTON_RIGHT_STICK);
+  }
+  static constexpr SDL_Scancode kGroup[4] = {SDL_SCANCODE_F1, SDL_SCANCODE_F2, SDL_SCANCODE_F3, SDL_SCANCODE_F4};
+  bool any = false;
+  for (int i = 0; i < 4; ++i) {
+    if (now[i] && !group_held_[i]) push_key(kGroup[i], true), push_key(kGroup[i], false);
+    group_held_[i] = now[i];
+    any = any || now[i];
+  }
+  if (any != fire_held_) push_key(SDL_SCANCODE_SPACE, any), fire_held_ = any;
+  if (r3 != legs_held_) push_key(SDL_SCANCODE_SLASH, r3), legs_held_ = r3;
 }
 
 // Each read of the mouse: the stick (a dead zone, then squared for fine aim) and the d-pad move the

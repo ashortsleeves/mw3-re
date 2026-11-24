@@ -97,6 +97,9 @@
 #include "mech3/weapon.h"
 
 namespace mech3 {
+#ifdef __ANDROID__
+int32_t use_joystick();  // options.h (0x0040d1b0); its Handle is not this file's
+#endif
 
 int32_t invincible();  // 0x0040cf20, mech3/options.h
 
@@ -359,7 +362,13 @@ class WiredLaunch : public LaunchHooks {
   Config* config_of(uint32_t handle) override { return static_cast<Config*>(g_w.object_of(g_w.engine, handle)); }
   Handle game_slot(Handle game) override { return h(g_w.vcall(g_w.engine, low(game), 0x34, {0})); }
   int32_t game_type(Handle game) override { return static_cast<int32_t>(g_w.vcall(g_w.engine, low(game), 0x2c, {})); }
+#ifdef __ANDROID__
+  // ours (docs/android.md): the UseJoystick option (0x0040d1b0), as the exe: mode 6 puts the axes on
+  // the stick. Kept 0 on the desktop (keyboard and mouse), where it has always been.
+  int32_t use_joystick() override { return mech3::use_joystick(); }
+#else
   int32_t use_joystick() override { return 0; }   // keyboard and mouse
+#endif
   int32_t camera_mode() override { return program_camera_option(); }  // 0x0040ce70
   void set_camera_mode(int32_t m) override { program_camera_set(m); }  // 0x0040ce10
   void mech_attach_view(Mech& m) override { program_view_attach(m); }   // vt+0x108, 0x0041ce30

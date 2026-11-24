@@ -1282,6 +1282,7 @@ int run(const Args& a, platform::VideoForWindows* vfw) {
     // mission's can be let go (sdl_input.h); fullscreen and hidden runs hold it.
     input.windowed = [&window, hidden = a.hidden] { return !hidden && !window.fullscreen(); };
     input.in_mission = [&app] { return app.current() == &mech3::states().core; };
+    input.in_pause = [&app] { return app.current() == &mech3::states().pause; };
     input.pointer_free = [] { return mech3::editor_state().active != 0; };
     // FIX (A), playtest W4 (sdl_focus.h): a shown window's real focus; the mouse is held only when it is ours.
     // MW3_FOCUS_AT=N (checks, a hidden run): the window without the focus until the pump's Nth pass.
@@ -2116,6 +2117,7 @@ int run(const Args& a, platform::VideoForWindows* vfw) {
     ztwod::set_host(nullptr);
     mech3::set_app(nullptr);
     input.in_mission = nullptr;  // the app is gone
+    input.in_pause = nullptr;
   }
   zin::set_host(nullptr);
   return result;

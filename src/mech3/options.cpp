@@ -187,6 +187,7 @@ void set_use_joystick(int32_t on) {
       t.ready = 0;
       t.set(2, 2, 1.0f, 0.0f, 0.0f);
       t.set(3, 1, -1.0f, 0.0f, 0.0f);
+      pad_axes(t);  // ours (docs/android.md)
       t.ready = 1;
     }
   } else {

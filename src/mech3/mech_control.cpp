@@ -226,6 +226,7 @@ void MechControls::set_mode(uint32_t mode) {
       t.axes[2].deadzone = 0.0f;
       t.ready = 0;
       t.set(3, 1, -1.0f, 0.0f, 0.0f);
+      pad_axes(t);  // ours (docs/android.md)
       t.ready = 1;
     } else if (mode & 1) {
       t.axes[2] = {10, 1.0f, 0.0f, 0.0f};
