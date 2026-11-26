@@ -1,3 +1,6 @@
+# Android port
+This runs on android, hasn't been thoroughly tested, and I'm messing with the controls to get them to suit my preference. Feel free to fork this and make it better.
+
 # MechWarrior 3 Rebuild
 
 An unofficial fan rebuild of **MechWarrior 3** (Zipper Interactive and
